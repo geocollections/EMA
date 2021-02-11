@@ -1,5 +1,5 @@
 <template>
-  <v-row v-if="drillcoreBox">
+  <v-row>
     <v-col>
       <h1 class="text-center py-3 page-title">
         {{ $t('drillcoreBox.nr', { number: drillcoreBox.number }) }}
@@ -42,12 +42,12 @@
                   'elevation-8': hover,
                   'elevation-4': !hover,
                 }"
-                :lazy-src="`https://files.geocollections.info/small/${activeBox.drillcorebox_image__attachment__uuid_filename}`"
-                :src="`https://files.geocollections.info/large/${activeBox.drillcorebox_image__attachment__uuid_filename}`"
+                :lazy-src="`https://files.geocollections.info/small/${activeBox.attachment__uuid_filename}`"
+                :src="`https://files.geocollections.info/large/${activeBox.attachment__uuid_filename}`"
                 max-width="2000"
                 @click="
                   openImage(
-                    activeBox.drillcorebox_image__attachment__uuid_filename
+                    activeBox.attachment__uuid_filename
                   )
                 "
               >
@@ -71,7 +71,7 @@
             class="d-flex justify-center flex-column justify-md-space-between flex-md-row mx-8"
           >
             <div class="text-center text-md-left">
-              <div>
+              <div v-if="activeBox.attachment__author__agent">
                 <span class="font-weight-bold"
                   >{{ $t('drillcoreBox.author') }}:
                 </span>
@@ -101,7 +101,7 @@
                   class="text-link underline"
                   :href="`https://files.geocollections.info/${
                     item === 'original' ? '' : `${item}/`
-                  }${activeBox.drillcorebox_image__attachment__uuid_filename}`"
+                  }${activeBox.attachment__uuid_filename}`"
                   target="ImageWindow"
                 >
                   {{ $t(`common.${item}`) }}
@@ -125,8 +125,8 @@
             >
               <v-hover v-slot="{ hover }">
                 <v-img
-                  :src="`https://files.geocollections.info/small/${item.drillcorebox_image__attachment__uuid_filename}`"
-                  :lazy-src="`https://files.geocollections.info/small/${item.drillcorebox_image__attachment__uuid_filename}`"
+                  :src="`https://files.geocollections.info/small/${item.attachment__uuid_filename}`"
+                  :lazy-src="`https://files.geocollections.info/small/${item.attachment__uuid_filename}`"
                   max-width="200"
                   :class="{
                     'elevation-4': hover,
@@ -329,39 +329,39 @@ export default {
         `https://api.geocollections.info/drillcore_box/${params.id}`
       )
 
-      const drillcoreBox = drillcoreBoxResponse?.results?.[0]
-      const drillcoreBoxes = drillcoreBoxResponse?.results
+      const results = drillcoreBoxResponse.results
+      const drillcoreBox = results[0]
       return {
         drillcoreBox,
-        drillcoreBoxes,
-        activeBox: drillcoreBoxes?.[0],
+        drillcoreBoxes: results,
+        activeBox: drillcoreBox,
         initActiveTab: route.path,
         tabs: [
           {
             routeName: 'drillcore_box-id',
             title: 'drillcore.samples',
             props: {
-              locality: drillcoreBox?.drillcore__locality,
-              depthStart: drillcoreBox?.depth_start,
-              depthEnd: drillcoreBox?.depth_end,
+              locality: drillcoreBox.drillcore__locality,
+              depthStart: drillcoreBox.depth_start,
+              depthEnd: drillcoreBox.depth_end,
             },
           },
           {
             routeName: 'drillcore_box-id-analyses',
             title: 'drillcore.analyses',
             props: {
-              locality: drillcoreBox?.drillcore__locality,
-              depthStart: drillcoreBox?.depth_start,
-              depthEnd: drillcoreBox?.depth_end,
+              locality: drillcoreBox.drillcore__locality,
+              depthStart: drillcoreBox.depth_start,
+              depthEnd: drillcoreBox.depth_end,
             },
           },
           {
             routeName: 'drillcore_box-id-specimens',
             title: 'drillcore.specimens',
             props: {
-              locality: drillcoreBox?.drillcore__locality,
-              depthStart: drillcoreBox?.depth_start,
-              depthEnd: drillcoreBox?.depth_end,
+              locality: drillcoreBox.drillcore__locality,
+              depthStart: drillcoreBox.depth_start,
+              depthEnd: drillcoreBox.depth_end,
             },
           },
         ],
@@ -381,10 +381,10 @@ export default {
   head() {
     return {
       title: `${this.$t('drillcoreBox.nr', {
-        number: this.drillcoreBox?.number,
+        number: this.drillcoreBox.number,
       })} - ${this.$translate({
-        et: this.drillcoreBox?.drillcore__drillcore,
-        en: this.drillcoreBox?.drillcore__drillcore_en,
+        et: this.drillcoreBox.drillcore__drillcore,
+        en: this.drillcoreBox.drillcore__drillcore_en,
       })}`,
     }
   },
