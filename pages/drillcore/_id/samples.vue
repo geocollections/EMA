@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { isEmpty, round } from 'lodash'
+import { round, isNil } from 'lodash'
 import global from '@/mixins/global'
 import TableWrapper from '~/components/TableWrapper.vue'
 
@@ -75,18 +75,18 @@ export default {
         { text: this.$t('samples.number'), value: 'number' },
         { text: this.$t('samples.depth'), value: 'depth' },
         { text: this.$t('samples.depthInterval'), value: 'depth_interval' },
-        {
-          text: this.$t('samples.thickness'),
-          value: 'thickness',
-          sortable: false,
-          class: 'static-cell-header',
-          cellClass: 'static-cell',
-        },
+        // {
+        //   text: this.$t('samples.thickness'),
+        //   value: 'thickness',
+        //   sortable: false,
+        //   class: 'static-cell-header',
+        //   cellClass: 'static-cell',
+        // },
         { text: this.$t('samples.stratigraphy'), value: 'stratigraphy' },
         { text: this.$t('samples.collector'), value: 'collector' },
         { text: this.$t('samples.dateCollected'), value: 'date_collected' },
       ],
-      sortValues: {
+      queryFields: {
         id: () => 'id',
         number: () => 'number',
         depth: () => 'depth',
@@ -101,32 +101,18 @@ export default {
   methods: {
     round,
     async handleUpdate(options) {
-      const start = (options.page - 1) * options.itemsPerPage
-
-      let params
-      if (isEmpty(options.sortBy)) {
-        params = {
-          q: isEmpty(options.search) ? '*' : `${options.search}`,
-          fq: `locality_id:${this.locality}`,
-          rows: options.itemsPerPage,
-          start,
+      const sampleResponse = await this.$services.sarvSolr.getResourceList(
+        'sample',
+        {
+          ...options,
+          isValid: isNil(this.locality),
+          defaultParams: {
+            fq: `locality_id:${this.locality}`,
+          },
+          queryFields: this.queryFields,
         }
-      } else {
-        const orderBy = options.sortBy.map((field, i) => {
-          if (options.sortDesc[i]) return `${this.sortValues[field]()} desc`
-          return `${this.sortValues[field]()} asc`
-        })
-
-        params = {
-          q: isEmpty(options.search) ? '*' : `${options.search}`,
-          fq: `locality_id:${this.locality}`,
-          rows: options.itemsPerPage,
-          start,
-          sort: orderBy.join(','),
-        }
-      }
-      const sampleResponse = await this.$axios.$get('solr/sample', { params })
-      this.samples = sampleResponse.results
+      )
+      this.samples = sampleResponse.items
       this.count = sampleResponse.count
     },
   },

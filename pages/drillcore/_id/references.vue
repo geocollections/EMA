@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { isEmpty } from 'lodash'
+import { isNil } from 'lodash'
 import global from '@/mixins/global'
 import TableWrapper from '~/components/TableWrapper.vue'
 
@@ -49,7 +49,7 @@ export default {
         { text: this.$t('localityReference.pages'), value: 'pages' },
         { text: this.$t('localityReference.remarks'), value: 'remarks' },
       ],
-      sortValues: {
+      queryFields: {
         reference: () => 'reference__reference',
         reference__title: () => 'reference__title',
         pages: () => 'pages',
@@ -59,38 +59,18 @@ export default {
   },
   methods: {
     async handleUpdate(options) {
-      let params, multiSearch
-      if (!isEmpty(options.search))
-        multiSearch = `value:${options.search};fields:${Object.values(
-          this.sortValues
-        )
-          .map((field) => field())
-          .join()};lookuptype:icontains`
-      if (isEmpty(options.sortBy)) {
-        params = {
-          multi_search: multiSearch,
-          locality: this.locality,
-          paginate_by: options.itemsPerPage,
-          page: options.page,
+      const referenceResponse = await this.$services.sarvREST.getResourceList(
+        'locality_reference',
+        {
+          ...options,
+          isValid: isNil(this.locality),
+          defaultParams: {
+            locality: this.locality,
+          },
+          queryFields: this.queryFields,
         }
-      } else {
-        const orderBy = options.sortBy.map((field, i) => {
-          if (options.sortDesc[i]) return `-${this.sortValues[field]()}`
-          return this.sortValues[field]()
-        })
-
-        params = {
-          multi_search: multiSearch,
-          locality: this.locality,
-          paginate_by: options.itemsPerPage,
-          page: options.page,
-          order_by: orderBy.join(','),
-        }
-      }
-      const referenceResponse = await this.$axios.$get('locality_reference', {
-        params,
-      })
-      this.references = referenceResponse.results
+      )
+      this.references = referenceResponse.items
       this.count = referenceResponse.count
     },
   },

@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { isEmpty, round } from 'lodash'
+import { round, isNil } from 'lodash'
 import global from '@/mixins/global'
 import TableWrapper from '~/components/TableWrapper.vue'
 
@@ -79,19 +79,19 @@ export default {
         { text: this.$t('specimen.number'), value: 'specimen_number' },
         { text: this.$t('specimen.depth'), value: 'depth' },
         { text: this.$t('specimen.depthInterval'), value: 'depth_interval' },
-        {
-          text: this.$t('specimen.thickness'),
-          value: 'thickness',
-          sortable: false,
-          class: 'static-cell-header',
-          cellClass: 'static-cell',
-        },
-        { text: this.$t('specimen.fossilGroup'), value: 'fossilgroup' },
-        { text: this.$t('specimen.kind'), value: 'kind' },
         { text: this.$t('specimen.stratigraphy'), value: 'stratigraphy' },
+        // {
+        //   text: this.$t('specimen.thickness'),
+        //   value: 'thickness',
+        //   sortable: false,
+        //   class: 'static-cell-header',
+        //   cellClass: 'static-cell',
+        // },
+        { text: this.$t('specimen.kind'), value: 'kind' },
+        { text: this.$t('specimen.fossilGroup'), value: 'fossilgroup' },
         { text: this.$t('specimen.taxon'), value: 'taxon' },
       ],
-      sortValues: {
+      queryFields: {
         id: () => 'id',
         specimen_number: () => 'specimen_number',
         depth: () => 'depth',
@@ -108,34 +108,19 @@ export default {
   methods: {
     round,
     async handleUpdate(options) {
-      const start = (options.page - 1) * options.itemsPerPage
-
-      let params
-      if (isEmpty(options.sortBy)) {
-        params = {
-          q: isEmpty(options.search) ? '*' : `${options.search}`,
-          fq: `locality_id:${this.locality}`,
-          rows: options.itemsPerPage,
-          start,
+      const specimenResponse = await this.$services.sarvSolr.getResourceList(
+        'specimen',
+        {
+          ...options,
+          isValid: isNil(this.locality),
+          defaultParams: {
+            fq: `locality_id:${this.locality}`,
+          },
+          queryFields: this.queryFields,
         }
-      } else {
-        const orderBy = options.sortBy.map((field, i) => {
-          if (options.sortDesc[i]) return `${this.sortValues[field]()} desc`
-          return `${this.sortValues[field]()} asc`
-        })
+      )
 
-        params = {
-          q: isEmpty(options.search) ? '*' : `${options.search}`,
-          fq: `locality_id:${this.locality}`,
-          rows: options.itemsPerPage,
-          start,
-          sort: orderBy.join(','),
-        }
-      }
-      const specimenResponse = await this.$axios.$get('solr/specimen', {
-        params,
-      })
-      this.specimens = specimenResponse.results
+      this.specimens = specimenResponse.items
       this.count = specimenResponse.count
     },
   },

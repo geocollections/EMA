@@ -9,6 +9,13 @@
     <template #item.rock="{ item }">
       {{ $translate({ et: item.rock__name, en: item.rock__name_en }) }}
     </template>
+    <template #item.thickness="{ item }">
+      {{
+        !item.depth_base || !item.depth_top
+          ? null
+          : round(item.depth_base - item.depth_top, 3)
+      }}
+    </template>
     <template #item.stratigraphy="{ item }">
       <a
         class="text-link"
@@ -44,7 +51,7 @@
 </template>
 
 <script>
-import { isEmpty } from 'lodash'
+import { round, isNil } from 'lodash'
 import global from '@/mixins/global'
 import TableWrapper from '~/components/TableWrapper.vue'
 
@@ -71,6 +78,13 @@ export default {
         { text: this.$t('localityDescription.depthTop'), value: 'depth_top' },
         { text: this.$t('localityDescription.depthBase'), value: 'depth_base' },
         {
+          text: this.$t('localityDescription.thickness'),
+          value: 'thickness',
+          sortable: false,
+          class: 'static-cell-header',
+          cellClass: 'static-cell',
+        },
+        {
           text: this.$t('localityDescription.rock'),
           value: 'rock',
         },
@@ -89,7 +103,7 @@ export default {
           sortable: false,
         },
       ],
-      sortValues: {
+      queryFields: {
         rock: () => {
           return this.$i18n.locale === 'et' ? 'rock__name' : 'rock__name_en'
         },
@@ -106,40 +120,20 @@ export default {
     }
   },
   methods: {
+    round,
     async handleUpdate(options) {
-      let params, multiSearch
-      if (!isEmpty(options.search))
-        multiSearch = `value:${options.search};fields:${Object.values(
-          this.sortValues
-        )
-          .map((field) => field())
-          .join()};lookuptype:icontains`
-      if (isEmpty(options.sortBy)) {
-        params = {
-          multi_search: multiSearch,
-          locality: this.locality,
-          paginate_by: options.itemsPerPage,
-          page: options.page,
-        }
-      } else {
-        const orderBy = options.sortBy.map((field, i) => {
-          if (options.sortDesc[i]) return `-${this.sortValues[field]()}`
-          return this.sortValues[field]()
-        })
-
-        params = {
-          multi_search: multiSearch,
-          locality: this.locality,
-          paginate_by: options.itemsPerPage,
-          page: options.page,
-          order_by: orderBy.join(','),
-        }
-      }
-      const descriptionResponse = await this.$axios.$get(
+      const descriptionResponse = await this.$services.sarvREST.getResourceList(
         'locality_description',
-        { params }
+        {
+          ...options,
+          isValid: isNil(this.locality),
+          defaultParams: {
+            locality: this.locality,
+          },
+          queryFields: this.queryFields,
+        }
       )
-      this.descriptions = descriptionResponse.results
+      this.descriptions = descriptionResponse.items
       this.count = descriptionResponse.count
     },
   },

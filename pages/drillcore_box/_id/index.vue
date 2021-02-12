@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { isEmpty, round } from 'lodash'
+import { round, isNil } from 'lodash'
 import global from '@/mixins/global'
 import TableWrapper from '~/components/TableWrapper.vue'
 
@@ -94,7 +94,7 @@ export default {
         { text: this.$t('samples.collector'), value: 'collector' },
         { text: this.$t('samples.dateCollected'), value: 'date_collected' },
       ],
-      sortValues: {
+      queryFields: {
         id: () => 'id',
         number: () => 'number',
         depth: () => 'depth',
@@ -109,32 +109,19 @@ export default {
   methods: {
     round,
     async handleUpdate(options) {
-      const start = (options.page - 1) * options.itemsPerPage
-
-      let params
-      if (isEmpty(options.sortBy)) {
-        params = {
-          q: isEmpty(options.search) ? '*' : `${options.search}`,
-          fq: `locality_id:${this.locality} AND (depth:[${this.depthStart} TO ${this.depthEnd}] OR depth_interval:[${this.depthStart} TO ${this.depthEnd}])`,
-          rows: options.itemsPerPage,
-          start,
+      const sampleResponse = await this.$services.sarvSolr.getResourceList(
+        'sample',
+        {
+          ...options,
+          isValid: isNil(this.locality),
+          defaultParams: {
+            fq: `locality_id:${this.locality} AND (depth:[${this.depthStart} TO ${this.depthEnd}] OR depth_interval:[${this.depthStart} TO ${this.depthEnd}])`,
+          },
+          queryFields: this.queryFields,
         }
-      } else {
-        const orderBy = options.sortBy.map((field, i) => {
-          if (options.sortDesc[i]) return `${this.sortValues[field]()} desc`
-          return `${this.sortValues[field]()} asc`
-        })
+      )
 
-        params = {
-          q: isEmpty(options.search) ? '*' : `${options.search}`,
-          fq: `locality_id:${this.locality} AND (depth:[${this.depthStart} TO ${this.depthEnd}] OR depth_interval:[${this.depthStart} TO ${this.depthEnd}])`,
-          rows: options.itemsPerPage,
-          start,
-          sort: orderBy.join(','),
-        }
-      }
-      const sampleResponse = await this.$axios.$get('solr/sample', { params })
-      this.samples = sampleResponse.results
+      this.samples = sampleResponse.items
       this.count = sampleResponse.count
     },
   },

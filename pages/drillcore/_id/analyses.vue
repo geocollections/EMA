@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { isEmpty, round } from 'lodash'
+import { round, isNil } from 'lodash'
 import global from '@/mixins/global'
 import TableWrapper from '~/components/TableWrapper.vue'
 export default {
@@ -79,13 +79,13 @@ export default {
         { text: this.$t('analysis.sampleNumber'), value: 'sample_number' },
         { text: this.$t('analysis.depth'), value: 'depth' },
         { text: this.$t('analysis.depthInterval'), value: 'depth_interval' },
-        {
-          text: this.$t('analysis.thickness'),
-          value: 'thickness',
-          sortable: false,
-          class: 'static-cell-header',
-          cellClass: 'static-cell',
-        },
+        // {
+        //   text: this.$t('analysis.thickness'),
+        //   value: 'thickness',
+        //   sortable: false,
+        //   class: 'static-cell-header',
+        //   cellClass: 'static-cell',
+        // },
         { text: this.$t('analysis.method'), value: 'method' },
         {
           text: this.$t('analysis.methodDetails'),
@@ -94,7 +94,7 @@ export default {
         { text: this.$t('analysis.analysedBy'), value: 'agent' },
         { text: this.$t('analysis.date'), value: 'date' },
       ],
-      sortValues: {
+      queryFields: {
         id: () => 'id',
         sample_number: () => 'sample_number',
         depth: () => 'depth',
@@ -111,34 +111,19 @@ export default {
   methods: {
     round,
     async handleUpdate(options) {
-      const start = (options.page - 1) * options.itemsPerPage
-
-      let params
-      if (isEmpty(options.sortBy)) {
-        params = {
-          q: isEmpty(options.search) ? '*' : `${options.search}`,
-          fq: `locality_id:${this.locality}`,
-          rows: options.itemsPerPage,
-          start,
+      const analysisResponse = await this.$services.sarvSolr.getResourceList(
+        'analysis',
+        {
+          ...options,
+          isValid: isNil(this.locality),
+          defaultParams: {
+            fq: `locality_id:${this.locality}`,
+          },
+          queryFields: this.queryFields,
         }
-      } else {
-        const orderBy = options.sortBy.map((field, i) => {
-          if (options.sortDesc[i]) return `${this.sortValues[field]()} desc`
-          return `${this.sortValues[field]()} asc`
-        })
+      )
 
-        params = {
-          q: isEmpty(options.search) ? '*' : `${options.search}`,
-          fq: `locality_id:${this.locality}`,
-          rows: options.itemsPerPage,
-          start,
-          sort: orderBy.join(','),
-        }
-      }
-      const analysisResponse = await this.$axios.$get('solr/analysis', {
-        params,
-      })
-      this.analyses = analysisResponse.results
+      this.analyses = analysisResponse.items
       this.count = analysisResponse.count
     },
   },

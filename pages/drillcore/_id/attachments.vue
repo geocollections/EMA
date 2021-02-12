@@ -9,7 +9,7 @@
     <template #item.description="{ item }">
       <a
         class="text-link"
-        @click="openGeoDetail({ table: 'attachment', id: item.id })"
+        @click="openGeoDetail({ table: 'attachment', id: item.attachment })"
         >{{
           $translate({
             et: item.attachment__description,
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { isEmpty } from 'lodash'
+import { isNil } from 'lodash'
 import global from '@/mixins/global'
 import TableWrapper from '~/components/TableWrapper.vue'
 
@@ -50,7 +50,7 @@ export default {
           value: 'attachment__author__agent',
         },
       ],
-      sortValues: {
+      queryFields: {
         description: () =>
           this.$i18n.locale === 'et'
             ? 'attachment__description'
@@ -61,38 +61,18 @@ export default {
   },
   methods: {
     async handleUpdate(options) {
-      let params, multiSearch
-      if (!isEmpty(options.search))
-        multiSearch = `value:${options.search};fields:${Object.values(
-          this.sortValues
-        )
-          .map((field) => field())
-          .join()};lookuptype:icontains`
-      if (isEmpty(options.sortBy)) {
-        params = {
-          multi_search: multiSearch,
-          or_search: `drillcore:${this.$route.params.id};locality:${this.locality}`,
-          paginate_by: options.itemsPerPage,
-          page: options.page,
+      const attachmentResponse = await this.$services.sarvREST.getResourceList(
+        'attachment_link',
+        {
+          ...options,
+          isValid: isNil(this.locality),
+          defaultParams: {
+            or_search: `drillcore:${this.$route.params.id};locality:${this.locality}`,
+          },
+          queryFields: this.queryFields,
         }
-      } else {
-        const orderBy = options.sortBy.map((field, i) => {
-          if (options.sortDesc[i]) return `-${this.sortValues[field]()}`
-          return this.sortValues[field]()
-        })
-
-        params = {
-          multi_search: multiSearch,
-          or_search: `drillcore:${this.$route.params.id};locality:${this.locality}`,
-          paginate_by: options.itemsPerPage,
-          page: options.page,
-          order_by: orderBy.join(','),
-        }
-      }
-      const attachmentResponse = await this.$axios.$get('attachment_link', {
-        params,
-      })
-      this.attachments = attachmentResponse.results
+      )
+      this.attachments = attachmentResponse.items
       this.count = attachmentResponse.count
     },
   },
