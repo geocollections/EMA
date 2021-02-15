@@ -1,9 +1,9 @@
 <template>
   <client-only>
-    <!-- TODO: #77 Search for ways to replace default zoom on map -->
     <l-map
       ref="map"
       style="z-index: 0"
+      :options="options"
       :zoom="13"
       :center="[center.latitude, center.longitude]"
     >
@@ -79,6 +79,16 @@ export default {
   },
   data() {
     return {
+      options: {
+        gestureHandling: true,
+        gestureHandlingOptions: {
+          text: {
+            touch: this.$t('gestureHandling.touch'),
+            scroll: this.$t('gestureHandling.scroll'),
+            scrollMac: this.$t('gestureHandling.scrollMac'),
+          },
+        },
+      },
       layers: {
         base: [
           {
@@ -160,11 +170,6 @@ export default {
         ],
       },
     }
-  },
-  computed: {
-    mapOptions() {
-      return { scrollWheelZoom: this.$vuetify.breakpoint.mdAndUp }
-    },
   },
 }
 </script>

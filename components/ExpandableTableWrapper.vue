@@ -3,7 +3,10 @@
     dense
     calculate-widths
     multi-sort
-    :headers="headers"
+    show-expand
+    :single-expand="singleExpand"
+    :expanded.sync="expanded"
+    :headers="headersLocal"
     :items="items"
     :options.sync="options"
     :server-items-length="count"
@@ -30,6 +33,16 @@
         @update:options="updateOptions"
       />
     </template>
+    <template #item.data-table-expand="{ expand, isExpanded, item }">
+      <v-btn
+        v-if="item[expandField]"
+        icon
+        :class="{ active: isExpanded }"
+        @click="expand(!isExpanded)"
+      >
+        <v-icon>mdi-chevron-down</v-icon>
+      </v-btn>
+    </template>
     <template v-for="(_, slotName) in $scopedSlots" #[slotName]="context">
       <slot :name="slotName" v-bind="context" />
     </template>
@@ -40,7 +53,7 @@
 import { debounce } from 'lodash'
 
 export default {
-  name: 'TableWrapper',
+  name: 'ExpandableTableWrapper',
   props: {
     items: {
       type: Array,
@@ -58,10 +71,31 @@ export default {
       type: Number,
       default: 0,
     },
+    singleExpand: {
+      type: Boolean,
+      default: false,
+    },
+    expandHeaderText: {
+      type: String,
+      default: '',
+    },
+    expandField: {
+      type: String,
+      default: null,
+    },
   },
   data() {
     return {
       search: '',
+      expanded: [],
+      headersLocal: [
+        ...this.headers,
+        {
+          text: this.expandHeaderText,
+          value: 'data-table-expand',
+          align: 'center',
+        },
+      ],
       options: this.initOptions,
       footerProps: {
         'items-per-page-options': [10, 25, 50, 100],
@@ -83,3 +117,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.v-btn.active .v-icon {
+  transform: rotate(-180deg);
+}
+</style>
