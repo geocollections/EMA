@@ -46,7 +46,7 @@
                         >
                           {{ $t('common.noValue') }}
                         </td>
-                        <td>
+                        <td v-else>
                           {{
                             $translate({
                               et: locality.type__value,
@@ -70,7 +70,7 @@
                         >
                           {{ $t('common.noValue') }}
                         </td>
-                        <td>
+                        <td v-else>
                           {{
                             $translate({
                               et: locality.country__value,
@@ -94,7 +94,7 @@
                         >
                           {{ $t('common.noValue') }}
                         </td>
-                        <td>
+                        <td v-else>
                           {{
                             $translate({
                               et: locality.vald__vald,
@@ -118,7 +118,7 @@
                         >
                           {{ $t('common.noValue') }}
                         </td>
-                        <td>
+                        <td v-else>
                           {{
                             $translate({
                               et: locality.asustusyksus__asustusyksus,
@@ -132,7 +132,7 @@
                         <td v-if="isNil(locality.elevation)" class="no-value">
                           {{ $t('common.noValue') }}
                         </td>
-                        <td>
+                        <td v-else>
                           {{ locality.elevation }}
                         </td>
                       </tr>
@@ -141,7 +141,7 @@
                         <td v-if="isNil(locality.latitude)" class="no-value">
                           {{ $t('common.noValue') }}
                         </td>
-                        <td>
+                        <td v-else>
                           {{ locality.latitude }}
                         </td>
                       </tr>
@@ -150,8 +150,50 @@
                         <td v-if="isNil(locality.longitude)" class="no-value">
                           {{ $t('common.noValue') }}
                         </td>
-                        <td>
+                        <td v-else>
                           {{ locality.longitude }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>{{ $t('locality.coordinateSystem') }}</td>
+                        <td
+                          v-if="isEmpty(locality.coord_system)"
+                          class="no-value"
+                        >
+                          {{ $t('common.noValue') }}
+                        </td>
+                        <td v-else>
+                          {{ locality.coord_system }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>{{ $t('locality.coordinateX') }}</td>
+                        <td v-if="isNil(locality.coordx)" class="no-value">
+                          {{ $t('common.noValue') }}
+                        </td>
+                        <td v-else>
+                          {{ locality.coordx }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>{{ $t('locality.coordinateY') }}</td>
+                        <td v-if="isNil(locality.coordy)" class="no-value">
+                          {{ $t('common.noValue') }}
+                        </td>
+                        <td v-else>
+                          {{ locality.coordy }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>{{ $t('locality.coordinatePrecision') }}</td>
+                        <td
+                          v-if="isNil(locality.coord_det_precision__value)"
+                          class="no-value"
+                        >
+                          {{ $t('common.noValue') }}
+                        </td>
+                        <td v-else>
+                          {{ locality.coord_det_precision__value }}
                         </td>
                       </tr>
                       <tr>
@@ -169,7 +211,7 @@
                         >
                           {{ $t('common.noValue') }}
                         </td>
-                        <td>
+                        <td v-else>
                           {{
                             $translate({
                               et: locality.coord_det_method__value,
@@ -186,7 +228,7 @@
                         >
                           {{ $t('common.noValue') }}
                         </td>
-                        <td>
+                        <td v-else>
                           {{ locality.coord_det_agent__agent }}
                         </td>
                       </tr>
@@ -198,7 +240,7 @@
                         >
                           {{ $t('common.noValue') }}
                         </td>
-                        <td>
+                        <td v-else>
                           {{ locality.remarks_location }}
                         </td>
                       </tr>
@@ -263,7 +305,7 @@
                         <td v-if="isNil(locality.remarks)" class="no-value">
                           {{ $t('common.noValue') }}
                         </td>
-                        <td>
+                        <td v-else>
                           {{ locality.remarks }}
                         </td>
                       </tr>
@@ -285,7 +327,7 @@
                 <v-card id="map-wrap" elevation="0" height="300">
                   <leaflet-map
                     :is-estonian="locality.country__value === 'Eesti'"
-                    :height="300"
+                    :height="400"
                     :center="{
                       latitude: locality.latitude,
                       longitude: locality.longitude,
@@ -315,7 +357,7 @@
 </template>
 
 <script>
-import { isNil } from 'lodash'
+import { isNil, isEmpty } from 'lodash'
 export default {
   async asyncData({ params, route, app, error }) {
     try {
@@ -330,59 +372,92 @@ export default {
         }
       )
       const locality = localityResponse.results[0]
+      const tabs = [
+        {
+          id: 'locality_synonym',
+          routeName: 'locality-id',
+          title: 'locality.synonyms',
+          count: 0,
+          props: {},
+        },
+        {
+          id: 'specimen',
+          routeName: 'locality-id-specimens',
+          title: 'locality.specimens',
+          isSolr: true,
+          count: 0,
+          props: {},
+        },
+        {
+          id: 'locality_reference',
+          routeName: 'locality-id-references',
+          title: 'locality.references',
+          count: 0,
+          props: {},
+        },
+        {
+          id: 'locality_description',
+          routeName: 'locality-id-descriptions',
+          title: 'locality.descriptions',
+          count: 0,
+          props: {},
+        },
+        {
+          id: 'attachment_link',
+          routeName: 'locality-id-attachments',
+          title: 'locality.attachments',
+          count: 0,
+          props: {},
+        },
+        {
+          id: 'sample',
+          routeName: 'locality-id-samples',
+          title: 'locality.samples',
+          isSolr: true,
+          count: 0,
+          props: {},
+        },
+        {
+          id: 'stratigraphy_stratotype',
+          routeName: 'locality-id-stratotypes',
+          title: 'locality.stratotypes',
+          count: 0,
+          props: {},
+        },
+      ]
+      const solrParams = { fq: `locality_id:${params.id}` }
+      const apiParams = { locality_id: locality.id }
+      // Hack: fix count in API!!!
+      const apiAttachmentLinkParams = {
+        locality: locality.id,
+      }
 
+      const forLoop = async () => {
+        const filteredTabs = tabs.filter((item) => !!item.id)
+        for (const item of filteredTabs) {
+          let countResponse
+          if (item?.isSolr)
+            countResponse = await app.$services.sarvSolr.getResourceCount(
+              item.id,
+              solrParams
+            )
+          else
+            countResponse = await app.$services.sarvREST.getResourceCount(
+              item.id,
+              item.id === 'attachment_link'
+                ? apiAttachmentLinkParams
+                : apiParams
+            )
+          item.count = countResponse?.count ?? 0
+          item.props = {
+            locality: locality.id,
+          }
+        }
+      }
+      await forLoop()
       return {
         locality,
-        tabs: [
-          {
-            id: 'synonyms',
-            routeName: 'locality-id',
-            title: 'locality.synonyms',
-            props: {
-              locality: route.params.id,
-            },
-          },
-          {
-            id: 'specimens',
-            routeName: 'locality-id-specimens',
-            title: 'locality.specimens',
-            props: {
-              locality: route.params.id,
-            },
-          },
-          {
-            id: 'references',
-            routeName: 'locality-id-references',
-            title: 'locality.references',
-            props: {
-              locality: route.params.id,
-            },
-          },
-          {
-            id: 'attachments',
-            routeName: 'locality-id-attachments',
-            title: 'locality.attachments',
-            props: {
-              locality: route.params.id,
-            },
-          },
-          {
-            id: 'samples',
-            routeName: 'locality-id-samples',
-            title: 'locality.samples',
-            props: {
-              locality: route.params.id,
-            },
-          },
-          {
-            id: 'stratotypes',
-            routeName: 'locality-id-stratotypes',
-            title: 'locality.stratotypes',
-            props: {
-              locality: route.params.id,
-            },
-          },
-        ],
+        tabs,
         initActiveTab: route.path,
       }
     } catch (err) {
@@ -394,6 +469,7 @@ export default {
   },
   methods: {
     isNil,
+    isEmpty,
   },
 }
 </script>

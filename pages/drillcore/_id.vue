@@ -160,7 +160,12 @@
                         <td>
                           <a
                             class="text-link"
-                            :href="`https://geocollections.info/locality/${drillcore.locality_id}`"
+                            :href="
+                              localePath({
+                                name: 'locality-id',
+                                params: { id: drillcore.locality_id },
+                              })
+                            "
                           >
                             {{
                               $translate({
@@ -299,6 +304,7 @@ import Tabs from '~/components/Tabs.vue'
 
 export default {
   components: { Tabs, LeafletMap },
+  layout: 'detail',
   async asyncData({ params, route, error, app }) {
     try {
       const drillcoreResponse = await app.$services.sarvREST.getResource(
