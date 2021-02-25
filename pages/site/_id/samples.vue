@@ -41,15 +41,7 @@ import TableWrapper from '~/components/tables/TableWrapper.vue'
 export default {
   components: { TableWrapper },
   props: {
-    locality: {
-      type: Number,
-      default: null,
-    },
-    depthStart: {
-      type: Number,
-      default: null,
-    },
-    depthEnd: {
+    site: {
       type: Number,
       default: null,
     },
@@ -92,14 +84,13 @@ export default {
         'sample',
         {
           ...options,
-          isValid: isNil(this.locality),
+          isValid: isNil(this.site),
           defaultParams: {
-            fq: `locality_id:${this.locality} AND (depth:[${this.depthStart} TO ${this.depthEnd}] OR depth_interval:[${this.depthStart} TO ${this.depthEnd}])`,
+            fq: `site_id:${this.site}`,
           },
           queryFields: this.queryFields,
         }
       )
-
       this.samples = sampleResponse.items
       this.count = sampleResponse.count
     },

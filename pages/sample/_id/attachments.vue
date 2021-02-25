@@ -6,13 +6,6 @@
     :init-options="options"
     @update="handleUpdate"
   >
-    <template #item.file="{ item }">
-      <attachment-cell
-        :src="`https://files.geocollections.info/small/${item.attachment__filename}`"
-        :type="item.attachment__attachment_format__value"
-        @click="$openGeoDetail('attachment', item.attachment)"
-      />
-    </template>
     <template #item.description="{ item }">
       <a
         class="text-link"
@@ -35,7 +28,7 @@ import TableWrapper from '~/components/tables/TableWrapper.vue'
 export default {
   components: { TableWrapper },
   props: {
-    locality: {
+    sample: {
       type: Number,
       default: null,
     },
@@ -49,12 +42,6 @@ export default {
         itemsPerPage: 25,
       },
       headers: [
-        {
-          text: this.$t('attachment.file'),
-          value: 'file',
-          width: '120px',
-          sortable: false,
-        },
         { text: this.$t('attachment.description'), value: 'description' },
         {
           text: this.$t('attachment.author'),
@@ -76,9 +63,9 @@ export default {
         'attachment_link',
         {
           ...options,
-          isValid: isNil(this.locality),
+          isValid: isNil(this.sample),
           defaultParams: {
-            or_search: `locality:${this.locality}`,
+            sample: this.sample,
           },
           queryFields: this.queryFields,
         }

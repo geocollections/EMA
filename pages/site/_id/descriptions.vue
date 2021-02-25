@@ -61,7 +61,7 @@ import ExpandableTableWrapper from '~/components/tables/ExpandableTableWrapper.v
 export default {
   components: { ExpandableTableWrapper },
   props: {
-    locality: {
+    site: {
       type: Number,
       default: null,
     },
@@ -128,9 +128,9 @@ export default {
         'locality_description',
         {
           ...options,
-          isValid: isNil(this.locality),
+          isValid: isNil(this.site),
           defaultParams: {
-            locality: this.locality,
+            site: this.site,
           },
           queryFields: this.queryFields,
         }

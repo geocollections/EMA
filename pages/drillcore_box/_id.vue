@@ -4,29 +4,7 @@
       <h1 class="text-center py-3 page-title">
         {{ $t('drillcoreBox.nr', { number: drillcoreBox.number }) }}
       </h1>
-      <div class="d-flex justify-space-between">
-        <nuxt-link
-          class="text-link"
-          :to="
-            localePath({
-              params: { id: parseInt($route.params.id) - 1 },
-            })
-          "
-        >
-          {{ $t('common.previous') }}
-        </nuxt-link>
-
-        <nuxt-link
-          class="text-link"
-          :to="
-            localePath({
-              params: { id: parseInt($route.params.id) + 1 },
-            })
-          "
-        >
-          {{ $t('common.next') }}
-        </nuxt-link>
-      </div>
+      <prev-next-nav />
       <v-card class="my-2">
         <v-card-text>
           <client-only>
@@ -102,7 +80,7 @@
             <div class="text-center">
               <span v-for="(size, index) in imageSizes" :key="index">
                 <a
-                  class="text-link underline"
+                  class="text-link"
                   @click="
                     $openImage(activeImage.attachment__uuid_filename, size)
                   "
@@ -162,148 +140,84 @@
           <v-simple-table dense class="custom-table">
             <template #default>
               <tbody>
-                <tr>
-                  <td>{{ $t('drillcoreBox.drillcore') }}</td>
-                  <td
-                    v-if="isNull(drillcoreBox.drillcore__id)"
-                    class="no-value"
-                  >
-                    {{ $t('common.noValue') }}
-                  </td>
-                  <td v-else>
-                    <nuxt-link
-                      class="text-link underline"
-                      :to="
-                        localePath({
-                          name: 'drillcore-id',
-                          params: { id: drillcoreBox.drillcore__id },
-                        })
-                      "
-                    >
-                      {{
-                        $translate({
-                          et: drillcoreBox.drillcore__drillcore,
-                          en: drillcoreBox.drillcore__drillcore_en,
-                        })
-                      }}
-                    </nuxt-link>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>{{ $t('drillcoreBox.depthStart') }}</td>
-
-                  <td v-if="isNull(drillcoreBox.depth_start)" class="no-value">
-                    {{ $t('common.noValue') }}
-                  </td>
-                  <td v-else>{{ drillcoreBox.depth_start }}</td>
-                </tr>
-                <tr>
-                  <td>{{ $t('drillcoreBox.depthEnd') }}</td>
-                  <td v-if="isNull(drillcoreBox.depth_end)" class="no-value">
-                    {{ $t('common.noValue') }}
-                  </td>
-                  <td v-else>{{ drillcoreBox.depth_end }}</td>
-                </tr>
-                <tr>
-                  <td>{{ $t('drillcoreBox.depthOther') }}</td>
-                  <td v-if="isNull(drillcoreBox.depth_other)" class="no-value">
-                    {{ $t('common.noValue') }}
-                  </td>
-                  <td v-else>{{ drillcoreBox.depth_other }}</td>
-                </tr>
-                <tr>
-                  <td>{{ $t('drillcoreBox.diameter') }}</td>
-                  <td v-if="isNull(drillcoreBox.diameter)" class="no-value">
-                    {{ $t('common.noValue') }}
-                  </td>
-                  <td v-else>{{ drillcoreBox.diameter }}</td>
-                </tr>
-                <tr>
-                  <td>{{ $t('drillcoreBox.stratigraphyTop') }}</td>
-                  <td
-                    v-if="isNull(drillcoreBox.stratigraphy_top_id)"
-                    class="no-value"
-                  >
-                    {{ $t('common.noValue') }}
-                  </td>
-                  <td v-else>
-                    <a
-                      class="text-link underline"
-                      @click="
-                        $openGeoDetail(
-                          'stratigraphy',
-                          drillcoreBox.stratigraphy_top_id
-                        )
-                      "
-                    >
-                      {{
-                        $translate({
-                          et: drillcoreBox.stratigraphy_top__stratigraphy,
-                          en: drillcoreBox.stratigraphy_top__stratigraphy_en,
-                        })
-                      }}
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{{ $t('drillcoreBox.stratigraphyTopFree') }}</td>
-                  <td
-                    v-if="isNull(drillcoreBox.stratigraphy_top_free)"
-                    class="no-value"
-                  >
-                    {{ $t('common.noValue') }}
-                  </td>
-                  <td v-else>{{ drillcoreBox.stratigraphy_top_free }}</td>
-                </tr>
-                <tr>
-                  <td>{{ $t('drillcoreBox.stratigraphyBase') }}</td>
-                  <td
-                    v-if="isNull(drillcoreBox.stratigraphy_base_id)"
-                    class="no-value"
-                  >
-                    {{ $t('common.noValue') }}
-                  </td>
-                  <td v-else>
-                    <a
-                      class="text-link underline"
-                      @click="
-                        $openGeoDetail(
-                          'stratigraphy',
-                          drillcoreBox.stratigraphy_base_id
-                        )
-                      "
-                    >
-                      {{
-                        $translate({
-                          et: drillcoreBox.stratigraphy_base__stratigraphy,
-                          en: drillcoreBox.stratigraphy_base__stratigraphy_en,
-                        })
-                      }}
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{{ $t('drillcoreBox.stratigraphyBaseFree') }}</td>
-                  <td
-                    v-if="isNull(drillcoreBox.stratigraphy_base_free)"
-                    class="no-value"
-                  >
-                    {{ $t('common.noValue') }}
-                  </td>
-                  <td v-else>{{ drillcoreBox.stratigraphy_base_free }}</td>
-                </tr>
-                <tr>
-                  <td>{{ $t('drillcoreBox.remarks') }}</td>
-                  <td v-if="isNull(drillcoreBox.remarks)" class="no-value">
-                    {{ $t('common.noValue') }}
-                  </td>
-                  <td v-else>{{ drillcoreBox.remarks }}</td>
-                </tr>
-                <tr>
-                  <td>{{ $t('drillcoreBox.id') }}</td>
-                  <td>{{ drillcoreBox.id }}</td>
-                </tr>
+                <link-data-row
+                  nuxt
+                  :title="$t('drillcoreBox.drillcore')"
+                  :value="
+                    $translate({
+                      et: drillcoreBox.drillcore__drillcore,
+                      en: drillcoreBox.drillcore__drillcore_en,
+                    })
+                  "
+                  :href="
+                    localePath({
+                      name: 'drillcore-id',
+                      params: { id: drillcoreBox.drillcore__id },
+                    })
+                  "
+                />
+                <data-row
+                  :title="$t('drillcoreBox.depthStart')"
+                  :value="drillcoreBox.depth_start"
+                />
+                <data-row
+                  :title="$t('drillcoreBox.depthEnd')"
+                  :value="drillcoreBox.depth_end"
+                />
+                <data-row
+                  :title="$t('drillcoreBox.depthOther')"
+                  :value="drillcoreBox.depth_other"
+                />
+                <data-row
+                  :title="$t('drillcoreBox.diameter')"
+                  :value="drillcoreBox.diameter"
+                />
+                <link-data-row
+                  :title="$t('drillcoreBox.stratigraphyTop')"
+                  :value="
+                    $translate({
+                      et: drillcoreBox.stratigraphy_top__stratigraphy,
+                      en: drillcoreBox.stratigraphy_top__stratigraphy_en,
+                    })
+                  "
+                  @link-click="
+                    $openGeoDetail(
+                      'stratigraphy',
+                      drillcoreBox.stratigraphy_top_id
+                    )
+                  "
+                />
+                <data-row
+                  :title="$t('drillcoreBox.stratigraphyTopFree')"
+                  :value="drillcoreBox.stratigraphy_top_free"
+                />
+                <link-data-row
+                  :title="$t('drillcoreBox.stratigraphyBase')"
+                  :value="
+                    $translate({
+                      et: drillcoreBox.stratigraphy_base__stratigraphy,
+                      en: drillcoreBox.stratigraphy_base__stratigraphy_en,
+                    })
+                  "
+                  @link-click="
+                    $openGeoDetail(
+                      'stratigraphy',
+                      drillcoreBox.stratigraphy_base_id
+                    )
+                  "
+                />
+                <data-row
+                  :title="$t('drillcoreBox.stratigraphyBaseFree')"
+                  :value="drillcoreBox.stratigraphy_base_free"
+                />
+                <data-row
+                  :title="$t('drillcoreBox.remarks')"
+                  :value="drillcoreBox.remarks"
+                />
+                <data-row
+                  :title="$t('drillcoreBox.id')"
+                  :value="drillcoreBox.id"
+                />
               </tbody>
             </template>
           </v-simple-table>
@@ -321,9 +235,12 @@
 import { isNull, isNil } from 'lodash'
 import BoxImageLoader from '@/components/BoxImageLoader'
 import Tabs from '@/components/Tabs'
+import DataRow from '~/components/DataRow.vue'
+import LinkDataRow from '~/components/LinkDataRow.vue'
+import PrevNextNav from '~/components/PrevNextNav.vue'
 
 export default {
-  components: { Tabs, BoxImageLoader },
+  components: { Tabs, BoxImageLoader, DataRow, LinkDataRow, PrevNextNav },
   layout: 'detail',
   async asyncData({ $axios, params, route, error, app }) {
     try {

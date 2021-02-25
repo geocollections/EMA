@@ -23,7 +23,7 @@ import TableWrapper from '~/components/tables/TableWrapper.vue'
 export default {
   components: { TableWrapper },
   props: {
-    locality: {
+    site: {
       type: Number,
       default: null,
     },
@@ -59,9 +59,9 @@ export default {
         'locality_reference',
         {
           ...options,
-          isValid: isNil(this.locality),
+          isValid: isNil(this.site),
           defaultParams: {
-            locality: this.locality,
+            site: this.site,
           },
           queryFields: this.queryFields,
         }

@@ -6,7 +6,7 @@
     show-expand
     :single-expand="singleExpand"
     :expanded.sync="expanded"
-    :headers="headersLocal"
+    :headers="headers"
     :items="items"
     :options.sync="options"
     :server-items-length="count"
@@ -14,28 +14,37 @@
     mobile-breakpoint="0"
     @update:options="handleChange"
   >
+    <template #no-data>{{ $t('table.noData') }}</template>
     <template #top="{ pagination, updateOptions }">
-      <v-text-field
-        v-model="search"
-        class="ma-4"
-        append-icon="mdi-magnify"
-        :label="$t('common.search')"
-        single-line
-        hide-details
-        clearable
-        @input="handleSearch"
-      ></v-text-field>
-      <v-data-footer
-        style="border: none"
-        :pagination="pagination"
-        :options="options"
-        :items-per-page-options="footerProps['items-per-page-options']"
-        @update:options="updateOptions"
-      />
+      <v-container>
+        <v-row>
+          <v-col cols="12" sm="4" class="py-0">
+            <v-text-field
+              v-model="search"
+              color="deep-orange darken-2"
+              append-icon="mdi-magnify"
+              :label="$t('common.search')"
+              hide-details
+              clearable
+              @input="handleSearch"
+            ></v-text-field>
+          </v-col>
+          <v-col class="pa-0">
+            <v-data-footer
+              style="border: none"
+              :pagination="pagination"
+              :options="options"
+              :items-per-page-options="footerProps['items-per-page-options']"
+              :items-per-page-text="footerProps['items-per-page-text']"
+              @update:options="updateOptions"
+            />
+          </v-col>
+        </v-row>
+      </v-container>
     </template>
     <template #item.data-table-expand="{ expand, isExpanded, item }">
       <v-btn
-        v-if="item[expandField]"
+        v-if="item.canExpand"
         icon
         :class="{ active: isExpanded }"
         @click="expand(!isExpanded)"
@@ -50,70 +59,21 @@
 </template>
 
 <script>
-import { debounce } from 'lodash'
+import tableMixin from '~/mixins/tableMixin'
 
 export default {
   name: 'ExpandableTableWrapper',
+  mixins: [tableMixin],
   props: {
-    items: {
-      type: Array,
-      default: () => [],
-    },
-    headers: {
-      type: Array,
-      default: () => [],
-    },
-    initOptions: {
-      type: Object,
-      default: () => {},
-    },
-    count: {
-      type: Number,
-      default: 0,
-    },
     singleExpand: {
       type: Boolean,
       default: false,
     },
-    expandHeaderText: {
-      type: String,
-      default: '',
-    },
-    expandField: {
-      type: String,
-      default: null,
-    },
   },
   data() {
     return {
-      search: '',
       expanded: [],
-      headersLocal: [
-        ...this.headers,
-        {
-          text: this.expandHeaderText,
-          value: 'data-table-expand',
-          align: 'center',
-        },
-      ],
-      options: this.initOptions,
-      footerProps: {
-        'items-per-page-options': [10, 25, 50, 100],
-      },
     }
-  },
-  methods: {
-    handleChange(options) {
-      this.$emit('update', { tableOptions: options, search: this.search })
-    },
-    handleSearch: debounce(function () {
-      if (this.options.page !== 1) this.options.page = 1
-      else
-        this.$emit('update', {
-          tableOptions: this.options,
-          search: this.search,
-        })
-    }, 500),
   },
 }
 </script>

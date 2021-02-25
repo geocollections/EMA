@@ -1,5 +1,5 @@
 <template>
-  <analysis-table :search-field="{ key: 'locality_id', value: locality }" />
+  <analysis-table :search-field="{ key: 'sample_id', value: sample }" />
 </template>
 
 <script>
@@ -7,7 +7,7 @@ import AnalysisTable from '@/components/tables/AnalysisTable'
 export default {
   components: { AnalysisTable },
   props: {
-    locality: {
+    sample: {
       type: Number,
       default: null,
     },
