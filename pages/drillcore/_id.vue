@@ -274,6 +274,7 @@ export default {
               )
             ).map((tab) =>
               app.$populateProps(tab, {
+                ...tab.props,
                 locality: drillcore.locality_id,
               })
             )
