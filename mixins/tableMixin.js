@@ -18,6 +18,14 @@ export default {
       type: Number,
       default: 0,
     },
+    showSearch: {
+      type: Boolean,
+      default: true,
+    },
+    externalOptions: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -31,15 +39,19 @@ export default {
   },
   methods: {
     handleChange(options) {
+      if (!this.externalOptions) {
+        this.options = options
+      }
       this.$emit('update', { tableOptions: options, search: this.search })
     },
     handleSearch: debounce(function () {
-      if (this.options.page !== 1) this.options.page = 1
-      else
-        this.$emit('update', {
-          tableOptions: this.options,
-          search: this.search,
-        })
+      if (!this.externalOptions) {
+        this.options = { ...this.options, page: 1 }
+      }
+      this.$emit('update', {
+        tableOptions: { ...this.options, page: 1 },
+        search: this.search,
+      })
     }, 500),
   },
 }

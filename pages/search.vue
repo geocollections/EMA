@@ -1,8 +1,10 @@
 <template>
-  <v-container>
+  <v-container fluid class="pa-0">
     <v-row justify="center" align="center">
       <v-col>
-        <h1 class="text-center">{{ $t('title') }}</h1>
+        <h1 class="text-center">
+          {{ $t('landing.searchTitle') }}
+        </h1>
       </v-col>
     </v-row>
     <v-row justify="center">
@@ -11,19 +13,23 @@
           v-model="search"
           dense
           outlined
+          single-line
+          :autofocus="true"
           color="deep-orange darken-2"
           append-icon="mdi-magnify"
-          :label="$t('common.search')"
+          :label="$t('common.searchAlt')"
           hide-details
           clearable
           @input="handleSearch"
-        ></v-text-field>
+        />
       </v-col>
     </v-row>
     <v-row justify="center">
       <v-col>
+        <button-tabs ref="tabs" :tabs="computedTabs" />
+
         <v-card>
-          <tabs ref="tabs" :tabs="tabs" :init-active-tab="initActiveTab" />
+          <nuxt-child />
         </v-card>
       </v-col>
     </v-row>
@@ -31,23 +37,15 @@
 </template>
 
 <script>
-import { debounce, isEmpty } from 'lodash'
-import Tabs from '@/components/Tabs'
-import { mapActions } from 'vuex'
-
+import { debounce, isEmpty, isEqual, orderBy } from 'lodash'
+import ButtonTabs from '@/components/ButtonTabs'
+import { mapFields } from 'vuex-map-fields'
 export default {
-  components: { Tabs },
-  async asyncData({ params, route, error, app }) {
+  components: { ButtonTabs },
+  // layout: 'search',
+  async asyncData({ params, route, error, app, store }) {
     try {
       const tabs = [
-        {
-          id: 'drillcore',
-          routeName: 'search',
-          title: 'landing.drillcores',
-          isSolr: true,
-          count: 0,
-          props: {},
-        },
         {
           id: 'locality',
           routeName: 'search-localities',
@@ -60,6 +58,14 @@ export default {
           id: 'site',
           routeName: 'search-sites',
           title: 'landing.sites',
+          isSolr: true,
+          count: 0,
+          props: {},
+        },
+        {
+          id: 'drillcore',
+          routeName: 'search',
+          title: 'landing.drillcores',
           isSolr: true,
           count: 0,
           props: {},
@@ -83,49 +89,87 @@ export default {
         {
           id: 'preparation',
           routeName: 'search-preparations',
+          path: '/localities',
           title: 'landing.preparations',
           isSolr: true,
           count: 0,
           props: {},
         },
       ]
+
       return {
-        initActiveTab: route.path,
         tabs: await Promise.all(
-          tabs.map(async (tab) => await app.$populateCount(tab))
+          tabs.map(
+            async (tab) =>
+              await app.$hydrateCount(tab, {
+                solr: {
+                  default: {
+                    q: isEmpty(store.state.landing.search)
+                      ? '*'
+                      : `${store.state.landing.search}`,
+                  },
+                },
+              })
+          )
         ),
       }
     } catch (err) {}
   },
-  data() {
-    return {
-      search: '',
-    }
-  },
   head() {
     return {
-      title: this.$t('title'),
+      title: this.$t('search.pageTitle'),
+    }
+  },
+  computed: {
+    ...mapFields('landing', ['search']),
+    computedTabs() {
+      // Filtering out empty tabs but still showing active tab whether it is empty or not
+      const filteredTabs = this.tabs.filter(
+        (item) =>
+          item.count > 0 ||
+          this.$route.name.includes(
+            item.id === 'drillcore' ? `${item.routeName}__` : item.routeName
+          )
+      )
+      return orderBy(filteredTabs, ['count'], ['desc'])
+    },
+  },
+  watch: {
+    '$route.query'(newVal, oldVal) {
+      if (!isEqual(newVal, oldVal)) {
+        this.handleSearch()
+      }
+    },
+  },
+  created() {
+    if (this.$route.query) {
+      // Todo: Should deconstruct query params
+      if (!isEmpty(this.$route.query.q)) this.search = this.$route.query.q
+      this.handleSearch()
     }
   },
   methods: {
-    ...mapActions('landing', ['updateSearch']),
     handleSearch: debounce(async function () {
-      const forLoop = async () => {
-        const filteredTabs = this.tabs.filter((item) => !!item.id)
-        for (const item of filteredTabs) {
-          const countResponse = await this.$services.sarvSolr.getResourceCount(
-            item.id,
-            { q: isEmpty(this.search) ? '*' : `${this.search}` }
-          )
-
-          item.count = countResponse?.count ?? 0
-        }
-      }
-      await forLoop()
-
-      this.$refs.tabs.$refs.tabs.callSlider()
-      this.updateSearch(this.search)
+      this.tabs = await Promise.all(
+        this.tabs.map(
+          async (tab) =>
+            await this.$hydrateCount(tab, {
+              solr: {
+                default: { q: isEmpty(this.search) ? '*' : `${this.search}` },
+              },
+            })
+        )
+      )
+      // this.updateRouteQuery()
     }, 500),
+
+    updateRouteQuery() {
+      const routeName = this.$route.name.includes('search')
+        ? this.$route.name.split('__')[0]
+        : 'search'
+      const query = isEmpty(this.search) ? {} : { q: this.search }
+      this.$router.push(this.localePath({ name: routeName, query }))
+    },
   },
 }
 </script>

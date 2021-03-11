@@ -1,18 +1,23 @@
 export default {
-  title: 'Geology and Resource InfoSystem',
+  title: 'e·Maapõu',
+  subtitle: 'Opening up geological data in Estonia',
   landing: {
+    searchTitle: 'Quick search',
     drillcores: 'Drillcores ({number})',
     localities: 'Localities ({number})',
     sites: 'Sites ({number})',
     samples: 'Samples ({number})',
     analyses: 'Analyses ({number})',
     preparations: 'Preparations ({number})',
+    visit_site: 'View',
+    title: 'Geological data and e-services',
+    otherPages: 'Other webservices',
   },
   common: {
     general: 'General info',
     pictures: 'Pictures',
-    noValue: ' - ',
-    title: 'Geoscience collections of Estonia',
+    noValue: '',
+    home: 'e·Maapõu',
     previous: 'Previous',
     next: 'Next',
     links: 'Links',
@@ -22,6 +27,18 @@ export default {
     large: 'Large',
     original: 'Original',
     linkToEdit: 'Edit record',
+    searchCommand: 'Search',
+    drillcore: 'Drillcore',
+    drillcores: 'Drillcores',
+    locality: 'Locality',
+    localities: 'Localities',
+    sample: 'Sample',
+    samples: 'Samples',
+    analysis: 'Analysis',
+    analyses: 'Analyses',
+    sites: 'Sites',
+    about: 'About',
+    searchAlt: 'Enter one or more keywords, ex. Estonia ...',
   },
   link: {
     sarvAPI: 'Public API',
@@ -35,6 +52,8 @@ export default {
     geokogud: 'Geocollections portal',
   },
   locality: {
+    pageTitle: 'Localities search',
+    id: 'ID',
     locality: 'Locality',
     country: 'Country',
     countryFormat: '{name} ({iso})',
@@ -77,10 +96,11 @@ export default {
     remarks: 'Remarks',
   },
   drillcore: {
+    pageTitle: 'Drillcores search',
     id: 'ID',
     name: 'Name',
     boxes: 'Boxes',
-    depository: 'Depository',
+    repository: 'Repository',
     remarks: 'Remarks',
     storage: 'Storage',
     driller: 'Driller',
@@ -95,6 +115,7 @@ export default {
     analyses: 'Analyses ({number})',
     specimens: 'Specimens ({number})',
     depth: 'Depth',
+    acronym: 'Owner',
   },
   drillcoreBox: {
     id: 'ID',
@@ -139,6 +160,7 @@ export default {
     file: 'File',
   },
   analysis: {
+    pageTitle: 'Analysis search',
     id: 'ID',
     sampleNumber: 'Sample number',
     depth: 'Depth',
@@ -203,6 +225,7 @@ export default {
     localityReferences: 'References ({number})',
   },
   site: {
+    pageTitle: 'Site search',
     id: 'ID',
     name: 'Name',
     area: 'Area',
@@ -223,6 +246,7 @@ export default {
     longitude: 'Longitude',
   },
   sample: {
+    pageTitle: 'Samples search',
     id: 'ID',
     name: 'Name',
     area: 'Area',
@@ -233,8 +257,8 @@ export default {
     depth: 'Depth / thickness (m)',
     description: 'Description',
     elevationAccuracy: 'Elevation accuracy',
-    locality: 'Location',
-    number: 'Number',
+    locality: 'Locality',
+    number: 'Sample No.',
     depthInterval: 'Depth to',
     stratigraphy: 'Stratigraphy',
     collector: 'Collector',
@@ -275,6 +299,7 @@ export default {
     remarks: 'Remarks',
   },
   taxon: {
+    id: 'ID',
     taxon: 'Taxon',
     name: 'Taxon, txt',
     frequency: 'Abundande',
@@ -297,12 +322,82 @@ export default {
     itemsPerPage: 'Rows per page:',
     noData: 'No data found',
   },
-  footerPreliminary: '2021 | EMA: Eesti Maapõue Andmebaas',
+  footerPreliminary: '2021 | e·Maapõu',
   footer:
-    'All materials in the portal are for free usage according to {0} licence, unless indicated otherwise. Portal is part of {1} national research infrastructure and geoscience data platform {2}, hosted by {3}. Built using {4}, available on {5}.',
+    'All materials in the portal are mostly for free usage according to {0} licence, unless indicated otherwise. Portal is part of {1} national research infrastructure and geoscience data platform {2}, hosted by {3} cloud. Built using {4}, source code available on {5}.',
   footerLinks: {
     sarv: 'Geoscience Database SARV',
     natarc: 'Natural history archives and information network“ (NATARC)',
+    ttu: 'Tallinn University of Technology',
+    tu: 'University of Tartu',
+    elm: 'Estonian Museum of Natural History',
     el: 'European Union',
+  },
+  geocollections: {
+    title: ' Geocollections',
+    description: 'Geoscience Collections Portal',
+  },
+  kirjandus: {
+    title: 'Geoscience Literature',
+    description: 'Estonian Geoscience Literature Database',
+  },
+  gmre: {
+    title: 'Geology of Estonia',
+    description: 'Book',
+  },
+  fond: {
+    title: 'Geoloogiafond',
+    description: 'Geological Reports',
+  },
+  fossiilid: {
+    title: 'Baltoscandian Fossils',
+    description: 'Baltoscandian Fossils',
+  },
+  kivid: {
+    title: 'Minerals and Rocks',
+    description: 'Minerals and Rocks',
+  },
+  stratigraphy: {
+    title: 'Stratigraphy and time scale',
+    description: 'Estonian Commission on Stratigraphy',
+  },
+  maardlad: {
+    title: 'Mineral Deposits',
+    description: 'Environmental Register',
+  },
+  turba: {
+    title: 'TURBA',
+    description: 'Estonian Peat Database',
+  },
+  doi: {
+    title: 'SARV-DOI',
+    description: 'Geoscience Data Repository',
+  },
+  geocase: {
+    title: 'GeoCASe',
+    description: 'The Earth Science Collections Network',
+  },
+  eurocore: {
+    title: 'EUROCORE',
+    description: 'European Drillcore Database for MSc Training',
+  },
+  sarv: {
+    title: 'SARV-WB',
+    description: 'SARV Workbench',
+  },
+  ema: {
+    title: 'e·Maapõu',
+    description: 'Quick search from the Geoscience Data Platform SARV',
+  },
+  search: {
+    pageTitle: 'Search',
+  },
+  about: {
+    pageTitle: 'About',
+    title: 'What is e·Maapõu?',
+  },
+  map: {
+    estonian_geoportal: 'Estonian Geoportal',
+    google_maps: 'Google Maps',
   },
 }

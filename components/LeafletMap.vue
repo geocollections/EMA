@@ -1,52 +1,75 @@
 <template>
   <client-only>
-    <l-map
-      ref="map"
-      style="z-index: 0"
-      :options="options"
-      :zoom="13"
-      :center="[center.latitude, center.longitude]"
-    >
-      <l-control-layers />
-      <l-control-fullscreen position="topleft" />
-      <l-tile-layer
-        v-for="layer in layers.base"
-        :key="layer.id"
-        layer-type="base"
-        :visible="layer.visible"
-        :name="layer.name"
-        :url="layer.url"
-        :options="layer.options"
-      />
-      <l-tile-layer
-        v-for="layer in tileOverlays"
-        :key="layer.id"
-        layer-type="overlay"
-        :visible="layer.visible"
-        :name="layer.name"
-        :url="layer.url"
-        :options="layer.options"
-      />
-      <l-wms-tile-layer
-        v-for="layer in wmsOverlays"
-        :key="layer.id"
-        layer-type="overlay"
-        :visible="layer.visible"
-        :name="layer.name"
-        :base-url="layer.url"
-        :layers="layer.layers"
-        :transparent="layer.transparent"
-        :options="layer.options"
-      />
-      <l-circle-marker
-        v-for="(marker, idx) in markers"
-        :key="`marker-${idx}`"
-        :lat-lng="[marker.latitude, marker.longitude]"
-        :radius="4"
+    <div :style="{ height: `${height}px` }">
+      <l-map
+        ref="map"
+        style="z-index: 0"
+        :options="options"
+        :zoom="mapZoom"
+        :center="[center.latitude, center.longitude]"
+        @baselayerchange="handleBaseLayerChange"
+        @overlayadd="handleOverlayAdd"
+        @overlayremove="handleOverlayRemove"
       >
-        <l-popup>{{ marker.text }}</l-popup>
-      </l-circle-marker>
-    </l-map>
+        <l-control-layers />
+        <l-control-fullscreen position="topleft" />
+        <l-control-scale
+          position="bottomleft"
+          :metric="true"
+          :imperial="false"
+        />
+        <l-tile-layer
+          v-for="layer in layers.base"
+          :key="layer.id"
+          layer-type="base"
+          :visible="layer.visible"
+          :name="layer.name"
+          :url="layer.url"
+          :options="layer.options"
+        />
+        <l-tile-layer
+          v-for="layer in tileOverlays"
+          :key="layer.id"
+          layer-type="overlay"
+          :visible="layer.visible"
+          :name="layer.name"
+          :url="layer.url"
+          :options="layer.options"
+        />
+        <l-wms-tile-layer
+          v-for="layer in wmsOverlays"
+          :key="layer.id"
+          layer-type="overlay"
+          :visible="layer.visible"
+          :name="layer.name"
+          :base-url="layer.url"
+          :layers="layer.layers"
+          :transparent="layer.transparent"
+          :options="layer.options"
+        />
+        <l-circle-marker
+          v-for="(marker, idx) in markers"
+          :key="`marker-${idx}`"
+          :lat-lng="[marker.latitude, marker.longitude]"
+          :radius="5"
+          :weight="2"
+          color="red"
+        >
+          <l-tooltip :options="tooltipOptions">{{ marker.text }}</l-tooltip>
+        </l-circle-marker>
+
+        <map-legend
+          :active-base-layer="activeBaseLayer"
+          :active-overlays="activeOverlays"
+          :height="height"
+        />
+      </l-map>
+      <map-links
+        :latitude="center.latitude"
+        :longitude="center.longitude"
+        :tooltip="markers[0].text"
+      />
+    </div>
     <template #placeholder>
       <div
         :style="`height: ${height}px; width: 100%`"
@@ -64,8 +87,11 @@
 </template>
 
 <script>
+import MapLegend from '~/components/map/MapLegend'
+import MapLinks from '~/components/map/MapLinks'
 export default {
   name: 'LeafletMap',
+  components: { MapLinks, MapLegend },
   props: {
     height: {
       type: Number,
@@ -102,6 +128,13 @@ export default {
           duration: 1000,
         },
       },
+      tooltipOptions: {
+        permanent: this.markers.length === 1,
+        direction: 'top',
+        offset: [1, -7],
+      },
+      activeBaseLayer: this.isEstonian ? 'Estonian map' : 'OpenStreetMap',
+      activeOverlays: [],
       layers: {
         base: [
           {
@@ -186,7 +219,7 @@ export default {
             name: 'Estonian bedrock',
             url: 'https://gis.geocollections.info/geoserver/wms',
             layers: 'geocollections:bedrock400k',
-            visible: false,
+            visible: this.isEstonian,
             transparent: true,
             options: {
               attribution:
@@ -203,12 +236,47 @@ export default {
     }
   },
   computed: {
+    computedTileOverlays() {
+      return this.layers.overlay.map((item) => {
+        if (item.id === 'est-bed-overlay')
+          return { ...item, visible: this.isEstonianBedrockVisibleAtAStart }
+        else return item
+      })
+    },
+
+    isEstonianBedrockVisibleAtAStart() {
+      return (
+        this.isEstonian &&
+        (this.$route.name.includes('drillcore-') ||
+          this.$route.name.includes('locality-'))
+      )
+    },
+
+    mapZoom() {
+      return this.isEstonianBedrockVisibleAtAStart ? 9 : 11
+    },
+
     tileOverlays() {
-      return this.layers.overlay.filter((item) => !item.isWMS)
+      return this.computedTileOverlays.filter((item) => !item.isWMS)
     },
 
     wmsOverlays() {
-      return this.layers.overlay.filter((item) => item.isWMS)
+      return this.computedTileOverlays.filter((item) => item.isWMS)
+    },
+  },
+  methods: {
+    handleBaseLayerChange(event) {
+      this.activeBaseLayer = event.name
+    },
+
+    handleOverlayAdd(event) {
+      if (!this.activeOverlays.includes(event.name))
+        this.activeOverlays.push(event.name)
+    },
+
+    handleOverlayRemove(event) {
+      const index = this.activeOverlays.indexOf(event.name)
+      if (index > -1) this.activeOverlays.splice(index, 1)
     },
   },
 }

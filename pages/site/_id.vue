@@ -294,7 +294,6 @@ import Tabs from '~/components/Tabs.vue'
 
 export default {
   components: { Tabs, LeafletMap },
-  layout: 'detail',
   async asyncData({ params, route, error, app }) {
     try {
       const detailViewResponse = await app.$services.sarvREST.getResource(
@@ -338,14 +337,21 @@ export default {
       return {
         site,
         initActiveTab: route.path,
-        tabs: await Promise.all(
-          tabs.map(
-            async (tab) =>
-              await app.$populateCount(tab, {
-                solr: { default: { fq: `site_id:${site.id}` } },
-                api: { default: { site: site.id } },
-              })
+        tabs: (
+          await Promise.all(
+            tabs.map(
+              async (tab) =>
+                await app.$hydrateCount(tab, {
+                  solr: { default: { fq: `site_id:${site.id}` } },
+                  api: { default: { site: site.id } },
+                })
+            )
           )
+        ).map((tab) =>
+          app.$populateProps(tab, {
+            ...tab.props,
+            site: site.id,
+          })
         ),
       }
     } catch (err) {

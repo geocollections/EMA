@@ -332,7 +332,6 @@ import Tabs from '@/components/Tabs'
 import LeafletMap from '@/components/LeafletMap'
 export default {
   components: { LinkDataRow, DataRow, Tabs, LeafletMap },
-  layout: 'detail',
   async asyncData({ params, route, error, app }) {
     try {
       const detailViewResponse = await app.$services.sarvREST.getResource(
@@ -385,7 +384,7 @@ export default {
         tabs: await Promise.all(
           tabs.map(
             async (tab) =>
-              await app.$populateCount(tab, {
+              await app.$hydrateCount(tab, {
                 solr: { default: { fq: `sample_id:${sample.id}` } },
                 api: { default: { sample: sample.id } },
               })
@@ -413,7 +412,7 @@ export default {
       return this.tabs.filter((item) => item.count > 0)
     },
     sampleTitle() {
-      return `${this.$t('sample.number')}: ${
+      return `${this.$t('sample.number')} ${
         this.sample.number ||
         this.sample.number_additional ||
         this.sample.number_field ||

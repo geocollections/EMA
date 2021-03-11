@@ -40,7 +40,7 @@
                         :value="drillcore.box_numbers"
                       />
                       <data-row
-                        :title="$t('drillcore.depository')"
+                        :title="$t('drillcore.repository')"
                         :value="
                           $translate({
                             et: drillcore.depository__value,
@@ -160,8 +160,8 @@
                         latitude: drillcore.locality__latitude,
                         longitude: drillcore.locality__longitude,
                         text: $translate({
-                          et: drillcore.drillcore,
-                          en: drillcore.drillcore_en,
+                          et: drillcore.locality__locality,
+                          en: drillcore.locality__locality_en,
                         }),
                       },
                     ]"
@@ -188,7 +188,6 @@ import LinkDataRow from '~/components/LinkDataRow.vue'
 
 export default {
   components: { Tabs, LeafletMap, DataRow, LinkDataRow },
-  layout: 'detail',
   async asyncData({ params, route, error, app }) {
     try {
       const drillcoreResponse = await app.$services.sarvREST.getResource(
@@ -259,13 +258,15 @@ export default {
               await Promise.all(
                 tabs.map(
                   async (tab) =>
-                    await app.$populateCount(tab, {
+                    await app.$hydrateCount(tab, {
                       solr: {
-                        default: { fq: `locality_id:${drillcore.locality_id}` },
+                        default: {
+                          fq: `locality_id :${drillcore.locality_id}`,
+                        },
                       },
                       api: {
                         default: { locality: drillcore.locality_id },
-                        attachment__link: {
+                        attachment_link: {
                           or_search: `drillcore:${drillcore.id};locality:${drillcore.locality_id}`,
                         },
                       },

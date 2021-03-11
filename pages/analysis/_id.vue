@@ -136,7 +136,6 @@ import LinkDataRow from '~/components/LinkDataRow.vue'
 import Tabs from '~/components/Tabs'
 export default {
   components: { DataRow, LinkDataRow, Tabs },
-  layout: 'detail',
   async asyncData({ params, route, error, app }) {
     try {
       const analysisResponse = await app.$services.sarvREST.getResource(
@@ -200,7 +199,7 @@ export default {
           await Promise.all(
             tabs.map(
               async (tab) =>
-                await app.$populateCount(tab, {
+                await app.$hydrateCount(tab, {
                   solr: {
                     default: { fq: `analysis_id:${analysis.id}` },
                   },
