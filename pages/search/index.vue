@@ -1,52 +1,51 @@
 <template>
-  <table-wrapper
+  <drillcore-table
     :show-search="false"
-    external-options
     :items="items"
-    :headers="translatedHeaders"
     :count="count"
-    :init-options="options"
+    :options="options"
     @update="handleUpdate"
-  >
-    <template #item.drillcore="{ item }">
-      <nuxt-link
-        class="text-link"
-        :to="localePath({ name: 'drillcore-id', params: { id: item.id } })"
-      >
-        {{ $translate({ et: item.drillcore, en: item.drillcore_en }) }}
-      </nuxt-link>
-    </template>
-  </table-wrapper>
+  />
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import TableWrapper from '@/components/tables/TableWrapper'
+import { mapState } from 'vuex'
+import { debounce } from 'lodash'
+import DrillcoreTable from '~/components/tables/DrillcoreTable.vue'
+import { DRILLCORE } from '~/constants'
+
 export default {
-  components: { TableWrapper },
+  components: { DrillcoreTable },
+  data() {
+    return {
+      options: DRILLCORE.options,
+      items: [],
+      count: 0,
+    }
+  },
   computed: {
     ...mapState('landing', ['search']),
-    ...mapState('drillcore', ['options', 'items', 'count', 'headers']),
-    translatedHeaders() {
-      return this.headers.map((header) => {
-        return {
-          ...header,
-          text: this.$t(header.text),
-        }
-      })
-    },
   },
   watch: {
     search: {
-      handler(value) {
-        this.handleUpdate({ ...this.options, search: value })
-      },
+      handler: debounce(function (value) {
+        this.handleUpdate({ tableOptions: { ...this.options }, search: value })
+      }, 500),
     },
   },
   methods: {
-    ...mapActions('drillcore', ['quickSearchDrillcores']),
     async handleUpdate(options) {
-      await this.quickSearchDrillcores(options.tableOptions)
+      const drillcoreResponse = await this.$services.sarvSolr.getResourceList(
+        'drillcore',
+        {
+          tableOptions: options.tableOptions,
+          search: this.search,
+          queryFields: this.$getQueryFields(DRILLCORE.queryFields),
+          searchFilters: {},
+        }
+      )
+      this.items = drillcoreResponse.items
+      this.count = drillcoreResponse.count
     },
   },
 }

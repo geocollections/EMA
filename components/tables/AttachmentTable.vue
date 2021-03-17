@@ -1,35 +1,38 @@
 <template>
   <table-wrapper
-    :items="attachments"
+    v-bind="{ showSearch, externalOptions }"
+    :items="items"
     :headers="headers"
     :count="count"
     :init-options="options"
-    @update="handleUpdate"
+    v-on="$listeners"
   >
     <template #item.file="{ item }">
       <attachment-cell
         :src="`https://files.geocollections.info/small/${item.attachment__filename}`"
         :type="item.attachment__attachment_format__value"
-        @click="$openGeoDetail('attachment', item.attachment)"
+        @click="
+          $router.push(localePath({ name: 'file-id', params: { id: item.id } }))
+        "
       />
     </template>
     <template #item.description="{ item }">
-      <a
+      <nuxt-link
         class="text-link"
-        @click="$openGeoDetail('attachment', item.attachment)"
-        >{{
+        :to="localePath({ name: 'file-id', params: { id: item[idField] } })"
+      >
+        {{
           $translate({
             et: item.attachment__description,
             en: item.attachment__description_en,
           })
-        }}</a
-      >
+        }}
+      </nuxt-link>
     </template>
   </table-wrapper>
 </template>
 
 <script>
-import { isNil } from 'lodash'
 import TableWrapper from '~/components/tables/TableWrapper.vue'
 import AttachmentCell from '~/components/AttachmentCell.vue'
 
@@ -37,26 +40,39 @@ export default {
   name: 'AttachmentTable',
   components: { TableWrapper, AttachmentCell },
   props: {
-    searchField: {
+    showSearch: {
+      type: Boolean,
+      default: true,
+    },
+    externalOptions: {
+      type: Boolean,
+      default: false,
+    },
+    items: {
+      type: Array,
+      default: () => [],
+    },
+    count: {
+      type: Number,
+      default: 0,
+    },
+    options: {
       type: Object,
-      default: null,
-      validator: (obj) => {
-        return (
-          typeof obj === 'object' &&
-          obj.key !== undefined &&
-          obj.value !== undefined
-        )
-      },
+      default: () => ({
+        page: 1,
+        itemsPerPage: 25,
+        sortBy: [],
+        sortDesc: [],
+      }),
+    },
+    idField: {
+      type: String,
+      required: false,
+      default: 'id',
     },
   },
   data() {
     return {
-      attachments: [],
-      count: 0,
-      options: {
-        page: 1,
-        itemsPerPage: 25,
-      },
       headers: [
         {
           text: this.$t('attachment.file'),
@@ -78,23 +94,6 @@ export default {
         attachment__author__agent: () => 'attachment__author__agent',
       },
     }
-  },
-  methods: {
-    async handleUpdate(options) {
-      const attachmentResponse = await this.$services.sarvREST.getResourceList(
-        'attachment_link',
-        {
-          ...options,
-          isValid: isNil(this.searchField.value),
-          defaultParams: {
-            [this.searchField.key]: this.searchField.value,
-          },
-          queryFields: this.queryFields,
-        }
-      )
-      this.attachments = attachmentResponse.items
-      this.count = attachmentResponse.count
-    },
   },
 }
 </script>

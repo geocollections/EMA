@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="pa-0">
+  <div>
     <v-row justify="center" align="center">
       <v-col>
         <h1 class="text-center my-3">
@@ -29,11 +29,11 @@
         <button-tabs ref="tabs" :tabs="computedTabs" />
 
         <v-card>
-          <nuxt-child />
+          <nuxt-child keep-alive />
         </v-card>
       </v-col>
     </v-row>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -41,6 +41,7 @@ import { debounce, isEmpty, isEqual, orderBy } from 'lodash'
 import ButtonTabs from '@/components/ButtonTabs'
 import { mapFields } from 'vuex-map-fields'
 export default {
+  name: 'QuickSearch',
   components: { ButtonTabs },
   // layout: 'search',
   async asyncData({ params, route, error, app, store }) {
@@ -143,8 +144,8 @@ export default {
   },
   created() {
     if (this.$route.query) {
-      // Todo: Should deconstruct query params
-      if (!isEmpty(this.$route.query.q)) this.search = this.$route.query.q
+      // Todo: Should deconstruct query params (page?, paginate? sort?)
+      if (!isEmpty(this.$route.query?.q)) this.search = this.$route.query.q
       this.handleSearch()
     }
   },

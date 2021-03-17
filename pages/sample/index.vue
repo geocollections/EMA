@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <div>
     <v-row>
       <v-col>
         <h1 class="text-center">{{ $t('common.samples') }}</h1>
@@ -28,56 +28,25 @@
         </v-card>
       </v-col>
       <v-col cols="12" md="9">
-        <table-wrapper
-          external-options
+        <sample-table
           :show-search="false"
           :items="items"
-          :headers="translatedHeaders"
           :count="count"
-          :init-options="options"
+          :options="options"
           @update="handleUpdate"
-        >
-          <template #item.id="{ item }">
-            <a
-              class="text-link"
-              @click="$openNuxtWindow('sample-id', { id: item.id })"
-            >
-              {{ item.id }}
-            </a>
-          </template>
-          <template #item.stratigraphy="{ item }">
-            <a
-              class="text-link"
-              @click="$openGeoDetail('stratigraphy', item.stratigraphy_id)"
-            >
-              {{
-                $translate({
-                  et: item.stratigraphy,
-                  en: item.stratigraphy_en,
-                })
-              }}
-            </a>
-          </template>
-          <template #item.date_collected="{ item }">
-            {{
-              item.date_collected
-                ? new Date(item.date_collected).toISOString().split('T')[0]
-                : null
-            }}
-          </template>
-        </table-wrapper>
+        />
       </v-col>
     </v-row>
-  </v-container>
+  </div>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import TableWrapper from '@/components/tables/TableWrapper'
 import SampleSearchForm from '@/components/search/SampleSearchForm'
+import SampleTable from '~/components/tables/SampleTable.vue'
 
 export default {
-  components: { TableWrapper, SampleSearchForm },
+  components: { SampleSearchForm, SampleTable },
   head() {
     return {
       title: this.$t('sample.pageTitle'),
@@ -85,15 +54,7 @@ export default {
   },
   computed: {
     ...mapState('landing', ['search']),
-    ...mapState('sample', ['options', 'items', 'count', 'headers']),
-    translatedHeaders() {
-      return this.headers.map((header) => {
-        return {
-          ...header,
-          text: this.$t(header.text),
-        }
-      })
-    },
+    ...mapState('sample', ['options', 'items', 'count']),
   },
   methods: {
     ...mapActions('sample', ['searchSamples']),
