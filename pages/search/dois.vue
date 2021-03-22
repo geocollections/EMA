@@ -1,5 +1,5 @@
 <template>
-  <preparation-table
+  <doi-table
     :show-search="false"
     external-options
     :items="items"
@@ -11,15 +11,15 @@
 
 <script>
 import { mapState } from 'vuex'
-import PreparationTable from '@/components/tables/PreparationTable'
 import { debounce } from 'lodash'
-import { PREPARATION } from '~/constants'
+import { DOI } from '~/constants'
+import DoiTable from '~/components/tables/DoiTable'
 
 export default {
-  components: { PreparationTable },
+  components: { DoiTable },
   data() {
     return {
-      options: PREPARATION.options,
+      options: DOI.options,
       items: [],
       count: 0,
     }
@@ -37,18 +37,15 @@ export default {
   },
   methods: {
     async handleUpdate(options) {
-      const preparationResponse = await this.$services.sarvSolr.getResourceList(
-        'preparation',
-        {
-          tableOptions: options.tableOptions,
-          search: this.search,
-          queryFields: this.$getQueryFields(PREPARATION.queryFields),
-          searchFilters: {},
-        }
-      )
+      const response = await this.$services.sarvSolr.getResourceList('doi', {
+        tableOptions: options.tableOptions,
+        search: this.search,
+        queryFields: this.$getQueryFields(DOI.queryFields),
+        searchFilters: {},
+      })
       this.options = options.tableOptions
-      this.items = preparationResponse.items
-      this.count = preparationResponse.count
+      this.items = response.items
+      this.count = response.count
     },
   },
 }

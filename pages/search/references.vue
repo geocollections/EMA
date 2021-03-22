@@ -1,5 +1,5 @@
 <template>
-  <preparation-table
+  <reference-table
     :show-search="false"
     external-options
     :items="items"
@@ -11,15 +11,15 @@
 
 <script>
 import { mapState } from 'vuex'
-import PreparationTable from '@/components/tables/PreparationTable'
 import { debounce } from 'lodash'
-import { PREPARATION } from '~/constants'
+import { REFERENCE } from '~/constants'
+import ReferenceTable from '~/components/tables/ReferenceTable'
 
 export default {
-  components: { PreparationTable },
+  components: { ReferenceTable },
   data() {
     return {
-      options: PREPARATION.options,
+      options: REFERENCE.options,
       items: [],
       count: 0,
     }
@@ -37,18 +37,19 @@ export default {
   },
   methods: {
     async handleUpdate(options) {
-      const preparationResponse = await this.$services.sarvSolr.getResourceList(
-        'preparation',
+      const analysisResponse = await this.$services.sarvSolr.getResourceList(
+        'reference',
         {
           tableOptions: options.tableOptions,
           search: this.search,
-          queryFields: this.$getQueryFields(PREPARATION.queryFields),
+          queryFields: this.$getQueryFields(REFERENCE.queryFields),
           searchFilters: {},
         }
       )
+
       this.options = options.tableOptions
-      this.items = preparationResponse.items
-      this.count = preparationResponse.count
+      this.items = analysisResponse.items
+      this.count = analysisResponse.count
     },
   },
 }

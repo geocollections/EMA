@@ -1,5 +1,5 @@
 <template>
-  <preparation-table
+  <specimen-table
     :show-search="false"
     external-options
     :items="items"
@@ -11,15 +11,15 @@
 
 <script>
 import { mapState } from 'vuex'
-import PreparationTable from '@/components/tables/PreparationTable'
 import { debounce } from 'lodash'
-import { PREPARATION } from '~/constants'
+import { SPECIMEN } from '~/constants'
+import SpecimenTable from '~/components/tables/SpecimenTable'
 
 export default {
-  components: { PreparationTable },
+  components: { SpecimenTable },
   data() {
     return {
-      options: PREPARATION.options,
+      options: SPECIMEN.options,
       items: [],
       count: 0,
     }
@@ -37,18 +37,18 @@ export default {
   },
   methods: {
     async handleUpdate(options) {
-      const preparationResponse = await this.$services.sarvSolr.getResourceList(
-        'preparation',
+      const analysisResponse = await this.$services.sarvSolr.getResourceList(
+        'specimen',
         {
           tableOptions: options.tableOptions,
           search: this.search,
-          queryFields: this.$getQueryFields(PREPARATION.queryFields),
+          queryFields: this.$getQueryFields(SPECIMEN.queryFields),
           searchFilters: {},
         }
       )
       this.options = options.tableOptions
-      this.items = preparationResponse.items
-      this.count = preparationResponse.count
+      this.items = analysisResponse.items
+      this.count = analysisResponse.count
     },
   },
 }

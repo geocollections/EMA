@@ -1,5 +1,5 @@
 <template>
-  <preparation-table
+  <stratigraphy-table
     :show-search="false"
     external-options
     :items="items"
@@ -11,15 +11,15 @@
 
 <script>
 import { mapState } from 'vuex'
-import PreparationTable from '@/components/tables/PreparationTable'
 import { debounce } from 'lodash'
-import { PREPARATION } from '~/constants'
+import { STRATIGRAPHY } from '~/constants'
+import StratigraphyTable from '~/components/tables/StratigraphyTable'
 
 export default {
-  components: { PreparationTable },
+  components: { StratigraphyTable },
   data() {
     return {
-      options: PREPARATION.options,
+      options: STRATIGRAPHY.options,
       items: [],
       count: 0,
     }
@@ -37,18 +37,18 @@ export default {
   },
   methods: {
     async handleUpdate(options) {
-      const preparationResponse = await this.$services.sarvSolr.getResourceList(
-        'preparation',
+      const analysisResponse = await this.$services.sarvSolr.getResourceList(
+        'stratigraphy',
         {
           tableOptions: options.tableOptions,
           search: this.search,
-          queryFields: this.$getQueryFields(PREPARATION.queryFields),
+          queryFields: this.$getQueryFields(STRATIGRAPHY.queryFields),
           searchFilters: {},
         }
       )
       this.options = options.tableOptions
-      this.items = preparationResponse.items
-      this.count = preparationResponse.count
+      this.items = analysisResponse.items
+      this.count = analysisResponse.count
     },
   },
 }

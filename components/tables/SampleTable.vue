@@ -23,26 +23,6 @@
         {{ item.number }}
       </nuxt-link>
     </template>
-    <template #item.stratigraphy="{ item }">
-      <a
-        class="text-link"
-        @click="$openGeoDetail('stratigraphy', item.stratigraphy_id)"
-      >
-        {{
-          $translate({
-            et: item.stratigraphy,
-            en: item.stratigraphy_en,
-          })
-        }}
-      </a>
-    </template>
-    <template #item.date_collected="{ item }">
-      {{
-        item.date_collected
-          ? new Date(item.date_collected).toISOString().split('T')[0]
-          : null
-      }}
-    </template>
     <template #item.locality="{ item }">
       <nuxt-link
         class="text-link"
@@ -52,6 +32,49 @@
       >
         {{ $translate({ et: item.locality, en: item.locality_en }) }}
       </nuxt-link>
+    </template>
+    <template #item.stratigraphy="{ item }">
+      <a
+        v-if="item.stratigraphy_id"
+        class="text-link"
+        @click="
+          $openWindow(`http://stratigraafia.info/term/${item.stratigraphy_id}`)
+        "
+      >
+        {{
+          $translate({
+            et: item.stratigraphy,
+            en: item.stratigraphy_en,
+          })
+        }}
+        <v-icon color="deep-orange darken-2" small>mdi-open-in-new</v-icon>
+      </a>
+    </template>
+    <template #item.lithostratigraphy="{ item }">
+      <a
+        v-if="item.lithostratigraphy_id"
+        class="text-link"
+        @click="
+          $openWindow(
+            `http://stratigraafia.info/term/${item.lithostratigraphy_id}`
+          )
+        "
+      >
+        {{
+          $translate({
+            et: item.lithostratigraphy,
+            en: item.lithostratigraphy_en,
+          })
+        }}
+        <v-icon color="deep-orange darken-2" small>mdi-open-in-new</v-icon>
+      </a>
+    </template>
+    <template #item.date_collected="{ item }">
+      {{
+        item.date_collected
+          ? new Date(item.date_collected).toISOString().split('T')[0]
+          : null
+      }}
     </template>
   </table-wrapper>
 </template>
@@ -95,9 +118,14 @@ export default {
       headers: [
         { text: this.$t('sample.id'), value: 'id' },
         { text: this.$t('sample.number'), value: 'number' },
+        { text: this.$t('sample.locality'), value: 'locality' },
         { text: this.$t('sample.depth'), value: 'depth' },
         { text: this.$t('sample.depthInterval'), value: 'depth_interval' },
         { text: this.$t('sample.stratigraphy'), value: 'stratigraphy' },
+        {
+          text: this.$t('sample.lithostratigraphy'),
+          value: 'lithostratigraphy',
+        },
         { text: this.$t('sample.collector'), value: 'collector' },
         { text: this.$t('sample.dateCollected'), value: 'date_collected' },
       ],
