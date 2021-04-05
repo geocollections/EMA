@@ -1,11 +1,20 @@
 <template>
   <v-app dark>
     <v-main>
-      <app-header />
+      <app-header
+        :is-detail="isDetail"
+        @toggle:navigationDrawer="drawer = !drawer"
+      />
+      <navigation-drawer
+        :drawer="drawer"
+        @update:navigationDrawer="drawer = $event"
+      />
       <v-container :fluid="$vuetify.breakpoint.lgAndDown">
-        <nuxt />
-        <back-fab v-if="isDetail" />
         <link-to-edit-fab v-if="isDetail" />
+        <client-only>
+          <history-viewer v-if="$vuetify.breakpoint.smAndUp" />
+        </client-only>
+        <nuxt />
         <scroll-top-fab class="fab-container fab-bottom-right ma-3" />
       </v-container>
       <client-only>
@@ -23,20 +32,23 @@ import AppHeader from '@/components/AppHeader'
 import LinkToEditFab from '@/components/LinkToEditFab'
 import ScrollTopFab from '~/components/ScrollTopFab.vue'
 import CookiePolicy from '~/components/CookiePolicy'
-import BackFab from '~/components/BackFab.vue'
+import HistoryViewer from '~/components/HistoryViewer.vue'
+import NavigationDrawer from '~/components/NavigationDrawer'
 
 export default {
   components: {
+    NavigationDrawer,
     CookiePolicy,
     AppHeader,
     AppFooter,
     ScrollTopFab,
     LinkToEditFab,
-    BackFab,
+    HistoryViewer,
   },
   data() {
     return {
       includeList: ['AnalysisSearch'],
+      drawer: false,
     }
   },
   computed: {

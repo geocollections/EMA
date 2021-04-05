@@ -188,6 +188,80 @@
           </v-col>
         </v-row>
       </v-card>
+
+      <v-card
+        v-if="images.length > 0"
+        class="mt-6 mx-4 d-flex align-center"
+        style="overflow-x: auto"
+        flat
+      >
+        <div v-for="(item, index) in images" :key="index" class="mx-3 mb-3">
+          <v-tooltip bottom>
+            <template #activator="{ on, attrs }">
+              <v-hover v-slot="{ hover }">
+                <v-img
+                  v-bind="attrs"
+                  :src="`https://files.geocollections.info/small/${item.uuid_filename}`"
+                  :lazy-src="`https://files.geocollections.info/small/${item.uuid_filename}`"
+                  max-width="200"
+                  max-height="200"
+                  width="200"
+                  height="200"
+                  :class="{
+                    'elevation-4': hover,
+                    'elevation-2': !hover,
+                  }"
+                  class="grey lighten-2 rounded transition-swing cursor-pointer"
+                  v-on="on"
+                  @click="
+                    $router.push(
+                      localePath({
+                        name: 'file-id',
+                        params: { id: item.attachment_id },
+                      })
+                    )
+                  "
+                >
+                  <template #placeholder>
+                    <v-row
+                      class="fill-height ma-0"
+                      align="center"
+                      justify="center"
+                    >
+                      <v-progress-circular
+                        indeterminate
+                        color="grey lighten-5"
+                      ></v-progress-circular>
+                    </v-row>
+                  </template>
+                </v-img>
+              </v-hover>
+            </template>
+
+            <div
+              v-if="item.agent || item.date_created || item.date_created_free"
+            >
+              <div v-if="item.agent">
+                <span class="font-weight-bold"
+                  >{{ $t('locality.author') }}:
+                </span>
+                <span>{{ item.agent }}</span>
+              </div>
+              <div v-if="item.date_created || item.date_created_free">
+                <span class="font-weight-bold"
+                  >{{ $t('locality.date') }}:
+                </span>
+                <span v-if="item.date_created">
+                  {{ new Date(item.date_created).toISOString().split('T')[0] }}
+                </span>
+                <span v-else>{{ item.date_created_free }}</span>
+              </div>
+            </div>
+            <div v-else>Click to open</div>
+          </v-tooltip>
+        </div>
+      </v-card>
+
       <v-card class="mt-6 mx-4 mb-4">
         <tabs :tabs="filteredTabs" :init-active-tab="initActiveTab" />
       </v-card>
@@ -231,6 +305,18 @@ export default {
       const drillcore = drillcoreResponse.items
         ? drillcoreResponse.items[0]
         : null
+
+      const attachmentResponse = await app.$services.sarvSolr.getResourceList(
+        'attachment',
+        {
+          defaultParams: {
+            fq: `locality_id:${locality.id} AND locality_type:[3 TO 5]`,
+            sort: 'date_created desc,date_created_free desc,stars desc,id desc',
+          },
+        }
+      )
+
+      const attachments = attachmentResponse.items ?? []
 
       const tabs = [
         {
@@ -320,6 +406,7 @@ export default {
         ),
         drillcore,
         initActiveTab: route.path,
+        attachments,
       }
     } catch (err) {
       error({
@@ -339,6 +426,12 @@ export default {
   computed: {
     filteredTabs() {
       return this.tabs.filter((item) => item.count > 0)
+    },
+
+    images() {
+      return this.attachments.filter((item) =>
+        item.format_value.includes('image')
+      )
     },
   },
   methods: {

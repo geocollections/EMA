@@ -37,6 +37,7 @@ export default {
     '~plugins/getQueryFields.js',
     { src: '~plugins/gtag.js', mode: 'client' },
     { src: '~plugins/vuexPersist.js', mode: 'client' },
+    { src: '~plugins/afterEach.js', mode: 'client' },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

@@ -14,7 +14,7 @@ import { ATTACHMENT } from '~/constants'
 export default {
   components: { AttachmentTable },
   props: {
-    sample: {
+    preparation: {
       type: Number,
       default: null,
     },
@@ -32,9 +32,9 @@ export default {
         'attachment_link',
         {
           ...options,
-          isValid: isNil(this.sample),
+          isValid: isNil(this.preparation),
           defaultParams: {
-            sample: `${this.sample}`,
+            preparation: `${this.preparation}`,
           },
           queryFields: this.$getQueryFields(ATTACHMENT.queryFields),
         }
