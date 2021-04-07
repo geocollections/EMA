@@ -8,16 +8,20 @@
     v-on="$listeners"
   >
     <template #item.id="{ item }">
-      <outer-link
-        :value="item.id"
+      <external-link
+        v-if="item.id"
         @click.native="$openGeoDetail('specimen', item.id)"
-      />
+      >
+        {{ item.id }}
+      </external-link>
     </template>
     <template #item.specimen_number="{ item }">
-      <outer-link
-        :value="item.specimen_number"
+      <external-link
+        v-if="item.specimen_number"
         @click.native="$openGeoDetail('specimen', item.id)"
-      />
+      >
+        {{ item.specimen_number }}
+      </external-link>
     </template>
     <template #item.locality="{ item }">
       <nuxt-link
@@ -42,54 +46,61 @@
       }}
     </template>
     <template #item.stratigraphy="{ item }">
-      <outer-link
-        v-if="item.stratigraphy_id"
-        :value="
+      <nuxt-link
+        class="text-link"
+        :to="
+          localePath({
+            name: 'stratigraphy-id',
+            params: { id: item.stratigraphy_id },
+          })
+        "
+      >
+        {{
           $translate({
             et: item.stratigraphy,
             en: item.stratigraphy_en,
           })
-        "
-        @click.native="
-          $openWindow(`http://stratigraafia.info/term/${item.stratigraphy_id}`)
-        "
-      />
+        }}
+      </nuxt-link>
     </template>
     <template #item.lithostratigraphy="{ item }">
-      <outer-link
-        v-if="item.lithostratigraphy_id"
-        class="font-italic"
-        :value="
+      <nuxt-link
+        class="text-link"
+        :to="
+          localePath({
+            name: 'stratigraphy-id',
+            params: { id: item.lithostratigraphy_id },
+          })
+        "
+      >
+        {{
           $translate({
             et: item.lithostratigraphy,
             en: item.lithostratigraphy_en,
           })
-        "
-        @click.native="
-          $openWindow(
-            `http://stratigraafia.info/term/${item.lithostratigraphy_id}`
-          )
-        "
-      />
+        }}
+      </nuxt-link>
     </template>
     <template #item.taxon="{ item }">
-      <outer-link
+      <external-link
         v-if="item.taxon_id"
-        :value="item.taxon"
         @click.native="$openWindow(`https://fossiilid.info/${item.taxon_id}`)"
-      />
+      >
+        {{ item.taxon }}
+      </external-link>
     </template>
     <template #item.rock="{ item }">
-      <outer-link
+      <external-link
         v-if="item.rock_id"
-        :value="
+        @click.native="$openWindow(`https://kivid.info/${item.rock_id}`)"
+      >
+        {{
           $translate({
             et: item.rock,
             en: item.rock_en,
           })
-        "
-        @click.native="$openWindow(`https://kivid.info/${item.rock_id}`)"
-      />
+        }}
+      </external-link>
     </template>
     <template #item.image="{ item }">
       <image-cell
@@ -106,10 +117,10 @@
 import { round } from 'lodash'
 import TableWrapper from '@/components/tables/TableWrapper.vue'
 import ImageCell from '@/components/ImageCell'
-import OuterLink from '~/components/OuterLink'
+import ExternalLink from '~/components/ExternalLink'
 export default {
   name: 'SpecimenTable',
-  components: { OuterLink, TableWrapper, ImageCell },
+  components: { ExternalLink, TableWrapper, ImageCell },
   props: {
     showSearch: {
       type: Boolean,

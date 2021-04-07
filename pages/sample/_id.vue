@@ -4,7 +4,7 @@
       <h1 class="text-center my-3 page-title">
         {{ sampleTitle }}
       </h1>
-      <prev-next-nav />
+      <prev-next-nav :ids="ids" />
       <v-card flat tile>
         <v-row no-gutters>
           <v-col cols="12" md="6">
@@ -67,8 +67,12 @@
                           en: sample.stratigraphy__stratigraphy_en,
                         })
                       "
-                      @link-click="
-                        $openGeoDetail('stratigraphy', sample.stratigraphy)
+                      nuxt
+                      :href="
+                        localePath({
+                          name: 'stratigraphy-id',
+                          params: { id: sample.stratigraphy__id },
+                        })
                       "
                     />
                     <link-data-row
@@ -79,8 +83,12 @@
                           en: sample.lithostratigraphy__stratigraphy_en,
                         })
                       "
-                      @link-click="
-                        $openGeoDetail('stratigraphy', sample.lithostratigraphy)
+                      nuxt
+                      :href="
+                        localePath({
+                          name: 'stratigraphy-id',
+                          params: { id: sample.lithostratigraphy },
+                        })
                       "
                     />
                     <data-row
@@ -320,6 +328,7 @@ export default {
         'sample',
         params.id
       )
+      const ids = detailViewResponse?.ids
       const sample = detailViewResponse.results[0]
 
       const tabs = [
@@ -362,6 +371,7 @@ export default {
       ]
       return {
         sample,
+        ids,
         initActiveTab: route.path,
         tabs: await Promise.all(
           tabs.map(

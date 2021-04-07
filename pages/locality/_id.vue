@@ -4,7 +4,7 @@
       <h1 class="text-center my-3 page-title">
         {{ $translate({ et: locality.locality, en: locality.locality_en }) }}
       </h1>
-      <prev-next-nav />
+      <prev-next-nav :ids="ids" />
       <v-card flat tile>
         <v-row no-gutters>
           <v-col cols="12" md="6">
@@ -111,10 +111,12 @@
                           en: locality.stratigraphy_top__stratigraphy_en,
                         })
                       "
-                      @link-click="
-                        $openWindow(
-                          `https://geocollections.info/stratigraphy/${locality.stratigraphy_top_id}`
-                        )
+                      nuxt
+                      :href="
+                        localePath({
+                          name: 'stratigraphy-id',
+                          params: { id: locality.stratigraphy_top_id },
+                        })
                       "
                     />
                     <link-data-row
@@ -125,10 +127,12 @@
                           en: locality.stratigraphy_base__stratigraphy_en,
                         })
                       "
-                      @link-click="
-                        $openWindow(
-                          `https://geocollections.info/stratigraphy/${locality.stratigraphy_base_id}`
-                        )
+                      nuxt
+                      :href="
+                        localePath({
+                          name: 'stratigraphy-id',
+                          params: { id: locality.stratigraphy_base_id },
+                        })
                       "
                     />
                     <link-data-row
@@ -291,6 +295,7 @@ export default {
           },
         }
       )
+      const ids = localityResponse?.ids
       const locality = localityResponse.results[0]
 
       const drillcoreResponse = await app.$services.sarvREST.getResourceList(
@@ -384,6 +389,7 @@ export default {
 
       return {
         locality,
+        ids,
         tabs: (
           await Promise.all(
             tabs.map(

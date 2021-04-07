@@ -1,26 +1,23 @@
 <template>
   <table-wrapper
-    v-bind="{ showSearch, externalOptions }"
+    v-bind="{ showSearch, externalOptions, onlyTable }"
     :headers="headers"
     :items="items"
     :init-options="options"
     :count="count"
     v-on="$listeners"
   >
-    <template #item.stratigraphy="{ item }">
+    <template #item.locality="{ item }">
       <nuxt-link
         class="text-link"
         :to="
-          localePath({
-            name: 'stratigraphy-id',
-            params: { id: item.stratigraphy__id },
-          })
+          localePath({ name: 'locality-id', params: { id: item.locality__id } })
         "
       >
         {{
           $translate({
-            et: item.stratigraphy__stratigraphy,
-            en: item.stratigraphy__stratigraphy_en,
+            et: item.locality__locality,
+            en: item.locality__locality_en,
           })
         }}
       </nuxt-link>
@@ -34,27 +31,33 @@
       }}
     </template>
     <template #item.reference="{ item }">
-      <a
-        class="text-link"
-        @click="$openGeology('reference', item.reference__id)"
-        >{{ item.reference__reference }}</a
+      <external-link
+        v-if="item.reference__id"
+        @click.native="$openGeology('reference', item.reference__id)"
       >
+        {{ item.reference__reference }}
+      </external-link>
     </template>
   </table-wrapper>
 </template>
 
 <script>
 import { round } from 'lodash'
+import ExternalLink from '../ExternalLink.vue'
 import TableWrapper from '~/components/tables/TableWrapper.vue'
 export default {
-  name: 'StratotypeTable',
-  components: { TableWrapper },
+  name: 'StratigraphyStratotypeTable',
+  components: { TableWrapper, ExternalLink },
   props: {
     showSearch: {
       type: Boolean,
       default: true,
     },
     externalOptions: {
+      type: Boolean,
+      default: false,
+    },
+    onlyTable: {
       type: Boolean,
       default: false,
     },
@@ -79,7 +82,7 @@ export default {
   data() {
     return {
       headers: [
-        { text: this.$t('stratotype.stratigraphy'), value: 'stratigraphy' },
+        { text: this.$t('stratotype.locality'), value: 'locality' },
         { text: this.$t('stratotype.type'), value: 'type' },
         { text: this.$t('stratotype.depthTop'), value: 'depth_top' },
         { text: this.$t('stratotype.depthBase'), value: 'depth_base' },

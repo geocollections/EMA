@@ -10,10 +10,11 @@
     :server-items-length="count"
     :footer-props="footerProps"
     mobile-breakpoint="0"
+    :hide-default-footer="onlyTable"
     @update:options="handleChange"
   >
     <template #no-data>{{ $t('table.noData') }}</template>
-    <template #top="{ pagination }">
+    <template v-if="!onlyTable" #top="{ pagination }">
       <v-row no-gutters>
         <v-col v-if="showSearch" cols="12" sm="4" class="py-0 px-3">
           <v-text-field
@@ -31,6 +32,7 @@
             style="border: none"
             :pagination="pagination"
             :options="externalOptions ? initOptions : options"
+            :show-first-last-page="footerProps.showFirstLastPage"
             :items-per-page-options="footerProps['items-per-page-options']"
             :items-per-page-text="footerProps['items-per-page-text']"
             @update:options="handleChange"
@@ -50,5 +52,11 @@ import tableMixin from '~/mixins/tableMixin'
 export default {
   name: 'TableWrapper',
   mixins: [tableMixin],
+  props: {
+    onlyTable: {
+      type: Boolean,
+      default: false,
+    },
+  },
 }
 </script>

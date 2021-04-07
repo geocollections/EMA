@@ -64,11 +64,7 @@
           :height="height"
         />-->
       </l-map>
-      <map-links
-        :latitude="center.latitude"
-        :longitude="center.longitude"
-        :tooltip="markers[0].text"
-      />
+      <map-links :latitude="center.latitude" :longitude="center.longitude" />
     </div>
     <template #placeholder>
       <div
@@ -129,7 +125,7 @@ export default {
         },
       },
       tooltipOptions: {
-        permanent: this.markers.length === 1,
+        permanent: this.markers.length <= 5,
         direction: 'top',
         offset: [1, -7],
       },
@@ -245,10 +241,12 @@ export default {
     },
 
     isEstonianBedrockVisibleAtAStart() {
+      // HACK: Should probably be a prop
       return (
         this.isEstonian &&
         (this.$route.name.includes('drillcore-') ||
-          this.$route.name.includes('locality-'))
+          this.$route.name.includes('locality-') ||
+          this.$route.name.includes('stratigraphy-'))
       )
     },
 
@@ -263,6 +261,22 @@ export default {
     wmsOverlays() {
       return this.computedTileOverlays.filter((item) => item.isWMS)
     },
+    latLngMarkers() {
+      return [
+        this.markers.map((marker) => marker.latitude),
+        this.markers.map((marker) => marker.longitude),
+      ]
+    },
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.$refs.map.mapObject.fitBounds(
+        this.markers.map((m) => {
+          return [m.latitude, m.longitude]
+        })
+      )
+      this.$refs.map.setZoom(this.mapZoom)
+    })
   },
   methods: {
     handleBaseLayerChange(event) {
