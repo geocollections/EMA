@@ -32,11 +32,11 @@ export default {
     }
   },
   methods: {
-    async handleUpdate(options) {
+    async handleUpdate(tableState) {
       const preparationResponse = await this.$services.sarvREST.getResourceList(
         'preparation',
         {
-          ...options,
+          ...tableState,
           isValid: isNil(this.sample),
           defaultParams: {
             sample: this.sample,
@@ -44,6 +44,7 @@ export default {
           queryFields: this.$getQueryFields(PREPARATION.queryFields),
         }
       )
+      this.options = tableState.options
       this.preparations = preparationResponse.items
       this.count = preparationResponse.count
     },

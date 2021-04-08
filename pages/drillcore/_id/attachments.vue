@@ -34,11 +34,11 @@ export default {
     }
   },
   methods: {
-    async handleUpdate(options) {
+    async handleUpdate(tableState) {
       const attachmentResponse = await this.$services.sarvREST.getResourceList(
         'attachment_link',
         {
-          ...options,
+          ...tableState,
           isValid: isNil(this.locality),
           defaultParams: {
             or_search: `drillcore:${this.$route.params.id};locality:${this.locality}`,
@@ -46,6 +46,7 @@ export default {
           queryFields: this.$getQueryFields(ATTACHMENT.queryFields),
         }
       )
+      this.options = tableState.options
       this.attachments = attachmentResponse.items
       this.count = attachmentResponse.count
     },

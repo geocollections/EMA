@@ -28,11 +28,11 @@ export default {
     }
   },
   methods: {
-    async handleUpdate(options) {
+    async handleUpdate(tableState) {
       const taxonResponse = await this.$services.sarvREST.getResourceList(
         'taxon_list',
         {
-          ...options,
+          ...tableState,
           isValid: isNil(this.sample),
           defaultParams: {
             sample: this.sample,
@@ -40,6 +40,7 @@ export default {
           queryFields: this.$getQueryFields(TAXON_LIST.queryFields),
         }
       )
+      this.options = tableState.options
       this.taxa = taxonResponse.items
       this.count = taxonResponse.count
     },

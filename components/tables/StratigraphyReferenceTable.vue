@@ -1,16 +1,16 @@
 <template>
   <table-wrapper
-    v-bind="{ showSearch, externalOptions }"
+    v-bind="{ showSearch }"
     :headers="headers"
     :items="items"
-    :init-options="options"
+    :options="options"
     :count="count"
     v-on="$listeners"
   >
     <template #item.reference="{ item }">
       <external-link
-        v-if="item.reference__id"
-        @click.native="$openGeology('reference', item.reference__id)"
+        v-if="item.reference_id"
+        @click.native="$openGeology('reference', item.reference_id)"
       >
         {{ item.reference__reference }}
       </external-link>
@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import { round } from 'lodash'
 import ExternalLink from '../ExternalLink.vue'
 import TableWrapper from '~/components/tables/TableWrapper.vue'
 export default {
@@ -29,10 +28,6 @@ export default {
     showSearch: {
       type: Boolean,
       default: true,
-    },
-    externalOptions: {
-      type: Boolean,
-      default: false,
     },
     items: {
       type: Array,
@@ -63,9 +58,6 @@ export default {
         { text: this.$t('stratigraphyReference.remarks'), value: 'remarks' },
       ],
     }
-  },
-  methods: {
-    round,
   },
 }
 </script>

@@ -2,6 +2,10 @@ import { debounce } from 'lodash'
 
 export default {
   props: {
+    onlyTable: {
+      type: Boolean,
+      default: false,
+    },
     items: {
       type: Array,
       default: () => [],
@@ -10,7 +14,7 @@ export default {
       type: Array,
       default: () => [],
     },
-    initOptions: {
+    options: {
       type: Object,
       default: () => {},
     },
@@ -22,15 +26,10 @@ export default {
       type: Boolean,
       default: true,
     },
-    externalOptions: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
       search: '',
-      options: this.initOptions,
       footerProps: {
         showFirstLastPage: true,
         'items-per-page-options': [10, 25, 50, 100],
@@ -40,17 +39,12 @@ export default {
   },
   methods: {
     handleChange(options) {
-      if (!this.externalOptions) {
-        this.options = options
-      }
-      this.$emit('update', { tableOptions: options, search: this.search })
+      this.$emit('update', { options, search: this.search })
     },
     handleSearch: debounce(function () {
-      if (!this.externalOptions) {
-        this.options = { ...this.options, page: 1 }
-      }
+      const options = { ...this.options, page: 1 }
       this.$emit('update', {
-        tableOptions: { ...this.options, page: 1 },
+        options,
         search: this.search,
       })
     }, 500),

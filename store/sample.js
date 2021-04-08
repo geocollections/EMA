@@ -30,9 +30,10 @@ const getDefaultState = () => {
           fields: ['stratigraphy', 'stratigraphy_en'],
         },
         hierarchy: {
-          value: '',
-          type: 'text',
-          lookUpType: 'startsWith',
+          value: null,
+          type: 'object',
+          searchField: 'hierarchy_string',
+          lookUpType: 'exact',
           label: 'sample.hierarchy',
           fields: [
             'stratigraphy_hierarchy',
@@ -114,7 +115,7 @@ export const actions = {
     const sampleResponse = await this.$services.sarvSolr.getResourceList(
       'sample',
       {
-        tableOptions: options,
+        options,
         search: rootState.landing.search,
         queryFields: this.$getQueryFields(SAMPLE.queryFields),
         searchFilters: {},
@@ -132,7 +133,7 @@ export const actions = {
     const sampleResponse = await this.$services.sarvSolr.getResourceList(
       'sample',
       {
-        tableOptions: options,
+        options,
         search: rootState.landing.search,
         queryFields: this.$getQueryFields(SAMPLE.queryFields),
         searchFilters: state.filters.byIds,

@@ -1,10 +1,10 @@
 <template>
   <div>
-    <v-row>
-      <v-col>
-        <h1 class="text-center">{{ $t('common.localities') }}</h1>
-      </v-col>
-    </v-row>
+    <search-view-title
+      title="common.localitiesCount"
+      :count="count"
+      icon="mdi-map-marker-outline"
+    />
     <!--    <v-row>-->
     <!--      <v-col>-->
     <!--        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam posuere,-->
@@ -30,7 +30,6 @@
       <v-col cols="12" md="9">
         <locality-table
           :show-search="false"
-          external-options
           :items="items"
           :count="count"
           :options="options"
@@ -45,9 +44,10 @@
 import { mapState, mapActions } from 'vuex'
 import LocalitySearchForm from '@/components/search/LocalitySearchForm'
 import LocalityTable from '~/components/tables/LocalityTable.vue'
+import SearchViewTitle from '~/components/search/SearchViewTitle'
 
 export default {
-  components: { LocalityTable, LocalitySearchForm },
+  components: { SearchViewTitle, LocalityTable, LocalitySearchForm },
   head() {
     return {
       title: this.$t('locality.pageTitle'),
@@ -59,8 +59,9 @@ export default {
   },
   methods: {
     ...mapActions('locality', ['searchLocalities']),
-    async handleUpdate(options) {
-      await this.searchLocalities(options.tableOptions)
+    async handleUpdate(tableState) {
+      await this.searchLocalities(tableState.options)
+      this.options = tableState.options
     },
   },
 }

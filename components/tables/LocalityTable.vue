@@ -1,9 +1,9 @@
 <template>
   <table-wrapper
-    v-bind="{ showSearch, externalOptions }"
+    v-bind="{ showSearch }"
     :headers="headers"
     :items="items"
-    :init-options="options"
+    :options="options"
     :count="count"
     v-on="$listeners"
   >
@@ -40,10 +40,6 @@ export default {
       type: Boolean,
       default: true,
     },
-    externalOptions: {
-      type: Boolean,
-      default: false,
-    },
     items: {
       type: Array,
       default: () => [],
@@ -65,6 +61,7 @@ export default {
   data() {
     return {
       headers: [
+        { text: this.$t('locality.id'), value: 'id' },
         { text: this.$t('locality.name'), value: 'locality' },
         { text: this.$t('locality.country'), value: 'country' },
         { text: this.$t('locality.latitude'), value: 'latitude' },

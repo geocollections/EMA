@@ -1,10 +1,10 @@
 <template>
   <v-row>
     <v-col>
-      <h1 class="text-center my-3 page-title">
-        {{ $translate({ et: site.name, en: site.name_en }) }}
-      </h1>
-      <prev-next-nav :ids="ids" />
+      <prev-next-nav-title
+        :ids="ids"
+        :title="$translate({ et: site.name, en: site.name_en })"
+      />
       <v-card flat tile class="my-2">
         <v-container>
           <v-row>
@@ -290,12 +290,12 @@
 
 <script>
 import { isNil } from 'lodash'
-import LeafletMap from '@/components/LeafletMap'
+import LeafletMap from '@/components/map/LeafletMap'
 import Tabs from '~/components/Tabs.vue'
-import PrevNextNav from '~/components/PrevNextNav'
+import PrevNextNavTitle from '~/components/PrevNextNavTitle'
 
 export default {
-  components: { PrevNextNav, Tabs, LeafletMap },
+  components: { PrevNextNavTitle, Tabs, LeafletMap },
   async asyncData({ params, route, error, app }) {
     try {
       const detailViewResponse = await app.$services.sarvREST.getResource(

@@ -32,15 +32,7 @@ const getSortByParams = (options, queryFields) => {
 export default ($axios) => ({
   async getResourceList(
     resource,
-    {
-      defaultParams,
-      queryFields,
-      search,
-      tableOptions,
-      isValid,
-      searchFilters = {},
-      ...options
-    }
+    { defaultParams, queryFields, search, options, isValid, searchFilters = {} }
   ) {
     if (isValid) {
       return {
@@ -52,8 +44,8 @@ export default ($axios) => ({
       ...defaultParams,
       ...buildQueryParameter(search),
       ...buildFilterQueryParameter(searchFilters),
-      ...getPaginationParams(tableOptions),
-      ...getSortByParams(tableOptions, queryFields),
+      ...getPaginationParams(options),
+      ...getSortByParams(options, queryFields),
     }
 
     const response = await $axios.$get(`solr/${resource}/`, { params })
@@ -102,6 +94,11 @@ const buildFilterQueryParameter = (filters) => {
       if (v.type === 'text' && (!v.value || v.value.trim().length <= 0))
         return false
       if (v.type === 'select' && (v.value === null || v.value.length < 1))
+        return false
+      if (
+        v.type === 'object' &&
+        (typeof v.value !== 'object' || !v.value?.[v.searchField])
+      )
         return false
       return v.value !== null
     })
@@ -158,6 +155,14 @@ const buildFilterQueryParameter = (filters) => {
             case 'text': {
               return encodeURIComponent(
                 `${buildTextParameter(searchParameter.value, fieldId)}`
+              )
+            }
+            case 'object': {
+              return encodeURIComponent(
+                `${buildTextParameter(
+                  searchParameter.value[searchParameter.searchField],
+                  fieldId
+                )}`
               )
             }
             default:

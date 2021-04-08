@@ -1,7 +1,6 @@
 <template>
   <doi-table
     :show-search="false"
-    external-options
     :items="items"
     :count="count"
     :options="options"
@@ -31,19 +30,19 @@ export default {
     search: {
       handler: debounce(function (value) {
         this.options.page = 1
-        this.handleUpdate({ tableOptions: { ...this.options }, search: value })
+        this.handleUpdate({ options: { ...this.options }, search: value })
       }, 500),
     },
   },
   methods: {
-    async handleUpdate(options) {
+    async handleUpdate(tableState) {
       const response = await this.$services.sarvSolr.getResourceList('doi', {
-        tableOptions: options.tableOptions,
+        options: tableState.options,
         search: this.search,
         queryFields: this.$getQueryFields(DOI.queryFields),
         searchFilters: {},
       })
-      this.options = options.tableOptions
+      this.options = tableState.options
       this.items = response.items
       this.count = response.count
     },

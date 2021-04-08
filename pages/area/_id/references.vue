@@ -27,11 +27,11 @@ export default {
     }
   },
   methods: {
-    async handleUpdate(options) {
+    async handleUpdate(tableState) {
       const referenceResponse = await this.$services.sarvREST.getResourceList(
         'locality_reference',
         {
-          ...options,
+          ...tableState,
           isValid: isNil(this.area),
           defaultParams: {
             area: this.area,
@@ -39,6 +39,7 @@ export default {
           queryFields: this.$getQueryFields(LOCALITY_REFERENCE.queryFields),
         }
       )
+      this.options = tableState.options
       this.references = referenceResponse.items
       this.count = referenceResponse.count
     },

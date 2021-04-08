@@ -26,17 +26,18 @@ export default {
     }
   },
   methods: {
-    async handleUpdate(options) {
+    async handleUpdate(tableState) {
       const attachmentResponse = await this.$services.sarvREST.getResourceList(
         'attachment_link',
         {
-          ...options,
+          ...tableState,
           defaultParams: {
             locality: `${this.$route.params.id}`,
           },
           queryFields: this.$getQueryFields(ATTACHMENT.queryFields),
         }
       )
+      this.options = tableState.options
       this.attachments = attachmentResponse.items
       this.count = attachmentResponse.count
     },

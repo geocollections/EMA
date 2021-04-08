@@ -5,7 +5,7 @@
     multi-sort
     :headers="headers"
     :items="items"
-    :options="externalOptions ? initOptions : options"
+    :options="options"
     item-key="_version"
     :server-items-length="count"
     :footer-props="footerProps"
@@ -14,7 +14,8 @@
     @update:options="handleChange"
   >
     <template #no-data>{{ $t('table.noData') }}</template>
-    <template v-if="!onlyTable" #top="{ pagination }">
+    <!-- eslint-disable-next-line vue/no-template-shadow -->
+    <template v-if="!onlyTable" #top="{ pagination, updateOptions, options }">
       <v-row no-gutters>
         <v-col v-if="showSearch" cols="12" sm="4" class="py-0 px-3">
           <v-text-field
@@ -31,11 +32,11 @@
           <v-data-footer
             style="border: none"
             :pagination="pagination"
-            :options="externalOptions ? initOptions : options"
+            :options="options"
             :show-first-last-page="footerProps.showFirstLastPage"
             :items-per-page-options="footerProps['items-per-page-options']"
             :items-per-page-text="footerProps['items-per-page-text']"
-            @update:options="handleChange"
+            @update:options="updateOptions"
           />
         </v-col>
       </v-row>
@@ -48,15 +49,8 @@
 
 <script>
 import tableMixin from '~/mixins/tableMixin'
-
 export default {
   name: 'TableWrapper',
   mixins: [tableMixin],
-  props: {
-    onlyTable: {
-      type: Boolean,
-      default: false,
-    },
-  },
 }
 </script>

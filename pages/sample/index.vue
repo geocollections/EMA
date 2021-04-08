@@ -1,10 +1,10 @@
 <template>
   <div>
-    <v-row>
-      <v-col>
-        <h1 class="text-center">{{ $t('common.samples') }}</h1>
-      </v-col>
-    </v-row>
+    <search-view-title
+      title="common.samplesCount"
+      :count="count"
+      icon="mdi-test-tube"
+    />
     <!--    <v-row>-->
     <!--      <v-col>-->
     <!--        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam posuere,-->
@@ -30,7 +30,6 @@
       <v-col cols="12" md="9">
         <sample-table
           :show-search="false"
-          external-options
           :items="items"
           :count="count"
           :options="options"
@@ -45,9 +44,10 @@
 import { mapState, mapActions } from 'vuex'
 import SampleSearchForm from '@/components/search/SampleSearchForm'
 import SampleTable from '~/components/tables/SampleTable.vue'
+import SearchViewTitle from '~/components/search/SearchViewTitle'
 
 export default {
-  components: { SampleSearchForm, SampleTable },
+  components: { SearchViewTitle, SampleSearchForm, SampleTable },
   head() {
     return {
       title: this.$t('sample.pageTitle'),
@@ -59,8 +59,9 @@ export default {
   },
   methods: {
     ...mapActions('sample', ['searchSamples']),
-    async handleUpdate(options) {
-      await this.searchSamples(options.tableOptions)
+    async handleUpdate(tableState) {
+      await this.searchSamples(tableState.options)
+      this.options = tableState.options
     },
   },
 }

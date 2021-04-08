@@ -1,10 +1,10 @@
 <template>
   <div>
-    <v-row>
-      <v-col>
-        <h1 class="text-center">{{ $t('common.analyses') }}</h1>
-      </v-col>
-    </v-row>
+    <search-view-title
+      title="common.analysesCount"
+      :count="count"
+      icon="mdi-chart-scatter-plot"
+    />
     <!--    <v-row>-->
     <!--      <v-col>-->
     <!--        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam posuere,-->
@@ -30,7 +30,6 @@
       <v-col cols="12" md="9">
         <analysis-table
           :show-search="false"
-          external-options
           :items="items"
           :count="count"
           :options="options"
@@ -45,10 +44,11 @@
 import { mapState, mapActions } from 'vuex'
 import AnalysisTable from '@/components/tables/AnalysisTable'
 import AnalysisSearchForm from '~/components/search/AnalysisSearchForm'
+import SearchViewTitle from '~/components/search/SearchViewTitle'
 
 export default {
   name: 'AnalysisSearch',
-  components: { AnalysisSearchForm, AnalysisTable },
+  components: { SearchViewTitle, AnalysisSearchForm, AnalysisTable },
   head() {
     return {
       title: this.$t('analysis.pageTitle'),
@@ -60,8 +60,9 @@ export default {
   },
   methods: {
     ...mapActions('analysis', ['searchAnalyses']),
-    async handleUpdate(options) {
-      await this.searchAnalyses(options.tableOptions)
+    async handleUpdate(tableState) {
+      await this.searchAnalyses(tableState.options)
+      this.options = tableState.options
     },
   },
 }

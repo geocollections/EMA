@@ -1,15 +1,15 @@
 <template>
   <v-row>
     <v-col>
-      <h1 class="text-center my-3 page-title">
-        {{
+      <prev-next-nav-title
+        :ids="ids"
+        :title="
           $translate({
             et: stratigraphy.stratigraphy,
             en: stratigraphy.stratigraphy_en,
           })
-        }}
-      </h1>
-      <prev-next-nav :ids="ids" />
+        "
+      />
       <v-card flat tile>
         <v-row no-gutters>
           <v-col cols="12" md="6">
@@ -125,11 +125,13 @@
 
                     <data-row :title="$t('stratigraphy.index')">
                       <template #value>
+                        <!-- eslint-disable-next-line vue/no-v-html -->
                         <div v-html="stratigraphy.index_main_html" />
                       </template>
                     </data-row>
                     <data-row :title="$t('stratigraphy.indexAlt')">
                       <template #value>
+                        <!-- eslint-disable-next-line vue/no-v-html -->
                         <div v-html="stratigraphy.index_additional_html" />
                       </template>
                     </data-row>
@@ -150,7 +152,9 @@
               />
               <v-card id="map-wrap" elevation="0" height="300">
                 <leaflet-map
-                  is-estonian
+                  :is-estonian="
+                    stratotypes[0].locality__country__value === 'Eesti'
+                  "
                   :height="300"
                   :markers="stratigraphyMarkers"
                 />
@@ -175,6 +179,8 @@
         <v-row no-gutters>
           <v-col cols="12">
             <v-card-title>{{ $t('common.description') }}</v-card-title>
+
+            <!-- eslint-disable vue/no-v-html -->
             <v-card-text
               v-html="
                 $translate({
@@ -183,6 +189,7 @@
                 })
               "
             />
+            <!-- eslint-enable -->
           </v-col>
         </v-row>
       </v-card>
@@ -192,17 +199,17 @@
 
 <script>
 import { isEmpty, isNull, isNil } from 'lodash'
-import LeafletMap from '@/components/LeafletMap'
+import LeafletMap from '@/components/map/LeafletMap'
 import Tabs from '~/components/Tabs.vue'
 import DataRow from '~/components/DataRow.vue'
 import LinkDataRow from '~/components/LinkDataRow.vue'
-import PrevNextNav from '~/components/PrevNextNav'
+import PrevNextNavTitle from '~/components/PrevNextNavTitle'
 import StratigraphyStratotypeTable from '~/components/tables/StratigraphyStratotypeTable'
 import { STRATOTYPE } from '~/constants'
 
 export default {
   components: {
-    PrevNextNav,
+    PrevNextNavTitle,
     Tabs,
     LinkDataRow,
     DataRow,

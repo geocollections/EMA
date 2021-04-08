@@ -1,10 +1,10 @@
 <template>
   <div>
-    <v-row>
-      <v-col>
-        <h1 class="text-center">{{ $t('common.drillcores') }}</h1>
-      </v-col>
-    </v-row>
+    <search-view-title
+      title="common.drillcoresCount"
+      :count="count"
+      icon="mdi-screw-machine-flat-top"
+    />
     <!--    <v-row>-->
     <!--      <v-col>-->
     <!--        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam posuere,-->
@@ -30,7 +30,6 @@
       <v-col cols="12" md="9">
         <drillcore-table
           :show-search="false"
-          external-options
           :items="items"
           :count="count"
           :options="options"
@@ -45,9 +44,10 @@
 import { mapState, mapActions } from 'vuex'
 import DrillcoreSearchForm from '@/components/search/DrillcoreSearchForm'
 import DrillcoreTable from '~/components/tables/DrillcoreTable.vue'
+import SearchViewTitle from '~/components/search/SearchViewTitle'
 
 export default {
-  components: { DrillcoreSearchForm, DrillcoreTable },
+  components: { SearchViewTitle, DrillcoreSearchForm, DrillcoreTable },
   head() {
     return {
       title: this.$t('drillcore.pageTitle'),
@@ -59,8 +59,9 @@ export default {
   },
   methods: {
     ...mapActions('drillcore', ['searchDrillcores']),
-    async handleUpdate(options) {
-      await this.searchDrillcores(options.tableOptions)
+    async handleUpdate(tableState) {
+      await this.searchDrillcores(tableState.options)
+      this.options = tableState.options
     },
   },
 }
