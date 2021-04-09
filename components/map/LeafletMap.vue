@@ -10,6 +10,7 @@
         @baselayerchange="handleBaseLayerChange"
         @overlayadd="handleOverlayAdd"
         @overlayremove="handleOverlayRemove"
+        @ready="fitBounds"
       >
         <l-control-layers />
         <l-control-fullscreen position="topleft" />
@@ -49,13 +50,25 @@
         />
         <l-circle-marker
           v-for="(marker, idx) in markers"
-          :key="`marker-${idx}`"
+          :key="`marker-${idx}-lat-${marker.latitude}-lon-${marker.latitude}`"
           :lat-lng="[marker.latitude, marker.longitude]"
           :radius="5"
           :weight="2"
           color="red"
+          @click="
+            marker.id && marker.routeName
+              ? $router.push(
+                  localePath({
+                    name: `${marker.routeName}-id`,
+                    params: { id: marker.id },
+                  })
+                )
+              : ''
+          "
         >
-          <l-tooltip :options="tooltipOptions">{{ marker.text }}</l-tooltip>
+          <l-tooltip v-if="marker.text" :options="tooltipOptions">{{
+            marker.text
+          }}</l-tooltip>
         </l-circle-marker>
 
         <!-- <map-legend
@@ -96,7 +109,7 @@ export default {
     center: {
       type: Object,
       default() {
-        return { latitude: 0, longitude: 0 }
+        return { latitude: 58.5, longitude: 25.5 }
       },
     },
     markers: {
@@ -110,6 +123,7 @@ export default {
       type: Boolean,
       default: false,
     },
+    invalidateSize: Boolean,
   },
   data() {
     return {
@@ -124,12 +138,7 @@ export default {
           duration: 1000,
         },
       },
-      tooltipOptions: {
-        permanent: this.markers.length <= 5,
-        direction: 'top',
-        offset: [1, -7],
-      },
-      activeBaseLayer: this.isEstonian ? 'Estonian map' : 'OpenStreetMap',
+      activeBaseLayer: this.isEstonian ? 'Estonian map' : 'CartoDB',
       activeOverlays: [],
       layers: {
         base: [
@@ -138,7 +147,7 @@ export default {
             name: 'CartoDB',
             url:
               'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-            visible: false,
+            visible: !this.isEstonian,
             options: {
               attribution:
                 '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -148,8 +157,7 @@ export default {
             id: 'open-steet-base',
             name: 'OpenStreetMap',
             url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-
-            visible: !this.isEstonian,
+            visible: false,
             options: {
               attribution:
                 '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -267,16 +275,32 @@ export default {
         this.markers.map((marker) => marker.longitude),
       ]
     },
+
+    tooltipOptions() {
+      return {
+        permanent: this.markers.length <= 5,
+        direction: 'top',
+        offset: [1, -7],
+      }
+    },
+
+    markersAsFitBoundsObject() {
+      return this.markers.map((m) => {
+        return [m.latitude, m.longitude]
+      })
+    },
   },
-  mounted() {
-    this.$nextTick(() => {
-      this.$refs.map.mapObject.fitBounds(
-        this.markers.map((m) => {
-          return [m.latitude, m.longitude]
-        })
-      )
-      this.$refs.map.setZoom(this.mapZoom)
-    })
+  watch: {
+    markers() {
+      this.fitBounds()
+    },
+    invalidateSize(newVal) {
+      if (newVal) {
+        this.$refs.map.mapObject.invalidateSize()
+        // HACK: This fixes initial bounds problem in search view (markers out of bounds)
+        this.fitBounds()
+      }
+    },
   },
   methods: {
     handleBaseLayerChange(event) {
@@ -291,6 +315,15 @@ export default {
     handleOverlayRemove(event) {
       const index = this.activeOverlays.indexOf(event.name)
       if (index > -1) this.activeOverlays.splice(index, 1)
+    },
+
+    fitBounds() {
+      if (this.markersAsFitBoundsObject.length > 0) {
+        this.$refs.map.mapObject.fitBounds(this.markersAsFitBoundsObject, {
+          padding: [50, 50],
+          maxZoom: this.mapZoom,
+        })
+      }
     },
   },
 }
