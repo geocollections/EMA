@@ -297,8 +297,14 @@ export default {
     invalidateSize(newVal) {
       if (newVal) {
         this.$refs.map.mapObject.invalidateSize()
+        // Fixes tooltip perminent positions when opeing map
+
         // HACK: This fixes initial bounds problem in search view (markers out of bounds)
         this.fitBounds()
+        this.$refs.map.mapObject.setView(
+          this.$refs.map.center,
+          this.$refs.map.zoom
+        )
       }
     },
   },
@@ -319,9 +325,11 @@ export default {
 
     fitBounds() {
       if (this.markersAsFitBoundsObject.length > 0) {
-        this.$refs.map.mapObject.fitBounds(this.markersAsFitBoundsObject, {
-          padding: [50, 50],
-          maxZoom: this.mapZoom,
+        this.$nextTick(() => {
+          this.$refs.map.mapObject.fitBounds(this.markersAsFitBoundsObject, {
+            padding: [50, 50],
+            maxZoom: this.mapZoom,
+          })
         })
       }
     },

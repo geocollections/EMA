@@ -1,10 +1,13 @@
 <template>
-  <v-row>
-    <v-col>
+  <detail>
+    <template #title>
       <prev-next-nav-title
         :ids="ids"
         :title="$t('analysis.title', { id: analysis.id })"
       />
+    </template>
+
+    <template #default>
       <v-card flat tile>
         <v-row no-gutters justify="center">
           <v-col cols="12" md="9" lg="7" xl="6">
@@ -112,6 +115,7 @@
                         })
                       "
                     />
+                    <data-row :title="$t('analysis.id')" :value="analysis.id" />
                   </tbody>
                 </template>
               </v-simple-table>
@@ -119,6 +123,8 @@
           </v-col>
         </v-row>
       </v-card>
+    </template>
+    <template #bottom>
       <v-card v-if="filteredTabs.length > 0" flat tile class="mt-6 mx-4 mb-4">
         <v-row no-gutters justify="center" class="px-4">
           <v-col cols="12" md="9" lg="7" xl="6" class="elevation-2 rounded">
@@ -126,8 +132,8 @@
           </v-col>
         </v-row>
       </v-card>
-    </v-col>
-  </v-row>
+    </template>
+  </detail>
 </template>
 
 <script>
@@ -136,8 +142,9 @@ import DataRow from '~/components/DataRow.vue'
 import LinkDataRow from '~/components/LinkDataRow.vue'
 import Tabs from '~/components/Tabs'
 import PrevNextNavTitle from '~/components/PrevNextNavTitle'
+import Detail from '~/components/templates/Detail.vue'
 export default {
-  components: { PrevNextNavTitle, DataRow, LinkDataRow, Tabs },
+  components: { PrevNextNavTitle, DataRow, LinkDataRow, Tabs, Detail },
   async asyncData({ params, route, error, app, redirect }) {
     try {
       const analysisResponse = await app.$services.sarvREST.getResource(

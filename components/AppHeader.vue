@@ -1,13 +1,5 @@
 <template>
-  <v-app-bar
-    app
-    color="#6A76AB"
-    :prominent="!isDetail"
-    :hide-on-scroll="!isDetail"
-    :dense="isDetail"
-    :src="require(`~/assets/header/header1a.jpg`)"
-    dark
-  >
+  <v-app-bar app color="#5c6598" dark style="z-index: 2050">
     <template #img="{ props }">
       <v-img
         v-bind="props"
@@ -24,8 +16,6 @@
                 v-bind="attrs"
                 class="header-text text-none text-nowrap"
                 :class="{
-                  emaapou: !isDetail,
-                  'emaapou-detail': isDetail,
                   'mr-4': $vuetify.breakpoint.smAndUp,
                 }"
                 v-on="on"
@@ -38,7 +28,8 @@
         </nuxt-link>
       </v-app-bar-title>
 
-      <template v-if="isDetail">
+      <!-- BUTTONS ON DENSE BAR -->
+      <!-- <template>
         <v-btn
           v-for="(item, index) in tabs"
           :key="index"
@@ -53,22 +44,39 @@
           :to="localePath({ name: item.name })"
           >{{ $t(`common.${item.lang}`) }}</v-btn
         >
-      </template>
+      </template> -->
     </v-toolbar-items>
 
     <v-spacer />
 
-    <app-header-search class="d-none d-sm-flex" />
+    <v-btn
+      v-show="$vuetify.breakpoint.smAndUp"
+      nuxt
+      aria-label="about page"
+      class="font-weight-bold"
+      text
+      :to="localePath({ name: 'about' })"
+    >
+      {{ $t('common.about') }}
+    </v-btn>
+
     <links />
-    <lang-switcher v-if="false" />
-    <lang-switcher-fast :is-detail="isDetail" />
-    <template v-if="!isDetail" #extension>
+
+    <app-header-search class="mr-2" />
+
+    <lang-switcher />
+
+    <lang-switcher-fast v-if="false" />
+
+    <template v-if="$vuetify.breakpoint.smAndUp" #extension>
       <v-tabs
         :value="tabValue"
         align-with-title
+        class="tabs"
         optional
         show-arrows
         center-active
+        centered
       >
         <v-tab
           v-for="(item, index) in tabs"
@@ -76,24 +84,36 @@
           nuxt
           :exact="item.name !== 'search'"
           :to="localePath({ name: item.name })"
-          >{{ $t(`common.${item.lang}`) }}</v-tab
+          ><b>{{ $t(`common.${item.lang}`) }}</b></v-tab
         >
       </v-tabs>
     </template>
 
-    <v-tooltip bottom>
-      <template #activator="{ on }">
-        <v-app-bar-nav-icon
-          small
-          :class="{ 'd-none': !isDetail, 'd-flex d-lg-none ml-1': isDetail }"
-          aria-label="Open navigation drawer"
-          style="height: 32px; width: 32px"
-          v-on="on"
-          @click.stop="$emit('toggle:navigationDrawer')"
-        />
-      </template>
-      <span>{{ $t('landing.showMenu') }}</span>
-    </v-tooltip>
+    <v-btn
+      :text="$vuetify.breakpoint.smAndUp"
+      :icon="!$vuetify.breakpoint.smAndUp"
+      class="font-weight-bold"
+      :class="{ 'mr-1 header-icon-button': !$vuetify.breakpoint.smAndUp }"
+      aria-label="Open navigation drawer"
+      :small="!$vuetify.breakpoint.smAndUp"
+      @click.stop="$emit('toggle:navigationDrawer')"
+    >
+      <div v-if="drawer">
+        <span
+          v-show="$vuetify.breakpoint.smAndUp"
+          style="vertical-align: middle"
+          >{{ $t('common.close') }}</span
+        ><v-icon size="font-size: 24px">mdi-close</v-icon>
+      </div>
+      <div v-else>
+        <span
+          v-show="$vuetify.breakpoint.smAndUp"
+          style="vertical-align: middle"
+          >{{ $t('common.more') }}</span
+        >
+        <v-icon size="font-size: 24px">mdi-menu</v-icon>
+      </div>
+    </v-btn>
   </v-app-bar>
 </template>
 
@@ -111,18 +131,11 @@ export default {
       required: false,
       default: false,
     },
+    drawer: Boolean,
   },
   data() {
     return {
       tabs: [
-        {
-          name: 'about',
-          lang: 'about',
-        },
-        {
-          name: 'search',
-          lang: 'search',
-        },
         {
           name: 'drillcore',
           lang: 'drillcores',
@@ -161,5 +174,9 @@ export default {
 <style scoped>
 .app-title >>> .v-app-bar-title__content {
   width: unset !important;
+}
+
+.tabs {
+  background-color: #7781b5;
 }
 </style>
