@@ -1,12 +1,5 @@
 <template>
-  <v-app-bar app color="#5c6598" dark style="z-index: 2050">
-    <template #img="{ props }">
-      <v-img
-        v-bind="props"
-        gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"
-      ></v-img>
-    </template>
-
+  <v-app-bar app dark style="z-index: 2050" color="secondary">
     <v-toolbar-items>
       <v-app-bar-title class="app-title align-self-center">
         <nuxt-link :to="localePath({ path: '/' })" class="title-link">
@@ -60,9 +53,9 @@
       {{ $t('common.about') }}
     </v-btn>
 
-    <links />
+    <links v-if="false" />
 
-    <app-header-search class="mr-2" />
+    <app-header-search class="mx-3" />
 
     <lang-switcher />
 
@@ -72,17 +65,18 @@
       <v-tabs
         :value="tabValue"
         align-with-title
-        class="tabs"
+        class="tertiary"
         optional
         show-arrows
         center-active
+        light
         centered
       >
         <v-tab
           v-for="(item, index) in tabs"
           :key="index"
           nuxt
-          :exact="item.name !== 'search'"
+          active-class="black--text"
           :to="localePath({ name: item.name })"
           ><b>{{ $t(`common.${item.lang}`) }}</b></v-tab
         >
@@ -119,9 +113,9 @@
 
 <script>
 import Links from '@/components/Links'
-import LangSwitcher from '@/components/LangSwitcher'
+import LangSwitcher from '~/components/lang_switcher/LangSwitcher'
 import AppHeaderSearch from '~/components/AppHeaderSearch'
-import LangSwitcherFast from '~/components/LangSwitcherFast'
+import LangSwitcherFast from '~/components/lang_switcher/LangSwitcherFast'
 export default {
   name: 'AppHeader',
   components: { LangSwitcherFast, AppHeaderSearch, LangSwitcher, Links },
@@ -137,12 +131,16 @@ export default {
     return {
       tabs: [
         {
-          name: 'drillcore',
-          lang: 'drillcores',
-        },
-        {
           name: 'locality',
           lang: 'localities',
+        },
+        {
+          name: 'site',
+          lang: 'sites',
+        },
+        {
+          name: 'drillcore',
+          lang: 'drillcores',
         },
         {
           name: 'sample',
@@ -174,9 +172,5 @@ export default {
 <style scoped>
 .app-title >>> .v-app-bar-title__content {
   width: unset !important;
-}
-
-.tabs {
-  background-color: #7781b5;
 }
 </style>

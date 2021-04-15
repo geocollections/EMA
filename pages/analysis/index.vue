@@ -1,6 +1,6 @@
 <template>
   <div>
-    <search-view-title
+    <page-title-wrapper
       title="common.analysesCount"
       :count="count"
       icon="mdi-chart-scatter-plot"
@@ -28,7 +28,7 @@
         </v-card>
       </v-col>
       <v-col cols="12" md="9">
-        <search-view-map-wrapper :items="items" />
+        <search-view-map-wrapper :items="items" class="mb-6" />
 
         <analysis-table
           :show-search="false"
@@ -45,15 +45,15 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import AnalysisTable from '@/components/tables/AnalysisTable'
-import AnalysisSearchForm from '~/components/search/AnalysisSearchForm'
-import SearchViewTitle from '~/components/search/SearchViewTitle'
+import AnalysisSearchForm from '~/components/search/forms/AnalysisSearchForm'
+import PageTitleWrapper from '~/components/search/PageTitleWrapper'
 import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
 
 export default {
   name: 'AnalysisSearch',
   components: {
     SearchViewMapWrapper,
-    SearchViewTitle,
+    PageTitleWrapper,
     AnalysisSearchForm,
     AnalysisTable,
   },

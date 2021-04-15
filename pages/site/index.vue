@@ -1,6 +1,6 @@
 <template>
   <div>
-    <search-view-title
+    <page-title-wrapper
       title="common.sitesCount"
       :count="count"
       icon="mdi-map-marker-star-outline"
@@ -28,7 +28,7 @@
         </v-card>
       </v-col>
       <v-col cols="12" md="9">
-        <search-view-map-wrapper :items="items" />
+        <search-view-map-wrapper :items="items" class="mb-6" />
 
         <site-table
           :show-search="false"
@@ -44,15 +44,15 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import SiteSearchForm from '@/components/search/SiteSearchForm'
+import SiteSearchForm from '@/components/search/forms/SiteSearchForm'
 import SiteTable from '~/components/tables/SiteTable.vue'
-import SearchViewTitle from '~/components/search/SearchViewTitle'
+import PageTitleWrapper from '~/components/search/PageTitleWrapper'
 import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
 
 export default {
   components: {
     SearchViewMapWrapper,
-    SearchViewTitle,
+    PageTitleWrapper,
     SiteSearchForm,
     SiteTable,
   },

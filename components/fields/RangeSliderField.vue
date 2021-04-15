@@ -1,43 +1,11 @@
 <template>
-  <!-- <div>
-    <v-row>
-      <v-col>
-        <div>{{ label }}</div>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <v-text-field
-          :value="value.min"
-          class="searchField"
-          color="grey darken-3"
-          :label="fieldLabels.min"
-          hide-details
-          type="number"
-          @input="handleInput({ isMin: true, value: $event })"
-        >
-        </v-text-field>
-      </v-col>
-      <v-col cols="6">
-        <v-text-field
-          :value="value.max"
-          class="searchField"
-          color="grey darken-3"
-          :label="fieldLabels.max"
-          hide-details
-          single-line
-          type="number"
-          @input="handleInput({ isMin: false, value: $event })"
-        />
-      </v-col>
-    </v-row>
-  </div> -->
-  <div>
-    <v-subheader v-if="label">{{ label }}</v-subheader>
+  <div class="pt-1">
+    <v-subheader v-if="label" class="px-0 d-inline">{{ label }}</v-subheader>
     <v-range-slider
       :value="value"
       :min="min"
       :max="max"
+      hide-details=""
       @input="$emit('input', $event)"
     >
       <template #prepend>
@@ -67,7 +35,7 @@
 
 <script>
 export default {
-  name: 'RangeSearchField',
+  name: 'RangeSliderField',
   props: {
     min: {
       type: Number,

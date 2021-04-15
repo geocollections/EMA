@@ -1,7 +1,7 @@
 <template>
   <div
-    class="d-flex justify-space-between px-4 flex-column flex-sm-row elevation-2"
-    :class="{ 'page-title my-3': title || $slots.title }"
+    class="d-flex justify-space-between px-4 flex-column flex-sm-row elevation-2 tertiary"
+    :class="{ 'my-3': title || $slots.title }"
   >
     <div class="align-self-start align-self-sm-center text-no-wrap">
       <v-tooltip bottom>
@@ -50,9 +50,11 @@
     </div>
 
     <slot name="title">
-      <h1 class="text-center">
-        {{ title }}
-      </h1>
+      <page-title
+        class="text-center"
+        :title="title"
+        :subtitle="$t(`breadcrumbs.${routeName}-id`, { id: $route.params.id })"
+      />
     </slot>
 
     <div class="align-self-end align-self-sm-center text-no-wrap">
@@ -103,8 +105,10 @@
 </template>
 
 <script>
+import PageTitle from '~/components/PageTitle'
 export default {
   name: 'PrevNextNavTitle',
+  components: { PageTitle },
   props: {
     arrowKeys: {
       type: Boolean,
@@ -142,6 +146,10 @@ export default {
 
     computedFirstId() {
       return this.ids?.first_id
+    },
+
+    routeName() {
+      return this.getRouteBaseName().split('-id')[0]
     },
   },
   beforeMount() {

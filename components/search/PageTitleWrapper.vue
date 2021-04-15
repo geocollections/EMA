@@ -1,21 +1,22 @@
 <template>
   <v-card class="mb-4" tile>
-    <v-row no-gutters class="page-title">
-      <v-col md="9" offset-md="3" class="py-0">
-        <div class="d-flex justify-center justify-md-start">
-          <v-icon v-if="icon" large left>{{ icon }}</v-icon>
-          <h1>
-            {{ $t(title, { count: count }) }}
-          </h1>
-        </div>
+    <v-row no-gutters class="tertiary">
+      <v-col>
+        <page-title
+          :icon="icon"
+          :title="title"
+          :subtitle="$t('common.count', { count: count })"
+        />
       </v-col>
     </v-row>
   </v-card>
 </template>
 
 <script>
+import PageTitle from '~/components/PageTitle'
 export default {
-  name: 'SearchViewTitle',
+  name: 'PageTitleWrapper',
+  components: { PageTitle },
   props: {
     title: {
       type: String,

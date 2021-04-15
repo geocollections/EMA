@@ -5,26 +5,14 @@
       <reset-search-button @click="handleReset" />
       <search-button />
     </div>
-    <text-search-field v-model="name" :label="$t(filters.byIds.name.label)" />
-    <text-search-field
+    <text-field v-model="name" :label="$t(filters.byIds.name.label)" />
+    <text-field
       v-model="repository"
       :label="$t(filters.byIds.repository.label)"
     />
-    <text-search-field
-      v-model="country"
-      :label="$t(filters.byIds.country.label)"
-    />
-    <text-search-field
-      v-model="storage"
-      :label="$t(filters.byIds.storage.label)"
-    />
-    <!-- TODO: Get min and max dynamically -->
-    <range-search-field
-      v-model="boxes"
-      :min="0"
-      :max="150"
-      :label="$t(filters.byIds.boxes.label)"
-    />
+    <text-field v-model="country" :label="$t(filters.byIds.country.label)" />
+    <text-field v-model="storage" :label="$t(filters.byIds.storage.label)" />
+    <range-text-field v-model="boxes" :label="$t(filters.byIds.boxes.label)" />
   </v-form>
 </template>
 
@@ -32,17 +20,17 @@
 import { mapState, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 
-import GlobalSearch from './GlobalSearch.vue'
-import TextSearchField from './TextSearchField.vue'
-import RangeSearchField from './RangeSearchField.vue'
-import ResetSearchButton from './ResetSearchButton.vue'
-import SearchButton from './SearchButton.vue'
+import GlobalSearch from '../GlobalSearch.vue'
+import ResetSearchButton from '../ResetSearchButton.vue'
+import SearchButton from '../SearchButton.vue'
+import RangeTextField from '~/components/fields/RangeTextField.vue'
+import TextField from '~/components/fields/TextField.vue'
 
 export default {
   name: 'DrillcoreSearchForm',
   components: {
-    TextSearchField,
-    RangeSearchField,
+    TextField,
+    RangeTextField,
     GlobalSearch,
     ResetSearchButton,
     SearchButton,

@@ -5,19 +5,9 @@
       <reset-search-button @click="handleReset" />
       <search-button />
     </div>
-    <text-search-field v-model="name" :label="$t(filters.byIds.name.label)" />
-    <range-search-field
-      v-model="latitude"
-      :min="-90"
-      :max="90"
-      :label="$t(filters.byIds.latitude.label)"
-    />
-    <range-search-field
-      v-model="longitude"
-      :min="-180"
-      :max="180"
-      :label="$t(filters.byIds.longitude.label)"
-    />
+    <text-field v-model="name" :label="$t(filters.byIds.name.label)" />
+    <text-field v-model="area" :label="$t(filters.byIds.area.label)" />
+    <text-field v-model="project" :label="$t(filters.byIds.project.label)" />
   </v-form>
 </template>
 
@@ -25,20 +15,18 @@
 import { mapState, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 
-import GlobalSearch from './GlobalSearch.vue'
-import TextSearchField from './TextSearchField.vue'
-import ResetSearchButton from './ResetSearchButton.vue'
-import SearchButton from './SearchButton.vue'
-import RangeSearchField from './RangeSearchField.vue'
+import TextField from '../../fields/TextField.vue'
+import GlobalSearch from '../GlobalSearch.vue'
+import ResetSearchButton from '../ResetSearchButton.vue'
+import SearchButton from '../SearchButton.vue'
 
 export default {
   name: 'SiteSearchForm',
   components: {
-    TextSearchField,
+    TextField,
     GlobalSearch,
     ResetSearchButton,
     SearchButton,
-    RangeSearchField,
   },
   computed: {
     ...mapState('site', ['filters']),
@@ -46,6 +34,8 @@ export default {
       name: 'filters.byIds.name.value',
       latitude: 'filters.byIds.latitude.value',
       longitude: 'filters.byIds.longitude.value',
+      area: 'filters.byIds.area.value',
+      project: 'filters.byIds.project.value',
     }),
   },
   methods: {

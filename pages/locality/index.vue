@@ -1,6 +1,6 @@
 <template>
   <div>
-    <search-view-title
+    <page-title-wrapper
       title="common.localitiesCount"
       :count="count"
       icon="mdi-map-marker-outline"
@@ -28,7 +28,7 @@
         </v-card>
       </v-col>
       <v-col cols="12" md="9">
-        <search-view-map-wrapper :items="items" />
+        <search-view-map-wrapper :items="items" class="mb-6" />
 
         <locality-table
           :show-search="false"
@@ -44,15 +44,15 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import LocalitySearchForm from '@/components/search/LocalitySearchForm'
+import LocalitySearchForm from '@/components/search/forms/LocalitySearchForm'
 import LocalityTable from '~/components/tables/LocalityTable.vue'
-import SearchViewTitle from '~/components/search/SearchViewTitle'
+import PageTitleWrapper from '~/components/search/PageTitleWrapper'
 import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
 
 export default {
   components: {
     SearchViewMapWrapper,
-    SearchViewTitle,
+    PageTitleWrapper,
     LocalityTable,
     LocalitySearchForm,
   },
