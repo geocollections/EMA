@@ -3,14 +3,22 @@
     <template #title>
       <prev-next-nav-title
         :ids="ids"
-        :title="$t('analysis.title', { id: analysis.id })"
+        :title="
+          $t('analysis.title', {
+            method: $translate({
+              et: analysis.analysis_method__analysis_method,
+              en: analysis.analysis_method__method_en,
+            }),
+            sample: analysis.sample__number,
+          })
+        "
       />
     </template>
 
     <template #default>
-      <v-card flat tile>
+      <v-card>
         <v-row no-gutters justify="center">
-          <v-col cols="12" md="9" lg="7" xl="6">
+          <v-col>
             <v-card-title>{{ $t('common.general') }}</v-card-title>
             <v-card-text>
               <v-simple-table dense class="custom-table">
@@ -115,7 +123,24 @@
                         })
                       "
                     />
-                    <data-row :title="$t('analysis.id')" :value="analysis.id" />
+                    <data-row
+                      v-if="analysis.date_added"
+                      :title="$t('analysis.dateAdded')"
+                      :value="
+                        new Date(analysis.date_added)
+                          .toISOString()
+                          .split('T')[0]
+                      "
+                    />
+                    <data-row
+                      v-if="analysis.date_changed"
+                      :title="$t('analysis.dateChanged')"
+                      :value="
+                        new Date(analysis.date_changed)
+                          .toISOString()
+                          .split('T')[0]
+                      "
+                    />
                   </tbody>
                 </template>
               </v-simple-table>
@@ -125,12 +150,8 @@
       </v-card>
     </template>
     <template #bottom>
-      <v-card v-if="filteredTabs.length > 0" flat tile class="mt-6 mx-4 mb-4">
-        <v-row no-gutters justify="center" class="px-4">
-          <v-col cols="12" md="9" lg="7" xl="6" class="elevation-2 rounded">
-            <tabs :tabs="filteredTabs" :init-active-tab="initActiveTab" />
-          </v-col>
-        </v-row>
+      <v-card v-if="filteredTabs.length > 0" class="mt-6 mb-4">
+        <tabs :tabs="filteredTabs" :init-active-tab="initActiveTab" />
       </v-card>
     </template>
   </detail>
@@ -252,7 +273,13 @@ export default {
   },
   head() {
     return {
-      title: this.$t('analysis.title', { id: this.analysis.id }),
+      title: this.$t('analysis.title', {
+        method: this.$translate({
+          et: this.analysis.analysis_method__analysis_method,
+          en: this.analysis.analysis_method__method_en,
+        }),
+        sample: this.analysis.sample__number,
+      }),
     }
   },
   computed: {

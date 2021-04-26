@@ -146,6 +146,18 @@
                   })
                 "
               />
+              <data-row
+                v-if="sample.date_added"
+                :title="$t('sample.dateAdded')"
+                :value="new Date(sample.date_added).toISOString().split('T')[0]"
+              />
+              <data-row
+                v-if="sample.date_changed"
+                :title="$t('sample.dateChanged')"
+                :value="
+                  new Date(sample.date_changed).toISOString().split('T')[0]
+                "
+              />
             </tbody>
           </template>
         </v-simple-table>
@@ -254,7 +266,6 @@
           v-if="sample.locality__latitude && sample.locality__longitude"
           id="map-wrap"
           elevation="0"
-          height="300"
         >
           <leaflet-map
             :is-estonian="sample.locality__country__value === 'Eesti'"

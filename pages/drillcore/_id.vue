@@ -54,7 +54,20 @@
                 :title="$t('drillcore.metersInBox')"
                 :value="drillcore.number_meters"
               />
-              <data-row :title="$t('drillcore.id')" :value="drillcore.id" />
+              <data-row
+                v-if="drillcore.date_added"
+                :title="$t('drillcore.dateAdded')"
+                :value="
+                  new Date(drillcore.date_added).toISOString().split('T')[0]
+                "
+              />
+              <data-row
+                v-if="drillcore.date_changed"
+                :title="$t('drillcore.dateChanged')"
+                :value="
+                  new Date(drillcore.date_changed).toISOString().split('T')[0]
+                "
+              />
             </tbody>
           </template>
         </v-simple-table>
@@ -119,7 +132,6 @@
           v-if="drillcore.locality__latitude && drillcore.locality__longitude"
           id="map-wrap"
           elevation="0"
-          height="300"
         >
           <leaflet-map
             :is-estonian="drillcore.locality__country__value === 'Eesti'"
@@ -143,7 +155,7 @@
       </v-card-text>
     </template>
     <template #bottom>
-      <v-card v-if="filteredTabs.length > 0" class="mt-6 mx-4 mb-4">
+      <v-card v-if="filteredTabs.length > 0" class="mt-6 mb-4">
         <tabs :tabs="filteredTabs" :init-active-tab="initActiveTab" />
       </v-card>
     </template>

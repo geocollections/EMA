@@ -1,10 +1,9 @@
 <template>
   <v-text-field
     v-model="search"
-    dense
     outlined
-    class="search-input"
-    color="deep-orange darken-2"
+    class="search-input frontsearch"
+    color="primary darken-2"
     :label="$t('common.search')"
     hide-details
     clearable

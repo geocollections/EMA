@@ -1,6 +1,7 @@
 export default {
   title: 'e·Maapõu',
   subtitle: 'Opening up geological data in Estonia',
+  slogan: 'Geological data from Estonia',
   landing: {
     searchTitle: 'Find quickly from e·Maapõu',
     drillcores: 'Drillcores ({number})',
@@ -55,6 +56,8 @@ export default {
     analysesCount: 'Analyses',
     sites: 'Sites',
     sitesCount: 'Sites',
+    datasets: 'Datasets',
+    datasetCount: 'Datasets',
     about: 'About',
     searchAlt: 'Enter one or more keywords, ex. Estonia ...',
     history: 'Recently viewed',
@@ -68,6 +71,7 @@ export default {
     stratigraphy: 'Stratigraphy',
     institutions: 'Geological institutions, organisations and companies',
     lang: 'Language',
+    clickToOpen: 'Click to open',
   },
   link: {
     sarvAPI: 'Public API',
@@ -121,6 +125,9 @@ export default {
     author: 'Author',
     stratigraphy: 'Stratigraphy',
     reference: 'Reference',
+    elevationAccuracy: 'Elevation accuracy',
+    dateAdded: 'Date added',
+    dateChanged: 'Date changed',
   },
   localitySynonym: {
     synonym: 'Synonym',
@@ -150,6 +157,8 @@ export default {
     depth: 'Depth',
     acronym: 'Owner',
     drillcore: 'Drillcore',
+    dateAdded: 'Date added',
+    dateChanged: 'Date changed',
   },
   drillcoreBox: {
     id: 'ID',
@@ -166,6 +175,8 @@ export default {
     diameter: 'Diameter',
     author: 'Image author',
     date: 'Image date',
+    dateAdded: 'Date added',
+    dateChanged: 'Date changed',
   },
   localityDescription: {
     stratigraphy: 'Stratigraphy',
@@ -215,7 +226,7 @@ export default {
     analysedBy: 'Person/Institution',
     date: 'Date',
     thickness: 'Thickness',
-    title: 'Analysis ID: {id}',
+    title: 'Analysis ({method}) from sample {sample}',
     remarks: 'Remarks',
     reference: 'Reference',
     dataset: 'Dataset',
@@ -227,6 +238,15 @@ export default {
     results: 'Results ({number})',
     attachments: 'Attachments ({number})',
     analysis: 'Sample no.',
+    dateAdded: 'Date added',
+    dateChanged: 'Date changed',
+  },
+  datasetAnalysis: {
+    analysis: 'Analysis',
+    sampleNumber: 'Sample number',
+    stratigraphy: 'Stratigraphy',
+    lithostratigraphy: 'Lithostratigraphy',
+    locality: 'Locality',
   },
   analysisResult: {
     parameter: 'Parameter',
@@ -273,6 +293,8 @@ export default {
     maardlaLink: 'Deposit information in the Estonian Land Board',
     sites: 'Sites ({number})',
     localityReferences: 'References ({number})',
+    dateAdded: 'Date added',
+    dateChanged: 'Date changed',
   },
   site: {
     pageTitle: 'Site search',
@@ -295,6 +317,8 @@ export default {
     latitude: 'Latitude',
     longitude: 'Longitude',
     site: 'Site',
+    dateAdded: 'Date added',
+    dateChanged: 'Date changed',
   },
   sample: {
     pageTitle: 'Samples search',
@@ -338,6 +362,8 @@ export default {
     sampleReferences: 'References ({number})',
     sample: 'Sample',
     hierarchy: 'Stratigraafia',
+    dateAdded: 'Date added',
+    dateChanged: 'Date changed',
   },
   preparation: {
     id: 'ID',
@@ -362,6 +388,8 @@ export default {
     location: 'Location',
     attachments: 'Attachments ({number})',
     taxa: 'Taxa ({number})',
+    dateAdded: 'Date added',
+    dateChanged: 'Date changed',
   },
   taxon: {
     id: 'ID',
@@ -417,6 +445,10 @@ export default {
     title: 'Analytical data',
     description: 'Analyses and results',
   },
+  frontStratigraphy: {
+    title: 'Stratotype sections',
+    description: 'Database on stratotype outcrops in Estonia',
+  },
   geocollections: {
     title: ' Geocollections',
     description: 'Geoscience Collections Portal',
@@ -427,7 +459,7 @@ export default {
   },
   gmre: {
     title: 'Geology of Estonia',
-    description: 'Book',
+    description: 'Book by Raukas & Teedumäe (eds), 1997',
   },
   fond: {
     title: 'Geoloogiafond',
@@ -442,6 +474,7 @@ export default {
     description: 'Minerals and Rocks',
   },
   stratigraphy: {
+    title: 'Stratigraphy',
     id: 'ID',
     stratigraphy: 'Stratigraphy',
     index_main: 'Index',
@@ -452,8 +485,6 @@ export default {
     age_stratigraphy: 'Age',
     age: 'Age (Ma)',
     parent_stratigraphy: 'Belongs to',
-    title: 'Stratigraphy and time scale',
-    description: 'Estonian Commission on Stratigraphy',
     parentStratigraphy: 'Belongs to',
     type: 'Type',
     rank: 'Rank',
@@ -471,16 +502,20 @@ export default {
     references: 'References ({number})',
     stratotypes: 'Stratotypes',
     synonyms: 'Synonyms ({number})',
-    lithostratigraphy: 'Lithostratigraphy ({number})',
+    relatedUnits: 'Related units ({number})',
     specimens: 'Specimens ({number})',
     samples: 'Samples ({number})',
     subUnits: 'Sub units ({number})',
     pageTitle: 'Stratigraphy search',
+    dateAdded: 'Date added',
+    dateChanged: 'Date changed',
   },
   stratigraphyReference: {
     reference: 'Reference',
     pages: 'Pages',
     remarks: 'Remarks',
+    year: 'Year',
+    content: 'Content',
   },
   stratigraphySynonym: {
     synonym: 'Synonym',
@@ -566,6 +601,7 @@ export default {
     keywords: 'Keywords',
     type: 'Type',
     download: 'Download file',
+    remarks: 'Remarks',
   },
   cookiePolicy: {
     introduction:
@@ -602,11 +638,23 @@ export default {
     drillcore_box: 'Drillcore box',
   },
   dataset: {
+    pageTitle: 'Dataset search',
     id: 'ID',
     name: 'Name',
     date: 'Date',
     database: 'Database',
     dataset: 'Dataset',
+    author: 'Corresponding author',
+    copyright: 'Copyright',
+    licence: 'Licence',
+    dateAdded: 'Date added',
+    dateChanged: 'Date changed',
+    owner: 'Owner',
+    remarks: 'Remarks',
+    description: 'Description',
+    references: 'References ({number})',
+    analyses: 'Analyses ({number})',
+    attachments: 'Attachments ({number})',
   },
   reference: {
     id: 'ID',
@@ -658,6 +706,7 @@ export default {
     'drillcore_box-id': 'Drillcore box ID: {id}',
     preparation: 'Preparations',
     stratigraphy: 'Stratigraphy',
+    dataset: 'Datasets',
     'preparation-id': 'Preparation ID: {id}',
     'search-specimens': 'Quick search: Eksemplarid',
     'search-analyses': 'Quick search: Analyses',
@@ -676,6 +725,7 @@ export default {
     'search-drillcores': 'Quick search: Drillcores',
     'search-files': 'Quick search: Files',
     'stratigraphy-id': 'Stratigraphy ID: {id}',
+    'dataset-id': 'Dataset ID: {id}',
   },
   institutions: {
     ttu: 'TalTech Department of Geology',

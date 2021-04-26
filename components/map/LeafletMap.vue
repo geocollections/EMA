@@ -1,18 +1,22 @@
 <template>
   <client-only>
-    <div :style="{ height: `${height}px` }">
+    <div>
       <l-map
         ref="map"
+        :class="{ rounded: rounded }"
+        :style="{ height: `${height}px` }"
         style="z-index: 0"
         :options="options"
         :zoom="mapZoom"
-        :center="[center.latitude, center.longitude]"
+        :center="currentCenter"
+        @update:center="updateCenter"
         @baselayerchange="handleBaseLayerChange"
         @overlayadd="handleOverlayAdd"
         @overlayremove="handleOverlayRemove"
         @ready="fitBounds"
+        @click="handleClick"
       >
-        <l-control-layers />
+        <l-control-layers ref="layer-control" />
         <l-control-fullscreen position="topleft" />
         <l-control-scale
           position="bottomleft"
@@ -48,32 +52,12 @@
           :transparent="layer.transparent"
           :options="layer.options"
         />
-        <v-marker-cluster
-          :options="{ spiderfyOnMaxZoom: false, disableClusteringAtZoom: 11 }"
-        >
-          <l-circle-marker
-            v-for="(marker, idx) in markers"
-            :key="`marker-${idx}-lat-${marker.latitude}-lon-${marker.latitude}`"
-            :lat-lng="[marker.latitude, marker.longitude]"
-            :radius="5"
-            :weight="2"
-            color="red"
-            @click="
-              marker.id && marker.routeName
-                ? $router.push(
-                    localePath({
-                      name: `${marker.routeName}-id`,
-                      params: { id: marker.id },
-                    })
-                  )
-                : ''
-            "
-          >
-            <l-tooltip v-if="marker.text" :options="tooltipOptions">{{
-              marker.text
-            }}</l-tooltip>
-          </l-circle-marker>
-        </v-marker-cluster>
+        <v-marker-cluster-wrapper
+          v-if="markers.length >= 250"
+          :markers="markers"
+        />
+
+        <l-circle-marker-wrapper v-else :markers="markers" />
 
         <!-- <map-legend
           :active-base-layer="activeBaseLayer"
@@ -81,7 +65,7 @@
           :height="height"
         />-->
       </l-map>
-      <map-links :latitude="center.latitude" :longitude="center.longitude" />
+      <map-links :latitude="currentCenter.lat" :longitude="currentCenter.lng" />
     </div>
     <template #placeholder>
       <div
@@ -101,10 +85,13 @@
 
 <script>
 // import MapLegend from '~/components/map/MapLegend'
+import { debounce } from 'lodash'
 import MapLinks from '~/components/map/MapLinks'
+import LCircleMarkerWrapper from '~/components/map/LCircleMarkerWrapper'
+import VMarkerClusterWrapper from '~/components/map/VMarkerClusterWrapper'
 export default {
   name: 'LeafletMap',
-  components: { MapLinks },
+  components: { VMarkerClusterWrapper, LCircleMarkerWrapper, MapLinks },
   props: {
     height: {
       type: Number,
@@ -128,9 +115,11 @@ export default {
       default: false,
     },
     invalidateSize: Boolean,
+    rounded: Boolean,
   },
   data() {
     return {
+      currentCenter: { lat: this.center.latitude, lng: this.center.longitude },
       options: {
         gestureHandling: true,
         gestureHandlingOptions: {
@@ -153,6 +142,8 @@ export default {
               'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
             visible: !this.isEstonian,
             options: {
+              maxNativeZoom: 18,
+              maxZoom: 21,
               attribution:
                 '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
             },
@@ -163,6 +154,8 @@ export default {
             url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             visible: false,
             options: {
+              maxNativeZoom: 18,
+              maxZoom: 21,
               attribution:
                 '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             },
@@ -173,6 +166,8 @@ export default {
             url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
             visible: false,
             options: {
+              maxNativeZoom: 18,
+              maxZoom: 21,
               attribution:
                 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
             },
@@ -184,6 +179,8 @@ export default {
               'https://tiles.maaamet.ee/tm/tms/1.0.0/foto@GMC/{z}/{x}/{-y}.png&ASUTUS=TALTECH&KESKKOND=LIVE&IS=SARV',
             visible: false,
             options: {
+              maxNativeZoom: 18,
+              maxZoom: 21,
               attribution:
                 "Estonian maps: <a  href='http://www.maaamet.ee/'>Republic of Estonia Land Board</a>",
               tms: true,
@@ -198,6 +195,8 @@ export default {
               'https://tiles.maaamet.ee/tm/tms/1.0.0/kaart@GMC/{z}/{x}/{-y}.png&ASUTUS=TALTECH&KESKKOND=LIVE&IS=SARV',
             visible: this.isEstonian,
             options: {
+              maxNativeZoom: 18,
+              maxZoom: 21,
               attribution:
                 "Estonian maps: <a  href='http://www.maaamet.ee/'>Republic of Estonia Land Board</a>",
               tms: true,
@@ -214,8 +213,10 @@ export default {
               'https://tiles.maaamet.ee/tm/tms/1.0.0/hybriid@GMC/{z}/{x}/{-y}.png&ASUTUS=TALTECH&KESKKOND=LIVE&IS=SARV',
             visible: false,
             options: {
+              maxNativeZoom: 18,
+              maxZoom: 21,
               attribution:
-                "Estonian maps: <a  href='http://www.maaamet.ee/'>Republic of Estonia Land Board</a>",
+                "Estonian maps: <a  href='http://www.maaamet.ee/'>Maa-amet</a>",
               tms: true,
               detectRetina: true,
               zIndex: 2,
@@ -230,8 +231,88 @@ export default {
             visible: this.isEstonian,
             transparent: true,
             options: {
+              maxNativeZoom: 18,
+              maxZoom: 21,
               attribution:
-                "Estonian maps: <a  href='https://ttu.ee/geoloogia-instituut'>Department of Geology</a>",
+                "Geology: <a  href='http://www.maaamet.ee/'>Maa-amet</a>",
+              format: 'image/png',
+              tiled: true,
+              detectRetina: true,
+              updateWhenIdle: true,
+              zIndex: 2,
+            },
+          },
+          {
+            id: 'locs',
+            isWMS: true,
+            name: 'Localities',
+            url: 'https://gis.geocollections.info/geoserver/wms',
+            layers: 'sarv:locality_summary',
+            styles: 'point',
+            visible: true,
+            transparent: true,
+            options: {
+              maxNativeZoom: 18,
+              minZoom: 13,
+              maxZoom: 21,
+              attribution:
+                "Localities: <a  href='https://geoloogia.info'>SARV</a>",
+              format: 'image/png',
+              tiled: true,
+              detectRetina: true,
+              updateWhenIdle: true,
+              zIndex: 2,
+            },
+          },
+          {
+            id: 'locs_tms',
+            name: 'Localities (overview)',
+            url:
+              'https://gis.geocollections.info/geoserver/gwc/service/tms/1.0.0/sarv:locality_summary@EPSG3857@png/{z}/{x}/{-y}.png',
+            // 'https://tiles.maaamet.ee/tm/tms/1.0.0/hybriid@GMC/{z}/{x}/{-y}.png&ASUTUS=TALTECH&KESKKOND=LIVE&IS=SARV',
+            visible: true,
+            options: {
+              maxNativeZoom: 12,
+              maxZoom: 12,
+              attribution:
+                "Localities: <a  href='https://geoloogia.info'>SARV</a>",
+              tms: true,
+              detectRetina: true,
+              zIndex: 2,
+            },
+          },
+          {
+            id: 'drillcores',
+            isWMS: true,
+            name: 'Boreholes',
+            url: 'https://gis.geocollections.info/geoserver/wms',
+            layers: 'sarv:locality_drillcores',
+            visible: true,
+            transparent: true,
+            options: {
+              maxNativeZoom: 18,
+              maxZoom: 21,
+              attribution:
+                "Boreholes: <a  href='https://geoloogia.info'>SARV</a>",
+              format: 'image/png',
+              tiled: true,
+              detectRetina: true,
+              updateWhenIdle: true,
+              zIndex: 2,
+            },
+          },
+          {
+            id: 'sites',
+            isWMS: true,
+            name: 'Sites',
+            url: 'https://gis.geocollections.info/geoserver/wms',
+            layers: 'sarv:site_summary',
+            visible: false,
+            transparent: true,
+            options: {
+              maxNativeZoom: 18,
+              maxZoom: 21,
+              attribution: "Sites: <a  href='https://geoloogia.info'>SARV</a>",
               format: 'image/png',
               tiled: true,
               detectRetina: true,
@@ -279,7 +360,6 @@ export default {
         this.markers.map((marker) => marker.longitude),
       ]
     },
-
     tooltipOptions() {
       return {
         permanent: this.markers.length <= 5,
@@ -313,6 +393,9 @@ export default {
     },
   },
   methods: {
+    updateCenter(center) {
+      this.currentCenter = center
+    },
     handleBaseLayerChange(event) {
       this.activeBaseLayer = event.name
     },
@@ -337,6 +420,48 @@ export default {
         })
       }
     },
+
+    handleClick: debounce(async function (event) {
+      console.log('click')
+      // site: sarv:site_summary, locality: sarv:locality_summary, drillcore: sarv:locality_drillcores
+      // Todo: Check if layer visible
+      const latlng = event.latlng
+      // Todo: Maybe bbox size needs testing
+      const bbox = {
+        minX: latlng.lng - 0.1,
+        minY: latlng.lat - 0.1,
+        maxX: latlng.lng + 0.1,
+        maxY: latlng.lat + 0.1,
+      }
+
+      const wmsResponse = await this.$services.geoserver.getWMSData({
+        QUERY_LAYERS:
+          'sarv:locality_summary1,sarv:locality_drillcores,sarv:site_summary',
+        LAYERS:
+          'sarv:locality_summary1,sarv:locality_drillcores,sarv:site_summary',
+        BBOX: `${bbox.minX},${bbox.minY},${bbox.maxX},${bbox.maxY}`,
+      })
+      console.log(wmsResponse)
+      if (wmsResponse?.features?.length > 0) {
+        if (wmsResponse?.features?.[0]?.properties?.url) {
+          const url = wmsResponse.features[0].properties.url
+          if (url.includes('/')) {
+            const splitUrl = url.split('/')
+            if (splitUrl.length >= 2) {
+              const object = splitUrl[splitUrl.length - 2]
+              const id = splitUrl[splitUrl.length - 1]
+              if (object && id)
+                this.$router.push(
+                  this.localePath({
+                    name: `${object}-id`,
+                    params: { id },
+                  })
+                )
+            }
+          }
+        }
+      }
+    }, 400),
   },
 }
 </script>

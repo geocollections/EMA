@@ -1,10 +1,11 @@
 <template>
-  <v-list>
+  <v-list class="py-0">
     <v-list-item
       v-for="(locale, i) in availableLocales"
       :key="i"
       dense
       class="header-menu-item"
+      :class="{ 'header-menu-item-active': $i18n.locale === locale.code }"
       @click="$i18n.setLocale(locale.code)"
     >
       <v-list-item-title class="d-flex">
