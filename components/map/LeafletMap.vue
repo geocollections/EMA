@@ -2,6 +2,7 @@
   <client-only>
     <div>
       <l-map
+        id="map"
         ref="map"
         :class="{ rounded: rounded }"
         :style="{ height: `${height}px` }"
@@ -89,6 +90,7 @@ import { debounce } from 'lodash'
 import MapLinks from '~/components/map/MapLinks'
 import LCircleMarkerWrapper from '~/components/map/LCircleMarkerWrapper'
 import VMarkerClusterWrapper from '~/components/map/VMarkerClusterWrapper'
+
 export default {
   name: 'LeafletMap',
   components: { VMarkerClusterWrapper, LCircleMarkerWrapper, MapLinks },
@@ -249,7 +251,7 @@ export default {
             url: 'https://gis.geocollections.info/geoserver/wms',
             layers: 'sarv:locality_summary',
             styles: 'point',
-            visible: true,
+            visible: false,
             transparent: true,
             options: {
               maxNativeZoom: 18,
@@ -270,7 +272,7 @@ export default {
             url:
               'https://gis.geocollections.info/geoserver/gwc/service/tms/1.0.0/sarv:locality_summary@EPSG3857@png/{z}/{x}/{-y}.png',
             // 'https://tiles.maaamet.ee/tm/tms/1.0.0/hybriid@GMC/{z}/{x}/{-y}.png&ASUTUS=TALTECH&KESKKOND=LIVE&IS=SARV',
-            visible: true,
+            visible: false,
             options: {
               maxNativeZoom: 12,
               maxZoom: 12,
@@ -287,7 +289,7 @@ export default {
             name: 'Boreholes',
             url: 'https://gis.geocollections.info/geoserver/wms',
             layers: 'sarv:locality_drillcores',
-            visible: true,
+            visible: false,
             transparent: true,
             options: {
               maxNativeZoom: 18,
@@ -329,17 +331,56 @@ export default {
       return this.layers.overlay.map((item) => {
         if (item.id === 'est-bed-overlay')
           return { ...item, visible: this.isEstonianBedrockVisibleAtAStart }
+        else if (item.id === 'locs')
+          return { ...item, visible: this.isLocalityLayerVisibleAtStart }
+        else if (item.id === 'locs_tms')
+          return { ...item, visible: this.isLocalityLayerVisibleAtStart }
+        else if (item.id === 'drillcores')
+          return { ...item, visible: this.isDrillcoreLayerVisibleAtStart }
+        else if (item.id === 'sites')
+          return { ...item, visible: this.isSiteLayerVisibleAtStart }
         else return item
       })
     },
 
     isEstonianBedrockVisibleAtAStart() {
       // HACK: Should probably be a prop
+      const routeName = this.getRouteBaseName()
       return (
         this.isEstonian &&
-        (this.$route.name.includes('drillcore-') ||
-          this.$route.name.includes('locality-') ||
-          this.$route.name.includes('stratigraphy-'))
+        (routeName === 'drillcore-id' ||
+          routeName === 'locality-id' ||
+          routeName === 'stratigraphy-id')
+      )
+    },
+
+    isLocalityLayerVisibleAtStart() {
+      const routeName = this.getRouteBaseName()
+      return (
+        routeName === 'locality' ||
+        routeName === 'sample' ||
+        routeName === 'analysis' ||
+        routeName === 'analytical_data'
+      )
+    },
+
+    isDrillcoreLayerVisibleAtStart() {
+      const routeName = this.getRouteBaseName()
+      return (
+        routeName === 'drillcore' ||
+        routeName === 'sample' ||
+        routeName === 'analysis' ||
+        routeName === 'analytical_data'
+      )
+    },
+
+    isSiteLayerVisibleAtStart() {
+      const routeName = this.getRouteBaseName()
+      return (
+        routeName === 'site' ||
+        routeName === 'sample' ||
+        routeName === 'analysis' ||
+        routeName === 'analytical_data'
       )
     },
 
@@ -373,6 +414,25 @@ export default {
         return [m.latitude, m.longitude]
       })
     },
+
+    checkableLayers() {
+      const checkableLayerNames = [
+        'Boreholes',
+        'Sites',
+        'Localities',
+        'Localities (overview)',
+      ]
+
+      return this.$refs['layer-control'].mapObject._layers.reduce(
+        (layers, item) => {
+          if (checkableLayerNames.includes(item.name)) {
+            layers[item.name] = item.layer
+          }
+          return layers
+        },
+        {}
+      )
+    },
   },
   watch: {
     markers() {
@@ -391,6 +451,17 @@ export default {
         )
       }
     },
+    activeOverlays(newVal) {
+      if (Object.keys(this.checkableLayers).some((el) => newVal.includes(el)))
+        document.getElementById('map').classList.add('cursor-crosshair')
+      else document.getElementById('map').classList.remove('cursor-crosshair')
+    },
+  },
+  mounted() {
+    this.$nextTick(() => {
+      if (this.isMapClickEnabled())
+        document.getElementById('map').classList.add('cursor-crosshair')
+    })
   },
   methods: {
     updateCenter(center) {
@@ -421,47 +492,88 @@ export default {
       }
     },
 
-    handleClick: debounce(async function (event) {
-      console.log('click')
-      // site: sarv:site_summary, locality: sarv:locality_summary, drillcore: sarv:locality_drillcores
-      // Todo: Check if layer visible
-      const latlng = event.latlng
-      // Todo: Maybe bbox size needs testing
-      const bbox = {
-        minX: latlng.lng - 0.1,
-        minY: latlng.lat - 0.1,
-        maxX: latlng.lng + 0.1,
-        maxY: latlng.lat + 0.1,
-      }
+    isMapClickEnabled() {
+      if (this.$refs?.map?.mapObject) {
+        return Object.values(this.checkableLayers).some((layer) =>
+          this.$refs.map.mapObject.hasLayer(layer)
+        )
+      } else return false
+    },
 
-      const wmsResponse = await this.$services.geoserver.getWMSData({
-        QUERY_LAYERS:
-          'sarv:locality_summary1,sarv:locality_drillcores,sarv:site_summary',
-        LAYERS:
-          'sarv:locality_summary1,sarv:locality_drillcores,sarv:site_summary',
-        BBOX: `${bbox.minX},${bbox.minY},${bbox.maxX},${bbox.maxY}`,
-      })
-      console.log(wmsResponse)
-      if (wmsResponse?.features?.length > 0) {
-        if (wmsResponse?.features?.[0]?.properties?.url) {
-          const url = wmsResponse.features[0].properties.url
-          if (url.includes('/')) {
-            const splitUrl = url.split('/')
-            if (splitUrl.length >= 2) {
-              const object = splitUrl[splitUrl.length - 2]
-              const id = splitUrl[splitUrl.length - 1]
-              if (object && id)
-                this.$router.push(
-                  this.localePath({
-                    name: `${object}-id`,
-                    params: { id },
-                  })
-                )
+    handleClick: debounce(async function (event) {
+      if (this.isMapClickEnabled()) {
+        const MAX_ZOOM = 21
+        const radius =
+          (MAX_ZOOM + 0.25 - this.$refs.map.mapObject.getZoom()) * 1000
+        const circle = this.$L
+          .circle(event.latlng, { radius })
+          .addTo(this.$refs.map.mapObject)
+        const bbox = circle.getBounds().toBBoxString()
+
+        // eslint-disable-next-line no-unused-vars
+        // const rect = this.$L
+        //   .rectangle(circle.getBounds(), { color: 'green', weight: 1 })
+        //   .addTo(this.$refs.map.mapObject)
+        circle.remove()
+
+        const wmsResponse = await this.$services.geoserver.getWMSData({
+          QUERY_LAYERS: this.buildQueryLayers(),
+          LAYERS:
+            'sarv:locality_summary1,sarv:locality_drillcores,sarv:site_summary',
+          // BBOX: `${bbox.minX},${bbox.minY},${bbox.maxX},${bbox.maxY}`,
+          BBOX: bbox,
+          // X: Math.floor(event.layerPoint.x),
+          // Y: Math.floor(event.layerPoint.y),
+          // HEIGHT: this.$refs.map.mapObject._size.y,
+          // WIDTH: this.$refs.map.mapObject._size.x,
+        })
+
+        // console.log(wmsResponse)
+        if (wmsResponse?.features?.length > 0) {
+          if (wmsResponse?.features?.[0]?.properties?.url) {
+            const url = wmsResponse.features[0].properties.url
+            if (url.includes('/')) {
+              const splitUrl = url.split('/')
+              if (splitUrl.length >= 2) {
+                const object = splitUrl[splitUrl.length - 2]
+                const id = splitUrl[splitUrl.length - 1]
+                if (object && id)
+                  this.$router.push(
+                    this.localePath({
+                      name: `${object}-id`,
+                      params: { id },
+                    })
+                  )
+              }
             }
           }
         }
       }
     }, 400),
+
+    buildQueryLayers() {
+      const queryLayers = []
+      if (this.activeOverlays.includes('Sites'))
+        queryLayers.push('sarv:site_summary')
+      if (this.activeOverlays.includes('Boreholes'))
+        queryLayers.push('sarv:locality_drillcores')
+      if (
+        this.activeOverlays.includes('Localities') ||
+        this.activeOverlays.includes('Localities (overview)')
+      )
+        queryLayers.push('sarv:locality_summary1')
+      return queryLayers.join(',')
+    },
   },
 }
 </script>
+
+<style scoped>
+.cursor-crosshair {
+  cursor: crosshair;
+}
+
+.cursor-crosshair:active {
+  cursor: grabbing;
+}
+</style>

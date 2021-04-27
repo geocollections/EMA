@@ -60,6 +60,31 @@
                   new Date(dataset.date_changed).toISOString().split('T')[0]
                 "
               />
+              <data-row
+                v-if="parameters"
+                :title="$t('dataset.parameters')"
+                :value="parameters"
+              >
+                <template #value>
+                  <v-chip-group
+                    :value="selectedParameterValues"
+                    multiple
+                    column
+                    active-class="primary--text text--darken-2"
+                    @change="handleParameterChange"
+                  >
+                    <v-chip
+                      v-for="(parameter, i) in parameters"
+                      :key="i"
+                      active-class="chip-active"
+                      :value="parameter.value"
+                      small
+                    >
+                      {{ parameter.text }}
+                    </v-chip>
+                  </v-chip-group>
+                </template>
+              </data-row>
             </tbody>
           </template>
         </v-simple-table>
@@ -98,6 +123,25 @@ export default {
       const ids = datasetResponse?.ids
       const dataset = datasetResponse.results[0]
 
+      const parameterResponse = await app.$services.sarvSolr.getResource(
+        'dataset',
+        `dataset_id:${params.id}`,
+        { fl: 'parameter_index_list,parameter_list' }
+      )
+      const parameters = parameterResponse.results[0]
+
+      const parameterValues = parameters.parameter_index_list[0].split('; ')
+      const parameterText = parameters.parameter_list[0].split('; ')
+      const parsedParameters = parameterValues.map((v, i) => {
+        return { text: parameterText[i], value: v }
+      })
+
+      const selectedParameters = parsedParameters.slice(0, 5)
+
+      const selectedParameterValues = selectedParameters.map(
+        (param) => param.value
+      )
+
       const tabs = [
         {
           id: 'dataset_analysis',
@@ -105,7 +149,10 @@ export default {
           routeName: 'dataset-id',
           title: 'dataset.analyses',
           count: 0,
-          props: { dataset: dataset.id },
+          props: {
+            dataset: dataset.id,
+            parameters: selectedParameters,
+          },
         },
         {
           id: 'dataset_reference',
@@ -145,49 +192,29 @@ export default {
               'dataset'
             )
           item.count = countResponse?.count ?? 0
-          item.props = {
-            dataset: dataset.id,
-          }
         }
       }
       await forLoop()
 
-      const hydratedTabs = (
-        await Promise.all(
-          tabs.map(
-            async (tab) =>
-              await app.$hydrateCount(tab, {
-                api: {
-                  default: { dataset: dataset.id },
-                },
-              })
-          )
+      const hydratedTabs = await Promise.all(
+        tabs.map(
+          async (tab) =>
+            await app.$hydrateCount(tab, {
+              api: {
+                default: { dataset: dataset.id },
+              },
+            })
         )
-      ).map((tab) =>
-        app.$populateProps(tab, {
-          ...tab.props,
-          dataset: dataset.id,
-        })
       )
-
-      // Find tab that has items
-      const initTab = hydratedTabs.find((tab) => tab.count > 0)
-
-      // Constuct route
-      const path = initTab
-        ? app.localePath({
-            name: initTab.routeName,
-            params: { id: dataset.id },
-          })
-        : route.path
-
-      if (initTab && path !== route.path) redirect(path)
-
+      const validPath = app.$validateTabRoute(route, hydratedTabs)
+      if (validPath !== route.path) redirect(validPath)
       return {
         dataset,
         ids,
         tabs: hydratedTabs,
-        initActiveTab: path,
+        initActiveTab: validPath,
+        parameters: parsedParameters,
+        selectedParameterValues,
       }
     } catch (err) {
       error({
@@ -212,6 +239,15 @@ export default {
   methods: {
     isEmpty,
     isNil,
+    handleParameterChange(e) {
+      const analysisTab = this.tabs.find((tab) => tab.id === 'dataset_analysis')
+
+      const newParams = this.parameters.filter((parameter) =>
+        e.includes(parameter.value)
+      )
+
+      analysisTab.props = { ...analysisTab.props, parameters: newParams }
+    },
   },
 }
 </script>

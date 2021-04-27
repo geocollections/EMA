@@ -133,11 +133,11 @@ export default {
           lang: 'samples',
         },
         {
-          name: 'analysis',
-          lang: 'analyses',
+          name: 'analytical_data',
+          lang: 'analyticalData',
         },
-        { name: 'stratigraphy', lang: 'stratigraphy' },
         { name: 'dataset', lang: 'datasets' },
+        { name: 'stratigraphy', lang: 'stratigraphy' },
       ],
       logo: require('~/assets/logos/emaapou5white.svg'),
     }
