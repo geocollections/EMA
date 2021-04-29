@@ -23,23 +23,32 @@ export const ANALYTICAL_DATA = {
   options: {
     page: 1,
     itemsPerPage: 25,
-    sortBy: ['sample_number'],
+    sortBy: ['id_l'],
     sortDesc: [true],
   },
   queryFields: {
-    sample_number: (locale) => 'sample_number',
-    locality: (locale) => 'locality,locality_id,locality_str',
+    id: (locale) => 'id_l',
+    analysis_method: (locale) =>
+      locale === 'et' ? 'analysis_method' : 'analysis_method_en',
+    sample_number: (locale) => 'sample_number,sample_id_sl',
+    locality: (locale) => 'locality,locality_id_sl,site,site_id_sl',
     stratigraphy: (locale) =>
       locale === 'et'
-        ? 'stratigraphy,stratigraphy,stratigraphy_id'
-        : 'stratigraphy_en,stratigraphy_en_str,stratigraphy_id',
-    depth: (locale) => 'depth',
-    depth_interval: (locale) => 'depth_interval',
+        ? 'stratigraphy,stratigraphy_id_sl,lithostratigraphy,lithostratigraphy_id_sl'
+        : 'stratigraphy_en,stratigraphy_id_sl,lithostratigraphy_en,lithostratigraphy_id_sl',
+    // lithostratigraphy: (locale) =>
+    //   locale === 'et'
+    //     ? 'lithostratigraphy,lithostratigraphy_id_sl'
+    //     : 'lithostratigraphy_en,lithostratigraphy_id_sl',
+    depth: (locale) => 'depth,depth_interval',
+    // depth_interval: (locale) => 'depth_interval',
     rock: (locale) =>
-      locale === 'et' ? 'rock,rock_str,rock_id' : 'rock_en,rock_en_str,rock_id',
-    reference: (locale) => 'reference,reference_str,reference_id',
-    dataset_id: (locale) => 'dataset_name,dataset_name_str,dataset_id',
-    analysis_id: (locale) => 'analysis_id',
+      locale === 'et'
+        ? 'rock,rock_txt,rock_id_sl'
+        : 'rock_en,rock_en_txt,rock_id_sl',
+    reference: (locale) => 'reference,reference_id_sl',
+    dataset_id: (locale) => 'dataset_id_sl,dataset_name',
+    analysis_id: (locale) => 'analysis_id_sl',
   },
 }
 
@@ -51,8 +60,8 @@ export const DATASET_ANALYSIS = {
     sortDesc: [],
   },
   queryFields: {
-    analysis: (locale) => 'analysis',
-    sample: (locale) => 'analysis__sample__number',
+    analysis: (locale) => 'id_l',
+    sample: (locale) => 'sample_id_sl',
     stratigraphy: (locale) =>
       locale === 'et' ? 'stratigraphy' : 'stratigraphy_en',
     lithostratigraphy: (locale) =>
@@ -327,7 +336,7 @@ export const STRATIGRAPHY_SYNONYM = {
 export const DESCRIPTION = {
   options: {
     page: 1,
-    itemsPerPage: 2,
+    itemsPerPage: 25,
     sortBy: ['depth_top', 'depth_base'],
     sortDesc: [false, true],
   },

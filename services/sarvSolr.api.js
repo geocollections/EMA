@@ -13,15 +13,22 @@ const getPaginationParams = (options) => {
 const getSortByParams = (options, queryFields) => {
   if (options?.sortBy && options?.sortDesc) {
     if (!isEmpty(options.sortBy)) {
-      const orderBy = options.sortBy.map((field, i) => {
-        // Support for multivalue fields #219
-        return queryFields[field]
-          .split(',')
-          .map((item) => (options.sortDesc[i] ? `${item} desc` : `${item} asc`))
-          .join()
-        // if (options.sortDesc[i]) return `${queryFields[field]} desc`
-        // return `${queryFields[field]} asc`
-      })
+      const orderBy = options.sortBy
+        .map((field, i) => {
+          // Support for multivalue fields #219
+          if (queryFields?.[field]) {
+            return queryFields[field]
+              .split(',')
+              .map((item) =>
+                options.sortDesc[i] ? `${item} desc` : `${item} asc`
+              )
+              .join()
+          } else return options.sortDesc[i] ? `${field} desc` : `${field} asc`
+
+          // if (options.sortDesc[i]) return `${queryFields[field]} desc`
+          // return `${queryFields[field]} asc`
+        })
+        .filter((item) => item)
 
       return { sort: orderBy.join(',') }
     }
@@ -112,6 +119,7 @@ const buildFilterQueryParameter = (filters) => {
         (typeof v.value !== 'object' || !v.value?.[v.searchField])
       )
         return false
+      if (v.type === 'list' && isEmpty(v.value)) return false
       return v.value !== null
     })
     .reduce((prev, [k, v]) => {
@@ -177,6 +185,17 @@ const buildFilterQueryParameter = (filters) => {
                   fieldId
                 )}`
               )
+            }
+            case 'list': {
+              return searchParameter.fields
+                .map((field) => {
+                  return searchParameter.value
+                    .map((obj) => {
+                      return `(${field}:${obj.value})`
+                    })
+                    .join(' OR ')
+                })
+                .join(' OR ')
             }
             default:
               return null

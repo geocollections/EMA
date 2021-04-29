@@ -1,12 +1,26 @@
 <template>
   <table-wrapper
     v-bind="{ showSearch }"
-    :headers="headers"
+    :headers="translatedHeaders"
     :items="items"
     :options="options"
     :count="count"
     v-on="$listeners"
   >
+    <template #item.id_l="{ item }">
+      <nuxt-link
+        v-if="item.id_l"
+        class="text-link"
+        :to="localePath({ name: 'analysis-id', params: { id: item.id_l } })"
+      >
+        {{ item.id_l }}
+      </nuxt-link>
+    </template>
+    <template #item.analysis_method="{ item }">
+      {{
+        $translate({ et: item.analysis_method, en: item.analysis_method_en })
+      }}
+    </template>
     <template #item.sample_number="{ item }">
       <nuxt-link
         v-if="item.sample_id"
@@ -26,34 +40,65 @@
       >
         {{ $translate({ et: item.locality, en: item.locality_en }) }}
       </nuxt-link>
-      <div v-else>{{ item.locality_str }}</div>
+      <nuxt-link
+        v-else-if="item.site_id"
+        class="text-link"
+        :to="localePath({ name: 'site-id', params: { id: item.site_id } })"
+      >
+        {{ item.site }}
+      </nuxt-link>
     </template>
     <template #item.stratigraphy="{ item }">
-      <nuxt-link
-        v-if="item.stratigraphy_id"
-        class="text-link"
-        :to="
-          localePath({
-            name: 'stratigraphy-id',
-            params: { id: item.stratigraphy_id },
-          })
-        "
-      >
-        {{
-          $translate({
-            et: item.stratigraphy,
-            en: item.stratigraphy_en,
-          })
-        }}
-      </nuxt-link>
-      <div v-else>
-        {{
-          $translate({
-            et: item.stratigraphy_str,
-            en: item.stratigraphy_en_str,
-          })
-        }}
+      <div class="d-flex flex-row justify-space-between">
+        <nuxt-link
+          v-if="item.stratigraphy_id"
+          class="text-link"
+          :to="
+            localePath({
+              name: 'stratigraphy-id',
+              params: { id: item.stratigraphy_id },
+            })
+          "
+        >
+          {{
+            $translate({
+              et: item.stratigraphy,
+              en: item.stratigraphy_en,
+            })
+          }}
+        </nuxt-link>
+
+        <div
+          v-if="item.stratigraphy_id && item.lithostratigraphy_id"
+          class="px-1 font-weight-bold"
+        >
+          |
+        </div>
+
+        <nuxt-link
+          v-if="item.lithostratigraphy_id"
+          class="text-link font-italic"
+          :to="
+            localePath({
+              name: 'stratigraphy-id',
+              params: { id: item.lithostratigraphy_id },
+            })
+          "
+        >
+          {{
+            $translate({
+              et: item.lithostratigraphy,
+              en: item.lithostratigraphy_en,
+            })
+          }}
+        </nuxt-link>
       </div>
+    </template>
+    <template #item.depth="{ item }">
+      <span v-if="item.depth && item.depth_interval"
+        >{{ item.depth }} - {{ item.depth_interval }} m</span
+      >
+      <span v-else>{{ item.depth }}</span>
     </template>
     <template #item.reference="{ item }">
       <external-link
@@ -72,9 +117,8 @@
           localePath({ name: 'dataset-id', params: { id: item.dataset_id } })
         "
       >
-        {{ item.dataset_name }}
+        {{ item.dataset_id }}
       </nuxt-link>
-      <div v-else>{{ item.dataset_name_str }}</div>
     </template>
     <template #item.analysis_id="{ item }">
       <nuxt-link
@@ -92,6 +136,7 @@
 
 <script>
 import { round } from 'lodash'
+import { mapState } from 'vuex'
 import TableWrapper from '~/components/tables/TableWrapper.vue'
 import ExternalLink from '~/components/ExternalLink'
 export default {
@@ -120,36 +165,17 @@ export default {
       }),
     },
   },
-  data() {
-    return {
-      headers: [
-        { text: this.$t('analyticalData.sample'), value: 'sample_number' },
-        { text: this.$t('analyticalData.locality'), value: 'locality' },
-        { text: this.$t('analyticalData.stratigraphy'), value: 'stratigraphy' },
+  computed: {
+    ...mapState('analyticalData', ['tableHeaders']),
 
-        { text: this.$t('analyticalData.depth'), value: 'depth' },
-        {
-          text: this.$t('analyticalData.depthInterval'),
-          value: 'depth_interval',
-        },
-        {
-          text: this.$t('analyticalData.rock'),
-          value: 'rock',
-        },
-        {
-          text: this.$t('analyticalData.reference'),
-          value: 'reference',
-        },
-        {
-          text: this.$t('analyticalData.dataset'),
-          value: 'dataset_id',
-        },
-        {
-          text: this.$t('analyticalData.analysis'),
-          value: 'analysis_id',
-        },
-      ],
-    }
+    translatedHeaders() {
+      return this.tableHeaders.map((header) => {
+        return {
+          ...header,
+          text: header.translate ? this.$t(header.text) : header.text,
+        }
+      })
+    },
   },
   methods: {
     round,
