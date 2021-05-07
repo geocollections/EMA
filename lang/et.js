@@ -138,6 +138,7 @@ export default {
     dateAdded: 'Kirje lisatud',
     dateChanged: 'Kirje muudetud',
     graphs: 'Graafikud',
+    section: 'Läbilõige',
   },
   localitySynonym: {
     synonym: 'Sünonüüm',

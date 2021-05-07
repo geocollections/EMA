@@ -354,6 +354,12 @@ export default {
           count: 0,
           props: { localityObject: locality },
         },
+        {
+          routeName: 'locality-id-section',
+          title: 'locality.section',
+          count: 1,
+          props: { localityObject: locality },
+        },
       ]
 
       if (drillcore) {

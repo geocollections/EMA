@@ -137,6 +137,7 @@ export default {
     dateAdded: 'Date added',
     dateChanged: 'Date changed',
     graphs: 'Graphs',
+    section: 'Section',
   },
   localitySynonym: {
     synonym: 'Synonym',
