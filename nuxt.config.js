@@ -46,6 +46,7 @@ export default {
     { src: '~plugins/gtag.js', mode: 'client' },
     { src: '~plugins/vuexPersist.js', mode: 'client' },
     { src: '~plugins/afterEach.js', mode: 'client' },
+    { src: '~plugins/vueECharts.js', mode: 'client' },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -132,6 +133,7 @@ export default {
           quaternary: '#fff',
           quinary: '#fcf2df',
           anchor: '#5a5957',
+          accent: '#3d8661',
           // primary: '#009270',
           // secondary: '#bfe6cf',
           // tertiary: '#333333',
@@ -146,10 +148,13 @@ export default {
           quaternary: '#f3f0ec',
           quinary: '#627aa2',
           anchor: '#5b4033',
+          accent: '#3d8661',
         },
       },
     },
   },
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    transpile: ['vue-echarts', 'resize-detector'],
+  },
 }

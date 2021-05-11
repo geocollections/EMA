@@ -163,8 +163,8 @@
         <v-card id="map-wrap" elevation="0">
           <leaflet-map
             rounded
-            :is-estonian="true"
-            :height="600"
+            estonian-map
+            estonian-bedrock-layer
             :markers="computedSites"
           />
         </v-card>

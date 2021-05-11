@@ -268,7 +268,10 @@
           elevation="0"
         >
           <leaflet-map
-            :is-estonian="sample.locality__country__value === 'Eesti'"
+            :estonian-map="sample.locality__country__value === 'Eesti'"
+            :estonian-bedrock-overlay="
+              sample.locality__country__value === 'Eesti'
+            "
             :height="300"
             :center="{
               latitude: sample.locality__latitude,
@@ -289,6 +292,15 @@
       </v-card-text>
     </template>
 
+    <template v-else-if="computedLocations.length > 0" #column-right>
+      <v-card-title>{{ $t('locality.map') }}</v-card-title>
+      <v-card-text>
+        <v-card elevation="0">
+          <leaflet-map rounded :markers="computedLocations" />
+        </v-card>
+      </v-card-text>
+    </template>
+
     <template #bottom>
       <v-card v-if="filteredTabs.length > 0" class="mt-6 mb-4">
         <tabs :tabs="filteredTabs" :init-active-tab="initActiveTab" />
@@ -298,7 +310,7 @@
 </template>
 
 <script>
-import { isNil } from 'lodash'
+import { isEmpty, isNil } from 'lodash'
 import DataRow from '@/components/DataRow'
 import LinkDataRow from '@/components/LinkDataRow'
 import Tabs from '@/components/Tabs'
@@ -323,6 +335,28 @@ export default {
       )
       const ids = detailViewResponse?.ids
       const sample = detailViewResponse.results[0]
+
+      const localityGroupedResponse = await app.$services.sarvSolr.getResourceList(
+        'analysis',
+        {
+          useRawSolr: true,
+          defaultParams: {
+            fq: `sample_id:${sample?.id}`,
+            fl:
+              'locality_id,locality,locality_en,latitude,longitude,site_id,name,name_en',
+            group: true,
+            'group.field': ['locality_id', 'site_id'],
+          },
+        }
+      )
+
+      const localities = localityGroupedResponse?.grouped?.locality_id?.groups
+        ?.map((item) => item?.doclist?.docs?.[0])
+        .filter((item) => !isEmpty(item) && item?.locality_id)
+      const sites = localityGroupedResponse?.grouped?.site_id?.groups
+        ?.map((item) => item?.doclist?.docs?.[0])
+        .filter((item) => !isEmpty(item) && item?.site_id)
+      const locations = localities.concat(sites)
 
       const tabs = [
         {
@@ -361,6 +395,25 @@ export default {
           count: 0,
           props: { sample: sample.id },
         },
+        {
+          id: 'analysis_results',
+          isSolr: true,
+          routeName: 'sample-id-analysis_results',
+          title: 'sample.analysisResults',
+          count: 0,
+          props: { sample: sample.id },
+        },
+        {
+          table: 'taxon_list',
+          id: 'graphs',
+          routeName: 'sample-id-graphs',
+          title: 'locality.graphs',
+          count: 0,
+          props: {
+            sample: sample.id,
+            sampleObject: { ...sample },
+          },
+        },
       ]
 
       const hydratedTabs = await Promise.all(
@@ -381,6 +434,7 @@ export default {
         ids,
         initActiveTab: validPath,
         tabs: hydratedTabs,
+        locations,
       }
     } catch (err) {
       error({
@@ -409,6 +463,30 @@ export default {
         this.sample.number_field ||
         this.sample.id
       }`
+    },
+
+    computedLocations() {
+      return this.locations.reduce((filtered, item) => {
+        if (item.latitude && item.longitude) {
+          const newItem = {
+            latitude: item.latitude,
+            longitude: item.longitude,
+            text:
+              this.$translate({ et: item.locality, en: item.locality_en }) ??
+              (item.name || `ID: ${item.id}`),
+            routeName: item.locality_id ? 'locality' : 'site',
+            id: item.locality_id ?? item.site_id,
+          }
+
+          const isItemInArray = !!filtered.find(
+            (existingItem) =>
+              existingItem.latitude === item.latitude &&
+              existingItem.longitude === item.longitude
+          )
+          if (!isItemInArray) filtered.push(newItem)
+        }
+        return filtered
+      }, [])
     },
   },
   methods: {

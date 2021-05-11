@@ -79,6 +79,8 @@ export default {
     from: 'Alates',
     to: 'Kuni',
     showSearch: 'Otsing',
+    showInstitutions: 'Asutused',
+    backToLanding: 'Tagasi avalehele',
   },
   link: {
     sarvAPI: 'Avalik API',
@@ -128,6 +130,7 @@ export default {
     descriptions: 'Kirjeldused ({number})',
     drillcore: 'Puursüdamik',
     drillcoreBoxes: 'Kastid ({number})',
+    analyses: 'Analüüsid ({number})',
     date: 'Kuupäev',
     author: 'Autor',
     stratigraphy: 'Stratigraafia',
@@ -135,6 +138,7 @@ export default {
     elevationAccuracy: 'Kõrguse täpsus',
     dateAdded: 'Kirje lisatud',
     dateChanged: 'Kirje muudetud',
+    graphs: 'Graafikud',
   },
   localitySynonym: {
     synonym: 'Sünonüüm',
@@ -258,6 +262,9 @@ export default {
   },
   analysisResult: {
     parameter: 'Parameeter',
+    method: 'Meetod',
+    depth: 'Sügavus',
+    depthInterval: 'Sügavus kuni',
     value: 'Väärtus',
     valueText: 'Tekst',
     valueError: 'Viga',
@@ -368,6 +375,7 @@ export default {
     preparations: 'Preparaadid ({number})',
     taxa: 'Taksonid ({number})',
     sampleReferences: 'Kirjandus ({number})',
+    analysisResults: 'Analüüsitulemused ({number})',
     sample: 'Proov',
     hierarchy: 'Stratigraafia',
     dateAdded: 'Kirje lisatud',
@@ -664,6 +672,9 @@ export default {
     analyses: 'Analüüsid ({number})',
     attachments: 'Failid ({number})',
     parameters: 'Parameetrid',
+    creators: 'Loojad',
+    doi: 'DOI',
+    reference: 'Kirjandus',
   },
   reference: {
     id: 'ID',
@@ -764,5 +775,10 @@ export default {
     columns: 'Veerud',
     parameter: 'Parameeter',
     analysisMethod: 'Meetod',
+  },
+  statistics: {
+    analysisMethods: 'Analüüsimeetodid',
+    activeParameters: 'Aktiivsed parameetrid',
+    isEmptyMessage: 'Palun valige mõni parameeter, et andmeid kuvada.',
   },
 }

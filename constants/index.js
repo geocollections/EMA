@@ -34,14 +34,14 @@ export const ANALYTICAL_DATA = {
     locality: (locale) => 'locality,locality_id_sl,site,site_id_sl',
     stratigraphy: (locale) =>
       locale === 'et'
-        ? 'stratigraphy,stratigraphy_id_sl,lithostratigraphy,lithostratigraphy_id_sl'
-        : 'stratigraphy_en,stratigraphy_id_sl,lithostratigraphy_en,lithostratigraphy_id_sl',
-    // lithostratigraphy: (locale) =>
-    //   locale === 'et'
-    //     ? 'lithostratigraphy,lithostratigraphy_id_sl'
-    //     : 'lithostratigraphy_en,lithostratigraphy_id_sl',
-    depth: (locale) => 'depth,depth_interval',
-    // depth_interval: (locale) => 'depth_interval',
+        ? 'stratigraphy,stratigraphy_id_sl'
+        : 'stratigraphy_en,stratigraphy_id_sl',
+    lithostratigraphy: (locale) =>
+      locale === 'et'
+        ? 'lithostratigraphy,lithostratigraphy_id_sl'
+        : 'lithostratigraphy_en,lithostratigraphy_id_sl',
+    depth: (locale) => 'depth',
+    depth_interval: (locale) => 'depth_interval',
     rock: (locale) =>
       locale === 'et'
         ? 'rock,rock_txt,rock_id_sl'
@@ -105,7 +105,8 @@ export const SAMPLE = {
   queryFields: {
     id: (locale) => 'id_l',
     number: (locale) => 'number',
-    locality: (locale) => (locale === 'et' ? 'locality' : 'locality_en'),
+    locality: (locale) =>
+      locale === 'et' ? 'locality,site_name' : 'locality_en,site_name_en',
     depth: (locale) => 'depth',
     depth_interval: (locale) => 'depth_interval',
     stratigraphy: (locale) =>
@@ -458,11 +459,11 @@ export const DATASET = {
   options: {
     page: 1,
     itemsPerPage: 25,
-    sortBy: [],
-    sortDesc: [],
+    sortBy: ['id'],
+    sortDesc: [true],
   },
   queryFields: {
-    id: (locale) => 'id',
+    id: (locale) => 'dataset_id',
     name: (locale) => (locale === 'et' ? 'name' : 'name_en'),
     date: (locale) => 'date,date_txt',
     database_acronym: (locale) => 'database_acronym',

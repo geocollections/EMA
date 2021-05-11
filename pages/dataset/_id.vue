@@ -14,6 +14,11 @@
           <template #default>
             <tbody>
               <data-row
+                :title="$t('dataset.creators')"
+                :value="dataset.owner_txt || dataset.owner__agent"
+              />
+              <data-row :title="$t('dataset.date')" :value="dataset.date_txt" />
+              <data-row
                 :title="$t('dataset.description')"
                 :value="
                   $translate({
@@ -22,11 +27,18 @@
                   })
                 "
               />
-              <data-row
-                :title="$t('dataset.author')"
-                :value="dataset.owner__agent"
+              <link-data-row
+                v-if="doi"
+                :title="$t('dataset.doi')"
+                :value="doi"
+                :href="`https://doi.geocollections.info/${doi}`"
               />
-              <data-row :title="$t('dataset.date')" :value="dataset.date_txt" />
+              <link-data-row
+                v-if="reference"
+                :title="$t('dataset.reference')"
+                :value="reference.reference"
+                :href="`https://kirjandus.geoloogia.info/reference/${reference.id}`"
+              />
               <data-row
                 :title="$t('dataset.copyright')"
                 :value="dataset.copyright_agent__agent"
@@ -91,6 +103,15 @@
       </v-card-text>
     </template>
 
+    <template #column-right>
+      <v-card-title>{{ $t('locality.map') }}</v-card-title>
+      <v-card-text>
+        <v-card id="map-wrap" elevation="0">
+          <leaflet-map rounded :markers="computedLocations" />
+        </v-card>
+      </v-card-text>
+    </template>
+
     <template #bottom>
       <v-card v-if="filteredTabs.length > 0" class="mt-6 mb-4">
         <tabs :tabs="filteredTabs" :init-active-tab="initActiveTab" />
@@ -106,8 +127,10 @@ import PrevNextNavTitle from '~/components/PrevNextNavTitle'
 import Detail from '~/components/templates/Detail.vue'
 import DataRow from '~/components/DataRow.vue'
 import LinkDataRow from '~/components/LinkDataRow.vue'
+import LeafletMap from '~/components/map/LeafletMap'
 export default {
   components: {
+    LeafletMap,
     PrevNextNavTitle,
     Tabs,
     Detail,
@@ -142,6 +165,40 @@ export default {
         (param) => param.value
       )
 
+      const doiResponse = await app.$services.sarvREST.getResourceList('doi', {
+        defaultParams: {
+          dataset: params.id,
+        },
+      })
+
+      const doi = doiResponse.items?.[0]?.identifier
+      const reference = {
+        id: doiResponse.items?.[0]?.reference,
+        reference: doiResponse.items?.[0]?.reference__reference,
+      }
+
+      const localityGroupedResponse = await app.$services.sarvSolr.getResourceList(
+        'analysis',
+        {
+          useRawSolr: true,
+          defaultParams: {
+            fq: `dataset_id:${dataset.id}`,
+            fl:
+              'locality_id,locality,locality_en,latitude,longitude,site_id,name,name_en',
+            group: true,
+            'group.field': ['locality_id', 'site_id'],
+          },
+        }
+      )
+
+      const localities = localityGroupedResponse?.grouped?.locality_id?.groups
+        ?.map((item) => item?.doclist?.docs?.[0])
+        .filter((item) => !isEmpty(item) && item?.locality_id)
+      const sites = localityGroupedResponse?.grouped?.site_id?.groups
+        ?.map((item) => item?.doclist?.docs?.[0])
+        .filter((item) => !isEmpty(item) && item?.site_id)
+      const locations = localities.concat(sites)
+
       const tabs = [
         {
           id: 'dataset_analysis',
@@ -171,6 +228,18 @@ export default {
           props: { dataset: dataset.id },
         },
       ]
+
+      if (locations.length === 1) {
+        tabs.push({
+          table: 'analysis_results',
+          id: 'graphs',
+          isSolr: true,
+          routeName: 'dataset-id-graphs',
+          title: 'locality.graphs',
+          count: 0,
+          props: { dataset: dataset.id, datasetObject: dataset },
+        })
+      }
 
       const solrParams = { fq: `dataset_id:${dataset.id}` }
       const apiParams = { dataset: dataset.id }
@@ -215,9 +284,12 @@ export default {
         initActiveTab: validPath,
         parameters: parsedParameters,
         selectedParameterValues,
+        doi,
+        reference,
+        localities,
+        locations,
       }
     } catch (err) {
-      console.log(err)
       error({
         message: `Could not find dataset ${route.params.id}`,
         path: route.path,
@@ -235,6 +307,30 @@ export default {
   computed: {
     filteredTabs() {
       return this.tabs.filter((item) => item.count > 0)
+    },
+
+    computedLocations() {
+      return this.locations.reduce((filtered, item) => {
+        if (item.latitude && item.longitude) {
+          const newItem = {
+            latitude: item.latitude,
+            longitude: item.longitude,
+            text:
+              this.$translate({ et: item.locality, en: item.locality_en }) ??
+              (item.name || `ID: ${item.id}`),
+            routeName: item.locality_id ? 'locality' : 'site',
+            id: item.locality_id ?? item.site_id,
+          }
+
+          const isItemInArray = !!filtered.find(
+            (existingItem) =>
+              existingItem.latitude === item.latitude &&
+              existingItem.longitude === item.longitude
+          )
+          if (!isItemInArray) filtered.push(newItem)
+        }
+        return filtered
+      }, [])
     },
   },
   methods: {

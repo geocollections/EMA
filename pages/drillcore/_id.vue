@@ -134,7 +134,11 @@
           elevation="0"
         >
           <leaflet-map
-            :is-estonian="drillcore.locality__country__value === 'Eesti'"
+            :estonian-map="drillcore.locality__country__value === 'Eesti'"
+            :estonian-bedrock-overlay="
+              drillcore.locality__country__value === 'Eesti'
+            "
+            borehole-overlay
             :height="300"
             :center="{
               latitude: drillcore.locality__latitude,
@@ -240,6 +244,15 @@ export default {
           title: 'drillcore.specimens',
           count: 0,
           props: {},
+        },
+        {
+          table: 'analysis_results',
+          id: 'graphs',
+          isSolr: true,
+          routeName: 'drillcore-id-graphs',
+          title: 'locality.graphs',
+          count: 0,
+          props: { drillcoreObject: drillcore },
         },
       ]
 

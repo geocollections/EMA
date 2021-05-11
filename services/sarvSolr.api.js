@@ -1,4 +1,5 @@
 import { isEmpty, isNil } from 'lodash'
+import qs from 'qs'
 
 const getPaginationParams = (options) => {
   if (options?.page && options?.itemsPerPage) {
@@ -39,7 +40,15 @@ const getSortByParams = (options, queryFields) => {
 export default ($axios) => ({
   async getResourceList(
     resource,
-    { defaultParams, queryFields, search, options, isValid, searchFilters = {} }
+    {
+      useRawSolr,
+      defaultParams,
+      queryFields,
+      search,
+      options,
+      isValid,
+      searchFilters = {},
+    }
   ) {
     if (isValid) {
       return {
@@ -55,11 +64,21 @@ export default ($axios) => ({
       ...getSortByParams(options, queryFields),
     }
 
-    const response = await $axios.$get(`solr/${resource}/`, { params })
+    const response = await $axios.$get(
+      `${useRawSolr ? 'raw_solr' : 'solr'}/${resource}/`,
+      {
+        params,
+        paramsSerializer: (par) => {
+          return qs.stringify(par, { indices: false })
+        },
+      }
+    )
 
     return {
-      items: response.results,
-      count: response.count,
+      items: useRawSolr ? response?.response?.docs : response.results,
+      count: useRawSolr ? response?.response?.numFound : response.count,
+      stats: response?.stats,
+      grouped: response?.grouped,
     }
   },
 
@@ -110,7 +129,10 @@ const buildFilterQueryParameter = (filters) => {
     .filter(([_, v]) => {
       if (v.type === 'range' && isNil(v.value[0]) && isNil(v.value[1]))
         return false
-      if (v.type === 'text' && (!v.value || v.value.trim().length <= 0))
+      if (
+        (v.type === 'text' || v.type === 'range_alt') &&
+        (!v.value || v.value.trim().length <= 0)
+      )
         return false
       if (v.type === 'select' && (v.value === null || v.value.length < 1))
         return false
@@ -119,7 +141,8 @@ const buildFilterQueryParameter = (filters) => {
         (typeof v.value !== 'object' || !v.value?.[v.searchField])
       )
         return false
-      if (v.type === 'list' && isEmpty(v.value)) return false
+      if ((v.type === 'list' || v.type === 'list_or') && isEmpty(v.value))
+        return false
       return v.value !== null
     })
     .reduce((prev, [k, v]) => {
@@ -161,6 +184,14 @@ const buildFilterQueryParameter = (filters) => {
 
               return `${fieldId}:[${start} TO ${end}]`
             }
+            case 'range_alt': {
+              const fieldValue = isNil(searchParameter.value)
+                ? '*'
+                : searchParameter.value
+              return idx === 0
+                ? `${searchParameter.fields[0]}:[${fieldValue} TO *]`
+                : `${searchParameter.fields[1]}:[* TO ${fieldValue}]`
+            }
             case 'checkbox': {
               const encodedValue = encodeURIComponent(searchParameter.value)
               return `${fieldId}:${encodedValue}`
@@ -191,7 +222,18 @@ const buildFilterQueryParameter = (filters) => {
                 .map((field) => {
                   return searchParameter.value
                     .map((obj) => {
-                      return `(${field}:${obj.value})`
+                      return `(${field}:${obj?.value ?? obj})`
+                    })
+                    .join(' AND ')
+                })
+                .join(' AND ')
+            }
+            case 'list_or': {
+              return searchParameter.fields
+                .map((field) => {
+                  return searchParameter.value
+                    .map((obj) => {
+                      return `(${field}:${obj?.value ?? obj})`
                     })
                     .join(' OR ')
                 })
@@ -204,6 +246,8 @@ const buildFilterQueryParameter = (filters) => {
 
         if (idx === 0)
           return `${prev}${buildEncodedParameterStr(v, curr) ?? ''}`
+        else if (v.type === 'range_alt')
+          return `${prev} AND ${buildEncodedParameterStr(v, curr) ?? ''}`
         else return `${prev} OR ${buildEncodedParameterStr(v, curr) ?? ''}`
       }, '')
 

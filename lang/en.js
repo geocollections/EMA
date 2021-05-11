@@ -78,6 +78,8 @@ export default {
     from: 'From',
     to: 'To',
     showSearch: 'Search',
+    showInstitutions: 'Institutions',
+    backToLanding: 'Go back to landing page',
   },
   link: {
     sarvAPI: 'Public API',
@@ -127,6 +129,7 @@ export default {
     descriptions: 'Descriptions ({number})',
     drillcore: 'Drillcore',
     drillcoreBoxes: 'Boxes ({number})',
+    analyses: 'Analyses ({number})',
     date: 'Date',
     author: 'Author',
     stratigraphy: 'Stratigraphy',
@@ -134,6 +137,7 @@ export default {
     elevationAccuracy: 'Elevation accuracy',
     dateAdded: 'Date added',
     dateChanged: 'Date changed',
+    graphs: 'Graphs',
   },
   localitySynonym: {
     synonym: 'Synonym',
@@ -257,6 +261,9 @@ export default {
   },
   analysisResult: {
     parameter: 'Parameter',
+    method: 'Method',
+    depth: 'Depth',
+    depthInterval: 'Depth to',
     value: 'Value',
     valueText: 'Text',
     valueError: 'Error',
@@ -367,6 +374,7 @@ export default {
     preparations: 'Preparations ({number})',
     taxa: 'Taxa ({number})',
     sampleReferences: 'References ({number})',
+    analysisResults: 'Analysis results ({number})',
     sample: 'Sample',
     hierarchy: 'Stratigraafia',
     dateAdded: 'Date added',
@@ -663,6 +671,9 @@ export default {
     analyses: 'Analyses ({number})',
     attachments: 'Attachments ({number})',
     parameters: 'Parameters',
+    creators: 'Creators',
+    doi: 'DOI',
+    reference: 'Reference',
   },
   reference: {
     id: 'ID',
@@ -763,5 +774,10 @@ export default {
     columns: 'Columns',
     parameter: 'Parameter',
     analysisMethod: 'Method',
+  },
+  statistics: {
+    analysisMethods: 'Analysis methods',
+    activeParameters: 'Active parameters',
+    isEmptyMessage: 'Nothing to show, please select an option.',
   },
 }

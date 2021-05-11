@@ -11,7 +11,11 @@
       </v-btn>
     </v-card-title>
     <v-card-text v-show="showMap" class="px-0 pb-1">
-      <leaflet-map :markers="mapMarkers" :invalidate-size="showMap" />
+      <leaflet-map
+        v-bind="$attrs"
+        :markers="mapMarkers"
+        :invalidate-size="showMap"
+      />
     </v-card-text>
   </v-card>
 </template>
@@ -44,7 +48,12 @@ export default {
             longitude: item.longitude,
             text:
               this.$translate({ et: item.locality, en: item.locality_en }) ??
-              (item.name || `ID: ${item.id}`),
+              (this.$translate({
+                et: item.site_name,
+                en: item.site_name_en,
+              }) ||
+                item.name ||
+                `ID: ${item.id}`),
             routeName: routeName === 'site' ? 'site' : 'locality',
             id: item.locality_id ?? item.id,
           }
