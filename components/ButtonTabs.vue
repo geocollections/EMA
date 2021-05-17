@@ -1,5 +1,8 @@
 <template>
-  <v-chip-group column active-class="chip-active primary--text text--darken-2">
+  <v-chip-group
+    column
+    active-class="light-blue lighten-3 font-weight-bold elevation-3"
+  >
     <transition-group name="flip-list">
       <v-chip
         v-for="(item, index) in tabs"

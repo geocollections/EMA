@@ -1,13 +1,25 @@
 <template>
-  <v-app-bar app dark style="z-index: 2050" color="primary">
+  <v-app-bar
+    app
+    dark
+    style="z-index: 2050"
+    color="primary"
+    class="gradient-background"
+    :height="isLanding ? ($vuetify.breakpoint.smAndDown ? 56 : 112) : 64"
+  >
     <v-toolbar-items>
-      <v-app-bar-title class="align-self-center">
+      <v-app-bar-title class="align-self-center app-title">
         <nuxt-link :to="localePath({ path: '/' })">
           <v-tooltip bottom>
             <template #activator="{ on, attrs }">
               <v-img
-                height="45"
-                width="90"
+                class="transition-logo"
+                :height="
+                  isLanding ? ($vuetify.breakpoint.smAndDown ? 45 : 65) : 45
+                "
+                :width="
+                  isLanding ? ($vuetify.breakpoint.smAndDown ? 90 : 130) : 90
+                "
                 contain
                 :src="logo"
                 v-bind="attrs"
@@ -28,6 +40,7 @@
     />
     <div
       v-if="$vuetify.breakpoint.mdAndUp"
+      :class="isLanding ? 'mt-8' : 'mt-5'"
       style="font-family: 'Montserrat', sans-serif"
     >
       {{ $t('slogan') }}
@@ -84,11 +97,11 @@
       </v-btn>
     </v-toolbar-items>
 
-    <template v-if="$vuetify.breakpoint.smAndUp" #extension>
+    <template v-if="$vuetify.breakpoint.smAndUp && !isLanding" #extension>
       <v-tabs
         :value="tabValue"
         align-with-title
-        class="header-tabs"
+        class="header-tabs white"
         optional
         show-arrows
         center-active
@@ -145,7 +158,7 @@ export default {
           lang: 'analyticalData',
         },
         { name: 'dataset', lang: 'datasets' },
-        { name: 'stratigraphy', lang: 'stratigraphy' },
+        { name: 'photo', lang: 'photo' },
       ],
       logo: require('~/assets/logos/emaapou5white.svg'),
     }
@@ -188,5 +201,17 @@ export default {
 
 .v-app-bar ::v-deep .v-toolbar__content {
   padding-right: 0;
+}
+
+.transition-logo {
+  transition: width 250ms ease-in-out, height 250ms ease-in-out;
+}
+
+.gradient-background {
+  background: linear-gradient(
+    320deg,
+    rgba(62, 163, 202, 1),
+    rgba(0, 0, 0, 1)
+  ) !important;
 }
 </style>
