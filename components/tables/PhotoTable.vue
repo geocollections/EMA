@@ -2,7 +2,7 @@
   <table-wrapper
     v-bind="{ showSearch }"
     :flat="$attrs.flat"
-    :headers="headers"
+    :headers="useDynamicHeaders ? dynamicHeaders : headers"
     :items="items"
     :options="options"
     :count="count"
@@ -44,6 +44,7 @@
 
 <script>
 import { round } from 'lodash'
+import { mapState } from 'vuex'
 import TableWrapper from '~/components/tables/TableWrapper.vue'
 export default {
   name: 'PhotoTable',
@@ -70,19 +71,39 @@ export default {
         sortDesc: [],
       }),
     },
+    useDynamicHeaders: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       headers: [
-        { text: this.$t('image.id'), value: 'id' },
-        { text: this.$t('image.number'), value: 'image_number' },
-        { text: this.$t('image.agent'), value: 'agent' },
-        { text: this.$t('image.date'), value: 'date' },
-        { text: this.$t('image.locality'), value: 'locality' },
-        { text: this.$t('image.imageObject'), value: 'image_object' },
-        { text: this.$t('image.tags'), value: 'tags' },
+        { text: this.$t('photo.id'), value: 'id' },
+        { text: this.$t('photo.number'), value: 'image_number' },
+        { text: this.$t('photo.agent'), value: 'agent' },
+        { text: this.$t('photo.date'), value: 'date' },
+        { text: this.$t('photo.locality'), value: 'locality' },
+        { text: this.$t('photo.imageObject'), value: 'image_object' },
+        { text: this.$t('photo.tags'), value: 'tags' },
       ],
     }
+  },
+  computed: {
+    ...mapState('tableHeaders', {
+      tableHeaders(state) {
+        return state.photo.tableHeaders
+      },
+    }),
+
+    dynamicHeaders() {
+      return this.tableHeaders.reduce((prev, item) => {
+        if (item.show) {
+          prev.push({ ...item, text: this.$t(item.text) })
+        }
+        return prev
+      }, [])
+    },
   },
   methods: {
     round,

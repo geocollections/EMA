@@ -113,15 +113,17 @@ export default {
   methods: {
     parseInput(input) {
       if (isEmpty(input)) return null
-      else return parseInt(input)
+      else return parseFloat(input)
     },
     handleParameter(parameter) {
-      this.$emit('input', {
-        ...this.value,
-        id: parameter.id,
-        label: parameter.label,
-        fields: [parameter.id],
-      })
+      if (parameter) {
+        this.$emit('input', {
+          ...this.value,
+          id: parameter.id,
+          label: parameter.label,
+          fields: [parameter.id],
+        })
+      }
     },
     handleValue(value) {
       this.$emit('input', { ...this.value, value })

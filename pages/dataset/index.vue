@@ -18,6 +18,7 @@
         :items="items"
         :count="count"
         :options="options"
+        use-dynamic-headers
         @update="handleUpdate"
       />
     </template>
@@ -30,6 +31,7 @@ import PageTitleWrapper from '~/components/search/PageTitleWrapper'
 import DatasetTable from '~/components/tables/DatasetTable'
 import DatasetSearchForm from '~/components/search/forms/DatasetSearchForm'
 import Search from '~/components/templates/Search'
+import dynamicTableHeaders from '~/mixins/dynamicTableHeaders'
 
 export default {
   components: {
@@ -38,6 +40,7 @@ export default {
     DatasetTable,
     PageTitleWrapper,
   },
+  mixins: [dynamicTableHeaders],
   head() {
     return {
       title: this.$t('dataset.pageTitle'),

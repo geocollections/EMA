@@ -16,16 +16,15 @@
       <search-view-map-wrapper
         site-overlay
         locality-overlay
-        borehole-overlay
         :items="items"
         class="mb-6"
       />
-
       <analytical-data-table
         :show-search="false"
         :items="items"
         :count="count"
         :options="options"
+        use-dynamic-headers
         @update="handleUpdate"
       />
     </template>

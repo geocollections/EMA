@@ -16,7 +16,6 @@
       <search-view-map-wrapper
         site-overlay
         locality-overlay
-        borehole-overlay
         :items="items"
         class="mb-6"
       />
@@ -26,6 +25,7 @@
         :items="items"
         :count="count"
         :options="options"
+        use-dynamic-headers
         @update="handleUpdate"
       />
     </template>
@@ -39,6 +39,7 @@ import SampleTable from '~/components/tables/SampleTable.vue'
 import PageTitleWrapper from '~/components/search/PageTitleWrapper'
 import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
 import Search from '~/components/templates/Search'
+import dynamicTableHeaders from '~/mixins/dynamicTableHeaders'
 
 export default {
   components: {
@@ -48,6 +49,7 @@ export default {
     SampleSearchForm,
     SampleTable,
   },
+  mixins: [dynamicTableHeaders],
   head() {
     return {
       title: this.$t('sample.pageTitle'),

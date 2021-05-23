@@ -5,7 +5,7 @@
         v-model="containImages"
         class="mt-0"
         hide-details
-        color="light-blue"
+        color="header"
         :label="$t('common.containImages')"
       />
     </div>
@@ -20,7 +20,7 @@
         md="3"
         lg="2"
       >
-        <v-tooltip bottom color="light-blue" z-index="51000" max-width="250">
+        <v-tooltip bottom color="header" z-index="51000" max-width="250">
           <template #activator="{ on }">
             <v-card
               flat
@@ -47,10 +47,7 @@
                     align="center"
                     justify="center"
                   >
-                    <v-progress-circular
-                      indeterminate
-                      color="light-blue lighten-4"
-                    />
+                    <v-progress-circular indeterminate color="grey lighten-5" />
                   </v-row>
                 </template>
               </v-img>
@@ -68,22 +65,22 @@
           </template>
 
           <span>
-            <b>{{ $t('image.id') }}: </b> {{ image.id }}<br />
+            <b>{{ $t('photo.id') }}: </b> {{ image.id }}<br />
             <span v-if="image.date_created || image.date_created_free">
-              <b>{{ $t('image.date') }}: </b>
+              <b>{{ $t('photo.date') }}: </b>
               <span v-if="image.date_created">{{
                 image.date_created.split('T')[0]
               }}</span>
-              <span v-else>image.date_created_free</span>
+              <span v-else>{{ image.date_created_free }}</span>
               <br />
             </span>
             <span v-if="image.agent || image.author_free">
-              <b>{{ $t('image.author') }}: </b
+              <b>{{ $t('photo.author') }}: </b
               >{{ image.agent || image.author_free }}
               <br />
             </span>
             <span v-if="image.image_number">
-              <b>{{ $t('image.number') }}: </b>
+              <b>{{ $t('photo.number') }}: </b>
               {{ image.image_number }}
               <br />
             </span>

@@ -20,6 +20,7 @@
         :items="items"
         :count="count"
         :options="options"
+        use-dynamic-headers
         @update="handleUpdate"
       />
     </template>
@@ -33,6 +34,7 @@ import AnalysisSearchForm from '~/components/search/forms/AnalysisSearchForm'
 import PageTitleWrapper from '~/components/search/PageTitleWrapper'
 import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
 import Search from '~/components/templates/Search'
+import dynamicTableHeaders from '~/mixins/dynamicTableHeaders'
 
 export default {
   name: 'AnalysisSearch',
@@ -43,6 +45,7 @@ export default {
     AnalysisSearchForm,
     AnalysisTable,
   },
+  mixins: [dynamicTableHeaders],
   head() {
     return {
       title: this.$t('analysis.pageTitle'),

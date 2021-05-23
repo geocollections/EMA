@@ -14,7 +14,6 @@
 
     <template #result>
       <search-view-map-wrapper
-        locality-overlay
         use-custom-markers
         :items="mapMarkers"
         class="mb-6"
@@ -33,7 +32,7 @@
             :key="entity"
             :label="$t(`common.${entity}`)"
             :value="entity"
-            color="light-blue darken-1"
+            color="header"
           ></v-radio>
         </v-radio-group>
 
@@ -44,11 +43,20 @@
           :items="items"
           :count="count"
           :options="options"
+          use-dynamic-headers
           @update="handleUpdate"
         />
 
         <image-view-wrapper
           v-if="currentView === 'image'"
+          :items="items"
+          :count="count"
+          :options="options"
+          @update="handleUpdate"
+        />
+
+        <gallery-view-wrapper
+          v-if="currentView === 'gallery'"
           :items="items"
           :count="count"
           :options="options"
@@ -68,9 +76,12 @@ import Search from '~/components/templates/Search'
 import PhotoSearchForm from '~/components/search/forms/PhotoSearchForm'
 import PhotoTable from '~/components/tables/PhotoTable'
 import ImageViewWrapper from '~/components/ImageViewWrapper'
+import GalleryViewWrapper from '~/components/GalleryViewWrapper'
+import dynamicTableHeaders from '~/mixins/dynamicTableHeaders'
 
 export default {
   components: {
+    GalleryViewWrapper,
     ImageViewWrapper,
     PhotoTable,
     PhotoSearchForm,
@@ -78,16 +89,17 @@ export default {
     SearchViewMapWrapper,
     PageTitleWrapper,
   },
+  mixins: [dynamicTableHeaders],
   head() {
     return {
-      title: this.$t('image.pageTitle'),
+      title: this.$t('photo.pageTitle'),
     }
   },
   computed: {
     ...mapState('landing', ['search']),
-    ...mapState('image', ['options', 'items', 'count']),
+    ...mapState('photo', ['options', 'items', 'count']),
     ...mapState('settings', ['listOfViews']),
-    ...mapFields('image', ['currentView']),
+    ...mapFields('photo', ['currentView']),
     mapMarkers() {
       if (this.items?.length > 0) {
         return this.items.reduce((filtered, item) => {
@@ -123,7 +135,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions('image', ['searchImages']),
+    ...mapActions('photo', ['searchImages']),
     async handleUpdate(tableState) {
       await this.searchImages(tableState?.options)
     },

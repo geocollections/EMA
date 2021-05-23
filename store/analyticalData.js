@@ -60,6 +60,20 @@ const getDefaultState = () => {
           label: 'analyticalData.method',
           fields: ['analysis_method', 'analysis_method_en', 'method_details'],
         },
+        lab: {
+          value: '',
+          type: 'text',
+          lookUpType: 'contains',
+          label: 'analyticalData.lab',
+          fields: ['lab', 'lab_en'],
+        },
+        agentAnalysed: {
+          value: '',
+          type: 'text',
+          lookUpType: 'contains',
+          label: 'analyticalData.agentAnalysed',
+          fields: ['agent_analysed', 'agent_analysed_free'],
+        },
         reference: {
           value: '',
           type: 'text',
@@ -182,7 +196,8 @@ export const getters = {
   distinctListParameters: (state) => (mustSeeParam) => {
     if (state.listParameters && state.listParameters.length > 0) {
       const distinctList = state.listParameters.filter(
-        (param) => !state.activeListParameters.includes(param)
+        (param) =>
+          !state.activeListParameters.find((item) => item.id === param.id)
       )
       return [mustSeeParam, ...distinctList]
     } else return [mustSeeParam]
@@ -260,11 +275,7 @@ export const mutations = {
     state.activeListParameters.splice(index, 1)
   },
   UPDATE_ACTIVE_LIST_PARAMETERS(state, payload) {
-    state.activeListParameters.splice(
-      payload.indexToReplace,
-      1,
-      payload.parameter
-    )
+    state.activeListParameters.splice(payload.index, 1, payload.parameter)
   },
   UPDATE_ACTIVE_PARAM(state, payload) {
     if (state.filters.byIds?.[payload.keyToReplace]) {
@@ -275,9 +286,10 @@ export const mutations = {
     }
   },
   UPDATE_ACTIVE_LIST_PARAMETERS_FILTERS(state, newFilters) {
+    const byIds = { ...state.filters.byIds, ...newFilters }
     state.filters = {
-      byIds: { ...state.filters.byIds, ...newFilters },
-      allIds: Object.keys(state.filters.byIds),
+      byIds,
+      allIds: Object.keys(byIds),
     }
   },
   REMOVE_ACTIVE_LIST_PARAMETER_FILTER(state, filterName) {
@@ -379,12 +391,12 @@ export const actions = {
     commit('SET_SHOWN_ACTIVE_LIST_PARAMETERS', list)
   },
   initActiveListParameters({ commit, dispatch }, parameters) {
-    // CaO, MgO, SiO, Al2O3
+    // CaO, MgO, SiO2, Al2O3
     const DEFAULT_PARAMETERS = [
-      parameters[24],
-      parameters[109],
-      parameters[163],
-      parameters[1],
+      parameters.find((param) => param.id === 'Ca_pct'),
+      parameters.find((param) => param.id === 'MgO_pct'),
+      parameters.find((param) => param.id === 'SiO2_pct'),
+      parameters.find((param) => param.id === 'Al2O3_pct'),
     ]
 
     commit('INIT_ACTIVE_LIST_PARAMETERS', DEFAULT_PARAMETERS)

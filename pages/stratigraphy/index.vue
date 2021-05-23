@@ -18,6 +18,7 @@
         :items="items"
         :count="count"
         :options="options"
+        use-dynamic-headers
         @update="handleUpdate"
       />
     </template>
@@ -30,6 +31,7 @@ import Search from '@/components/templates/Search'
 import StratigraphySearchForm from '@/components/search/forms/StratigraphySearchForm.vue'
 import StratigraphyTable from '@/components/tables/StratigraphyTable'
 import PageTitleWrapper from '@/components/search/PageTitleWrapper'
+import dynamicTableHeaders from '~/mixins/dynamicTableHeaders'
 export default {
   components: {
     Search,
@@ -37,6 +39,7 @@ export default {
     StratigraphyTable,
     PageTitleWrapper,
   },
+  mixins: [dynamicTableHeaders],
   head() {
     return {
       title: this.$t('stratigraphy.pageTitle'),

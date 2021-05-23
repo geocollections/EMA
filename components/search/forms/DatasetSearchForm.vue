@@ -25,10 +25,12 @@
     />
 
     <institution-search-filter
-      class="pt-3"
+      class="pt-1"
       :institution="institution"
       @change:institution="institution = $event"
     />
+
+    <extra-options class="pt-1" />
   </v-form>
 </template>
 
@@ -42,10 +44,12 @@ import ResetSearchButton from '../ResetSearchButton.vue'
 import SearchButton from '../SearchButton.vue'
 import TextField from '~/components/fields/TextField.vue'
 import AutocompleteField from '~/components/fields/AutocompleteField'
+import ExtraOptions from '~/components/search/ExtraOptions'
 
 export default {
   name: 'DatasetSearchForm',
   components: {
+    ExtraOptions,
     InstitutionSearchFilter,
     TextField,
     GlobalSearch,
@@ -64,7 +68,7 @@ export default {
         'analysis_parameter',
         {
           defaultParams: {
-            fq: 'id_l:[2 TO *]', // Because first one is N/A
+            fq: 'is_null:false',
           },
         }
       )
