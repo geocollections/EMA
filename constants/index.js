@@ -95,6 +95,43 @@ export const ATTACHMENT = {
   },
 }
 
+export const DATASET_AUTHORS = {
+  options: {
+    page: 1,
+    itemsPerPage: 25,
+    sortBy: [],
+    sortDesc: [],
+  },
+  queryFields: {
+    // id: (locale) => 'id',
+    // dataset: (locale) => 'dataset',
+    // agent: (locale) => 'agent',
+    affiliation: (locale) => 'affiliation',
+    name: (locale) => 'agent__agent',
+    remarks: (locale) => 'remarks',
+    type: (locale) => 'agent_type__value',
+  },
+}
+
+export const DATASET_GEOLOCATIONS = {
+  options: {
+    page: 1,
+    itemsPerPage: 25,
+    sortBy: [],
+    sortDesc: [],
+  },
+  queryFields: {
+    // id: (locale) => 'id',
+    // dataset: (locale) => 'dataset',
+    // agent: (locale) => 'agent',
+
+    name: (locale) =>
+      locale === 'et' ? 'locality__locality' : 'locality__locality_en',
+    latitude: (locale) => 'point_latitude',
+    longitude: (locale) => 'point_longitude',
+  },
+}
+
 export const IMAGE = {
   options: {
     page: 1,
@@ -407,6 +444,8 @@ export const TAXON = {
     taxon: (locale) => 'taxon',
     author_year: (locale) => 'author_year',
     parent_taxon: (locale) => 'parent_taxon',
+    fad: (locale) => (locale === 'et' ? 'fad' : 'fad_en'),
+    lad: (locale) => (locale === 'et' ? 'lad' : 'lad_en'),
   },
 }
 

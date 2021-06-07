@@ -4,6 +4,7 @@
       <prev-next-nav-title
         :ids="ids"
         :title="$translate({ et: locality.locality, en: locality.locality_en })"
+        class="title-locality"
       />
     </template>
 
@@ -135,23 +136,25 @@
                   })
                 "
               />
-              <link-data-row
-                v-if="drillcore"
-                nuxt
-                :title="$t('locality.drillcore')"
-                :value="
-                  $translate({
-                    et: drillcore.drillcore,
-                    en: drillcore.drillcore_en,
-                  })
-                "
-                :href="
-                  localePath({
-                    name: 'drillcore-id',
-                    params: { id: drillcore.id },
-                  })
-                "
-              />
+
+              <!-- NOTE: #466 added same link as a button -->
+              <!--              <link-data-row-->
+              <!--                v-if="drillcore"-->
+              <!--                nuxt-->
+              <!--                :title="$t('locality.drillcore')"-->
+              <!--                :value="-->
+              <!--                  $translate({-->
+              <!--                    et: drillcore.drillcore,-->
+              <!--                    en: drillcore.drillcore_en,-->
+              <!--                  })-->
+              <!--                "-->
+              <!--                :href="-->
+              <!--                  localePath({-->
+              <!--                    name: 'drillcore-id',-->
+              <!--                    params: { id: drillcore.id },-->
+              <!--                  })-->
+              <!--                "-->
+              <!--              />-->
 
               <data-row
                 v-if="locality.date_added"
@@ -176,12 +179,35 @@
         </v-simple-table>
 
         <v-btn
+          v-if="analysisResultsCount > 0"
           small
-          color="accent"
-          class="mt-2 lighten-2"
+          color="emp-analysis"
+          class="mt-2 white--text"
           @click="goToAnalyticalData"
           >{{ $t('locality.linkToAnalyticalData') }}
           <v-icon right>mdi-chart-scatter-plot</v-icon>
+        </v-btn>
+
+        <v-btn
+          v-if="drillcore"
+          small
+          color="emp-drillcore"
+          class="mt-2 white--text"
+          @click="
+            $router.push(
+              localePath({
+                name: 'drillcore-id',
+                params: { id: drillcore.id },
+              })
+            )
+          "
+          >{{
+            $translate({
+              et: drillcore.drillcore,
+              en: drillcore.drillcore_en,
+            })
+          }}
+          <v-icon right>mdi-screw-machine-flat-top</v-icon>
         </v-btn>
       </v-card-text>
     </template>
@@ -213,8 +239,8 @@
     </template>
 
     <template #bottom>
-      <image-bar v-if="images.length > 0" :images="images" />
-      <v-card v-if="filteredTabs.length > 0" class="mt-6 mb-4">
+      <image-bar v-if="images.length > 0" class="mt-4" :images="images" />
+      <v-card v-if="filteredTabs.length > 0" class="mt-4 mb-4">
         <tabs :tabs="filteredTabs" :init-active-tab="initActiveTab" />
       </v-card>
     </template>
@@ -287,7 +313,8 @@ export default {
         {
           defaultParams: {
             fq: `locality_id:${locality.id} AND specimen_image_attachment:2`,
-            sort: 'date_created desc,date_created_free desc,stars desc,id desc',
+            sort:
+              'date_created_dt desc,date_created_free desc,stars desc,id desc',
           },
         }
       )
@@ -421,6 +448,16 @@ export default {
         et: this.locality.locality,
         en: this.locality.locality_en,
       }),
+      meta: [
+        {
+          property: 'og:title',
+          hid: 'og:title',
+          content: this.$translate({
+            et: this.locality.locality,
+            en: this.locality.locality_en,
+          }),
+        },
+      ],
     }
   },
   computed: {
@@ -434,6 +471,10 @@ export default {
     images() {
       // return this.attachmentsOutcrop.concat(this.attachments)
       return this.attachments
+    },
+
+    analysisResultsCount() {
+      return this.tabs?.find((tab) => tab.id === 'graphs')?.count
     },
   },
   methods: {

@@ -3,7 +3,8 @@
     <template #title>
       <prev-next-nav-title
         :ids="ids"
-        :title="$translate({ et: dataset.name, en: dataset.name_en })"
+        :title="dataset.title"
+        class="title-dataset"
       />
     </template>
 
@@ -13,19 +14,58 @@
         <v-simple-table dense class="custom-table">
           <template #default>
             <tbody>
+              <data-row :title="$t('dataset.title')" :value="dataset.title" />
+              <data-row
+                :title="$t('dataset.titleTranslated')"
+                :value="dataset.title_translated"
+              />
+              <data-row
+                :title="$t('dataset.titleAlt')"
+                :value="dataset.title_alternative"
+              />
               <data-row
                 :title="$t('dataset.creators')"
-                :value="dataset.owner_txt || dataset.owner__agent"
+                :value="
+                  dataset.creators || dataset.owner_txt || dataset.owner__agent
+                "
               />
-              <data-row :title="$t('dataset.date')" :value="dataset.date_txt" />
               <data-row
-                :title="$t('dataset.description')"
+                :title="$t('dataset.publicationYear')"
+                :value="dataset.publication_year"
+              />
+              <data-row :title="$t('dataset.date')" :value="dataset.date" />
+              <data-row
+                :title="$t('dataset.resourceTopic')"
+                :value="dataset.resource"
+              />
+              <data-row
+                :title="$t('dataset.publisher')"
+                :value="dataset.publisher"
+              />
+              <data-row
+                :title="$t('dataset.subjects')"
+                :value="dataset.subjects"
+              />
+              <data-row
+                :title="$t('dataset.language')"
                 :value="
                   $translate({
-                    et: dataset.description,
-                    en: dataset.description_en,
+                    et: dataset.language__value,
+                    en: dataset.language__value_en,
                   })
                 "
+              />
+              <data-row
+                :title="$t('dataset.abstract')"
+                :value="dataset.abstract"
+              />
+              <data-row
+                :title="$t('dataset.methods')"
+                :value="dataset.methods"
+              />
+              <data-row
+                :title="$t('dataset.version')"
+                :value="dataset.version"
               />
               <link-data-row
                 v-if="doi"
@@ -36,8 +76,24 @@
               <link-data-row
                 v-if="reference"
                 :title="$t('dataset.reference')"
-                :value="reference.reference"
-                :href="`https://kirjandus.geoloogia.info/reference/${reference.id}`"
+                :value="dataset.reference__reference"
+                :href="`https://kirjandus.geoloogia.info/reference/${dataset.reference__id}`"
+              />
+              <link-data-row
+                :title="$t('dataset.locality')"
+                :value="
+                  $translate({
+                    et: dataset.locality__locality,
+                    en: dataset.locality__locality_en,
+                  })
+                "
+                nuxt
+                :href="
+                  localePath({
+                    name: 'locality-id',
+                    params: { id: dataset.locality },
+                  })
+                "
               />
               <data-row
                 :title="$t('dataset.copyright')"
@@ -82,7 +138,7 @@
                     :value="selectedParameterValues"
                     multiple
                     column
-                    active-class="header lighten-2 font-weight-bold elevation-3"
+                    active-class="header lighten-2 font-weight-bold elevation-1"
                     @change="handleParameterChange"
                   >
                     <v-chip
@@ -112,7 +168,7 @@
     </template>
 
     <template #bottom>
-      <v-card v-if="filteredTabs.length > 0" class="mt-6 mb-4">
+      <v-card v-if="filteredTabs.length > 0" class="mt-4 mb-4">
         <tabs :tabs="filteredTabs" :init-active-tab="initActiveTab" />
       </v-card>
     </template>
@@ -227,6 +283,22 @@ export default {
           count: 0,
           props: { dataset: dataset.id },
         },
+        {
+          id: 'dataset_author',
+          table: 'dataset_author',
+          routeName: 'dataset-id-authors',
+          title: 'dataset.authors',
+          count: 0,
+          props: { dataset: dataset.id },
+        },
+        {
+          id: 'dataset_geolocation',
+          table: 'dataset_geolocation',
+          routeName: 'dataset-id-geolocations',
+          title: 'dataset.geolocations',
+          count: 0,
+          props: { dataset: dataset.id },
+        },
       ]
 
       if (locations.length === 1) {
@@ -302,6 +374,26 @@ export default {
         et: this.dataset.name,
         en: this.dataset.name_en,
       }),
+      meta: [
+        {
+          property: 'og:title',
+          content: this.$translate({
+            et: this.dataset.name,
+            en: this.dataset.name_en,
+          }),
+          hid: 'og:title',
+        },
+        {
+          property: 'og:description',
+          content: this.dataset.abstract,
+          hid: 'og:description',
+        },
+        {
+          property: 'description',
+          content: this.dataset.abstract,
+          hid: 'description',
+        },
+      ],
     }
   },
   computed: {
