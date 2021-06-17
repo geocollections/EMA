@@ -1,7 +1,7 @@
 <template>
   <detail>
     <template #title>
-      <prev-next-nav-title
+      <title-card-detail
         :ids="ids"
         :title="
           $t('analysis.title', {
@@ -20,7 +20,9 @@
       <v-card>
         <v-row no-gutters justify="center">
           <v-col>
-            <v-card-title>{{ $t('common.general') }}</v-card-title>
+            <v-card-title class="subsection-title">{{
+              $t('common.general')
+            }}</v-card-title>
             <v-card-text>
               <v-simple-table dense class="custom-table">
                 <template #default>
@@ -91,6 +93,10 @@
                       :title="$t('analysis.depth')"
                       :value="analysis.sample__depth"
                     />
+                    <data-row
+                      :title="$t('analysis.depthInterval')"
+                      :value="analysis.sample__depth_interval"
+                    />
                     <link-data-row
                       :title="$t('analysis.stratigraphy')"
                       :value="
@@ -160,13 +166,14 @@
 
 <script>
 import { isEmpty, isNil } from 'lodash'
+import TitleCardDetail from '@/components/TitleCardDetail'
 import DataRow from '~/components/DataRow.vue'
 import LinkDataRow from '~/components/LinkDataRow.vue'
 import Tabs from '~/components/Tabs'
-import PrevNextNavTitle from '~/components/PrevNextNavTitle'
 import Detail from '~/components/templates/Detail.vue'
 export default {
-  components: { PrevNextNavTitle, DataRow, LinkDataRow, Tabs, Detail },
+  components: { TitleCardDetail, DataRow, LinkDataRow, Tabs, Detail },
+
   async asyncData({ params, route, error, app, redirect }) {
     try {
       const analysisResponse = await app.$services.sarvREST.getResource(

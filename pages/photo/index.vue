@@ -3,30 +3,25 @@
     <template #title>
       <title-card
         :title="$t('common.photosCount')"
-        :subtitle="$t('common.count', { count: count })"
         icon="mdi-file-image-outline"
         class="title-photo"
       />
     </template>
 
     <template #form>
-      <photo-search-form />
+      <photo-search-form :markers="mapMarkers" />
     </template>
 
     <template #result>
-      <search-view-map-wrapper
-        use-custom-markers
-        :items="mapMarkers"
-        class="mb-6"
-        @update="handleUpdate"
-      />
-
-      <v-card>
+      <div class="text-h6 pl-2 py-1">
+        {{ count ? $tc('common.count', count) : '' }}
+      </div>
+      <v-card class="mt-0">
         <v-radio-group
           v-model="currentView"
           row
           hide-details
-          class="pa-4"
+          class="pa-4 mt-0"
           mandatory
         >
           <v-radio
@@ -73,7 +68,6 @@
 import { mapState, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import TitleCard from '~/components/TitleCard.vue'
-import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
 import Search from '~/components/templates/Search'
 import PhotoSearchForm from '~/components/search/forms/PhotoSearchForm'
 import PhotoTable from '~/components/tables/PhotoTable'
@@ -88,7 +82,6 @@ export default {
     PhotoTable,
     PhotoSearchForm,
     Search,
-    SearchViewMapWrapper,
     TitleCard,
   },
   mixins: [dynamicTableHeaders],

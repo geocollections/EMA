@@ -1,49 +1,56 @@
 <template>
   <v-form @submit.prevent="handleSearch">
-    <global-search />
-    <div class="mt-2 d-flex justify-end align-center">
-      <reset-search-button @click="handleReset" />
-      <search-button />
-    </div>
-    <text-field v-model="species" :label="$t(filters.byIds.species.label)" />
+    <search-actions class="mb-3" :count="count" @click="handleReset" />
+    <search-fields-wrapper :active="hasActiveFilters">
+      <text-field v-model="species" :label="$t(filters.byIds.species.label)" />
 
-    <text-field v-model="locality" :label="$t(filters.byIds.locality.label)" />
+      <text-field
+        v-model="locality"
+        :label="$t(filters.byIds.locality.label)"
+      />
 
-    <autocomplete-field
-      v-model="stratigraphyHierarchy"
-      :items="autocomplete.stratigraphy"
-      :loading="autocomplete.loaders.stratigraphy"
-      :label="$t(filters.byIds.stratigraphyHierarchy.label)"
-      :item-text="stratigraphyLabel"
-      @search:items="autocompleteStratigraphySearch"
+      <autocomplete-field
+        v-model="stratigraphyHierarchy"
+        :items="autocomplete.stratigraphy"
+        :loading="autocomplete.loaders.stratigraphy"
+        :label="$t(filters.byIds.stratigraphyHierarchy.label)"
+        :item-text="stratigraphyLabel"
+        @search:items="autocompleteStratigraphySearch"
+      />
+
+      <autocomplete-field
+        v-model="taxonHierarchy"
+        :items="autocomplete.taxon"
+        :loading="autocomplete.loaders.taxon"
+        :label="$t(filters.byIds.taxonHierarchy.label)"
+        :item-text="taxonLabel"
+        @search:items="autocompleteTaxonSearch"
+      />
+
+      <text-field v-model="author" :label="$t(filters.byIds.author.label)" />
+    </search-fields-wrapper>
+    <search-view-map-wrapper
+      locality-overlay
+      :items="items"
+      class="mt-2"
+      :active="geoJSON"
+      @update="handleMapUpdate"
     />
-
-    <autocomplete-field
-      v-model="taxonHierarchy"
-      :items="autocomplete.taxon"
-      :loading="autocomplete.loaders.taxon"
-      :label="$t(filters.byIds.taxonHierarchy.label)"
-      :item-text="taxonLabel"
-      @search:items="autocompleteTaxonSearch"
-    />
-
-    <text-field v-model="author" :label="$t(filters.byIds.author.label)" />
-
-    <extra-options class="pt-1" />
+    <extra-options class="mt-2" />
   </v-form>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 
-import GlobalSearch from '../GlobalSearch.vue'
-import ResetSearchButton from '../ResetSearchButton.vue'
-import SearchButton from '../SearchButton.vue'
+import SearchFieldsWrapper from '../SearchFieldsWrapper.vue'
+import SearchActions from '../SearchActions.vue'
 import TextField from '~/components/fields/TextField'
 import AutocompleteField from '~/components/fields/AutocompleteField'
 import autocompleteMixin from '~/mixins/autocompleteMixin'
 import ExtraOptions from '~/components/search/ExtraOptions'
+import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
 
 export default {
   name: 'TaxonSearchForm',
@@ -51,9 +58,9 @@ export default {
     ExtraOptions,
     AutocompleteField,
     TextField,
-    GlobalSearch,
-    ResetSearchButton,
-    SearchButton,
+    SearchFieldsWrapper,
+    SearchActions,
+    SearchViewMapWrapper,
   },
   mixins: [autocompleteMixin],
   data() {
@@ -69,7 +76,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('taxon', ['filters']),
+    ...mapState('taxon', ['filters', 'count', 'items']),
     ...mapFields('taxon', {
       species: 'filters.byIds.species.value',
       locality: 'filters.byIds.locality.value',
@@ -79,7 +86,9 @@ export default {
     }),
     ...mapFields('globalSearch', {
       institution: 'filters.byIds.institution.value',
+      geoJSON: 'filters.byIds.geoJSON.value',
     }),
+    ...mapGetters('taxon', ['hasActiveFilters']),
   },
   created() {
     this.fillAutocompleteLists()
@@ -97,6 +106,9 @@ export default {
     },
     fillAutocompleteLists() {
       if (this.hierarchy) this.autocomplete.stratigraphy.push(this.hierarchy)
+    },
+    async handleMapUpdate(tableState) {
+      await this.searchTaxa(tableState?.options)
     },
   },
 }

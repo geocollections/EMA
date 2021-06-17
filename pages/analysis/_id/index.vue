@@ -3,6 +3,8 @@
     :items="analysisResults"
     :count="count"
     :options="options"
+    hide-depth
+    hide-method
     @update="handleUpdate"
   />
 </template>

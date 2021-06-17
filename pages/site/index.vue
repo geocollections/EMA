@@ -3,7 +3,6 @@
     <template #title>
       <title-card
         :title="$t('common.sitesCount')"
-        :subtitle="$t('common.count', { count: count })"
         icon="mdi-map-marker-star-outline"
         class="title-site"
       />
@@ -14,13 +13,9 @@
     </template>
 
     <template #result>
-      <search-view-map-wrapper
-        site-overlay
-        :items="items"
-        class="mb-6"
-        @update="handleUpdate"
-      />
-
+      <div class="text-h6 pl-2 py-1">
+        {{ count ? $tc('common.count', count) : '' }}
+      </div>
       <site-table
         :show-search="false"
         :items="items"
@@ -37,7 +32,6 @@
 import { mapState, mapActions } from 'vuex'
 import SiteSearchForm from '@/components/search/forms/SiteSearchForm'
 import SiteTable from '~/components/tables/SiteTable.vue'
-import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
 import Search from '~/components/templates/Search'
 import dynamicTableHeaders from '~/mixins/dynamicTableHeaders'
 import TitleCard from '~/components/TitleCard.vue'
@@ -45,7 +39,6 @@ import TitleCard from '~/components/TitleCard.vue'
 export default {
   components: {
     Search,
-    SearchViewMapWrapper,
     SiteSearchForm,
     SiteTable,
     TitleCard,

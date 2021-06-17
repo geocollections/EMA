@@ -1,7 +1,7 @@
 <template>
   <detail>
     <template #title>
-      <prev-next-nav-title :ids="ids" :title="fileTitle" class="title-main" />
+      <title-card-detail :ids="ids" :title="fileTitle" class="title-main" />
     </template>
     <template #column-left>
       <v-card-text class="text-center">
@@ -310,8 +310,11 @@
         </v-simple-table>
 
         <v-card v-if="showMap" id="map-wrap" elevation="0">
-          <v-card-title class="pl-0">{{ $t('locality.map') }}</v-card-title>
+          <v-card-title class="pl-0 subsection-title">{{
+            $t('locality.map')
+          }}</v-card-title>
           <leaflet-map
+            rounded
             :estonian-map="mapIsEstonian"
             :estonian-bedrock-overlay="mapIsEstonian"
             :height="300"
@@ -343,7 +346,9 @@
           md="6"
         >
           <v-card>
-            <v-card-title>{{ $t(item.title) }}</v-card-title>
+            <v-card-title class="subsection-title">{{
+              $t(item.title)
+            }}</v-card-title>
 
             <v-card-text>
               <v-simple-table>
@@ -415,14 +420,14 @@
 
 <script>
 import { isNull, isNil } from 'lodash'
+import TitleCardDetail from '@/components/TitleCardDetail'
 import DataRow from '~/components/DataRow.vue'
 import LinkDataRow from '~/components/LinkDataRow.vue'
 import LeafletMap from '~/components/map/LeafletMap'
-import PrevNextNavTitle from '~/components/PrevNextNavTitle'
 import Detail from '~/components/templates/Detail'
 export default {
   components: {
-    PrevNextNavTitle,
+    TitleCardDetail,
     LeafletMap,
     DataRow,
     LinkDataRow,

@@ -1,7 +1,7 @@
 <template>
   <detail>
     <template #title>
-      <prev-next-nav-title
+      <title-card-detail
         :ids="ids"
         :title="$translate({ et: site.name, en: site.name_en })"
         class="title-site"
@@ -9,7 +9,9 @@
     </template>
 
     <template #column-left>
-      <v-card-title>{{ $t('common.general') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('common.general')
+      }}</v-card-title>
       <v-card-text>
         <v-simple-table dense class="custom-table">
           <template #default>
@@ -23,7 +25,11 @@
                   })
                 "
               />
-              <data-row :value="site.area" :title="$t('site.area')">
+              <data-row
+                v-if="site.area"
+                :value="site.area"
+                :title="$t('site.area')"
+              >
                 <template #value>
                   <a
                     v-if="site.area__area_type === 2"
@@ -185,6 +191,7 @@
           elevation="0"
         >
           <leaflet-map
+            rounded
             :estonian-map="site.locality__country__value === 'Eesti'"
             :estonian-bedrock-overlay="
               site.locality__country__value === 'Eesti'
@@ -283,8 +290,8 @@
 <script>
 import { isNil } from 'lodash'
 import LeafletMap from '@/components/map/LeafletMap'
+import TitleCardDetail from '@/components/TitleCardDetail'
 import Tabs from '~/components/Tabs.vue'
-import PrevNextNavTitle from '~/components/PrevNextNavTitle'
 import DataRow from '~/components/DataRow.vue'
 import LinkDataRow from '~/components/LinkDataRow.vue'
 import Detail from '~/components/templates/Detail.vue'
@@ -292,7 +299,7 @@ import ImageBar from '~/components/ImageBar.vue'
 
 export default {
   components: {
-    PrevNextNavTitle,
+    TitleCardDetail,
     Tabs,
     LeafletMap,
     DataRow,
@@ -401,9 +408,7 @@ export default {
   },
   computed: {
     title() {
-      return this.$t(`breadcrumbs.${this.routeName}-id`, {
-        id: this.$route.params.id,
-      })
+      return this.$translate({ et: this.site.name, en: this.site.name_en })
     },
     filteredTabs() {
       return this.tabs.filter((item) => item.count > 0)

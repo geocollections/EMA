@@ -3,7 +3,6 @@
     <template #title>
       <title-card
         :title="$t('common.drillcoresCount')"
-        :subtitle="$t('common.count', { count: count })"
         icon="mdi-screw-machine-flat-top"
         class="title-drillcore"
       />
@@ -11,16 +10,18 @@
 
     <template #form>
       <drillcore-search-form />
+      <!-- <search-view-map-wrapper
+        borehole-overlay
+        :items="items"
+        class="mb-6 mt-2"
+        @update="handleUpdate"
+      /> -->
     </template>
 
     <template #result>
-      <search-view-map-wrapper
-        borehole-overlay
-        :items="items"
-        class="mb-6"
-        @update="handleUpdate"
-      />
-
+      <div class="text-h6 pl-2 py-1">
+        {{ count ? $tc('common.count', count) : '' }}
+      </div>
       <drillcore-table
         :show-search="false"
         :items="items"
@@ -35,17 +36,15 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import DrillcoreSearchForm from '@/components/search/forms/DrillcoreSearchForm'
+import DrillcoreSearchForm from '@/components/search/forms/DrillcoreSearchForm.vue'
 import DrillcoreTable from '~/components/tables/DrillcoreTable.vue'
-import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
-import Search from '~/components/templates/Search'
+import Search from '~/components/templates/Search.vue'
 import dynamicTableHeaders from '~/mixins/dynamicTableHeaders'
 import TitleCard from '~/components/TitleCard.vue'
 
 export default {
   components: {
     Search,
-    SearchViewMapWrapper,
     DrillcoreSearchForm,
     DrillcoreTable,
     TitleCard,

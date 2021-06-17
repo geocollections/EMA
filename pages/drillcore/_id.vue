@@ -1,7 +1,7 @@
 <template>
   <detail>
     <template #title>
-      <prev-next-nav-title
+      <title-card-detail
         :ids="ids"
         :title="
           $translate({ et: drillcore.drillcore, en: drillcore.drillcore_en })
@@ -11,7 +11,9 @@
     </template>
 
     <template #column-left>
-      <v-card-title>{{ $t('common.general') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('common.general')
+      }}</v-card-title>
       <v-card-text>
         <v-simple-table dense class="custom-table">
           <template #default>
@@ -74,13 +76,17 @@
         </v-simple-table>
       </v-card-text>
       <div v-if="drillcore.remarks">
-        <v-card-title>{{ $t('drillcore.remarks') }}</v-card-title>
+        <v-card-title class="subsection-title">{{
+          $t('drillcore.remarks')
+        }}</v-card-title>
         <v-card-text>{{ drillcore.remarks }}</v-card-text>
       </div>
     </template>
 
     <template v-if="drillcore.locality_id" #column-right>
-      <v-card-title>{{ $t('locality.locality') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('locality.locality')
+      }}</v-card-title>
       <v-card-text>
         <v-simple-table dense class="mb-4 custom-table">
           <template #default>
@@ -139,6 +145,7 @@
             :estonian-bedrock-overlay="
               drillcore.locality__country__value === 'Eesti'
             "
+            rounded
             borehole-overlay
             :height="300"
             :center="{
@@ -170,15 +177,15 @@
 <script>
 import { isEmpty, isNull } from 'lodash'
 import LeafletMap from '@/components/map/LeafletMap'
+import TitleCardDetail from '@/components/TitleCardDetail'
 import Tabs from '~/components/Tabs.vue'
 import DataRow from '~/components/DataRow.vue'
 import LinkDataRow from '~/components/LinkDataRow.vue'
-import PrevNextNavTitle from '~/components/PrevNextNavTitle'
 import Detail from '~/components/templates/Detail.vue'
 
 export default {
   components: {
-    PrevNextNavTitle,
+    TitleCardDetail,
     Tabs,
     LeafletMap,
     DataRow,

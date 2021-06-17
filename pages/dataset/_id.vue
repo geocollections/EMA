@@ -1,7 +1,7 @@
 <template>
   <detail>
     <template #title>
-      <prev-next-nav-title
+      <title-card-detail
         :ids="ids"
         :title="dataset.title"
         class="title-dataset"
@@ -9,7 +9,9 @@
     </template>
 
     <template #column-left>
-      <v-card-title>{{ $t('common.general') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('common.general')
+      }}</v-card-title>
       <v-card-text>
         <v-simple-table dense class="custom-table">
           <template #default>
@@ -159,7 +161,9 @@
     </template>
 
     <template #column-right>
-      <v-card-title>{{ $t('locality.map') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('locality.map')
+      }}</v-card-title>
       <v-card-text>
         <v-card id="map-wrap" elevation="0">
           <leaflet-map rounded :markers="computedLocations" />
@@ -177,8 +181,8 @@
 
 <script>
 import { isEmpty, isNil } from 'lodash'
+import TitleCardDetail from '@/components/TitleCardDetail'
 import Tabs from '~/components/Tabs'
-import PrevNextNavTitle from '~/components/PrevNextNavTitle'
 import Detail from '~/components/templates/Detail.vue'
 import DataRow from '~/components/DataRow.vue'
 import LinkDataRow from '~/components/LinkDataRow.vue'
@@ -186,7 +190,7 @@ import LeafletMap from '~/components/map/LeafletMap'
 export default {
   components: {
     LeafletMap,
-    PrevNextNavTitle,
+    TitleCardDetail,
     Tabs,
     Detail,
     DataRow,

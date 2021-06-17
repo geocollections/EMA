@@ -1,7 +1,7 @@
 <template>
   <detail>
     <template #title>
-      <prev-next-nav-title
+      <title-card-detail
         :ids="ids"
         :title="$translate({ et: area.name, en: area.name_en })"
         class="title-area"
@@ -11,7 +11,9 @@
     <template #column-left>
       <v-row no-gutters justify="center">
         <v-col cols="12">
-          <v-card-title>{{ $t('common.general') }}</v-card-title>
+          <v-card-title class="subsection-title">{{
+            $t('common.general')
+          }}</v-card-title>
           <v-card-text>
             <v-simple-table dense class="custom-table">
               <template #default>
@@ -150,7 +152,9 @@
     </template>
 
     <template v-if="computedSites" #column-right>
-      <v-card-title>{{ $t('locality.map') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('locality.map')
+      }}</v-card-title>
       <v-card-text>
         <v-card id="map-wrap" elevation="0">
           <leaflet-map
@@ -173,17 +177,17 @@
 
 <script>
 import { isNil } from 'lodash'
+import TitleCardDetail from '@/components/TitleCardDetail'
 import Tabs from '~/components/Tabs.vue'
 import DataRow from '~/components/DataRow.vue'
 import LinkDataRow from '~/components/LinkDataRow.vue'
-import PrevNextNavTitle from '~/components/PrevNextNavTitle'
 import Detail from '~/components/templates/Detail.vue'
 import LeafletMap from '~/components/map/LeafletMap'
 
 export default {
   components: {
     LeafletMap,
-    PrevNextNavTitle,
+    TitleCardDetail,
     Tabs,
     DataRow,
     LinkDataRow,

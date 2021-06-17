@@ -1,34 +1,43 @@
 <template>
-  <v-card>
-    <v-card-title class="py-1">
-      <div class="card-title--clickable" @click="showMap = !showMap">
-        <span v-html="$tc('common.map', mapMarkers.length)" />
+  <card-expandable
+    :active="active"
+    :show-body="showMap"
+    @click="showMap = $event"
+  >
+    <template #title="{ showBody }">
+      <div @click="$emit('click', !showBody)">
+        <span
+          class="montserrat"
+          style="font-size: 1rem"
+          v-html="$tc('common.map', mapMarkers.length)"
+        />
         <v-icon class="pb-1">mdi-earth</v-icon>
       </div>
-      <v-spacer></v-spacer>
-      <v-btn icon @click="showMap = !showMap">
-        <v-icon>{{ showMap ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-      </v-btn>
-    </v-card-title>
-    <v-card-text v-show="showMap" class="px-0 pb-1">
+    </template>
+
+    <template #body="{ showBody }">
       <leaflet-map
+        v-show="showBody"
         v-bind="$attrs"
         :markers="mapMarkers"
-        :invalidate-size="showMap"
+        :invalidate-size="showBody"
         activate-search
         gps-enabled
+        :show-links="false"
+        :gesture-handling="$vuetify.breakpoint.smAndDown"
         @update="$emit('update')"
       />
-    </v-card-text>
-  </v-card>
+    </template>
+  </card-expandable>
 </template>
 
 <script>
 import { mapFields } from 'vuex-map-fields'
-import LeafletMap from '~/components/map/LeafletMap'
+import CardExpandable from '../CardExpandable.vue'
+import LeafletMap from '~/components/map/LeafletMap.vue'
 export default {
   name: 'SearchViewMapWrapper',
-  components: { LeafletMap },
+  components: { LeafletMap, CardExpandable },
   props: {
     items: {
       type: Array,
@@ -43,6 +52,10 @@ export default {
       default() {
         return false
       },
+    },
+    active: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
@@ -88,14 +101,3 @@ export default {
   },
 }
 </script>
-
-<style scoped lang="scss">
-.card-title--clickable {
-  transition: opacity 200ms ease-in-out;
-
-  &:hover {
-    cursor: pointer;
-    opacity: 0.7;
-  }
-}
-</style>

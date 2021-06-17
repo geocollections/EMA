@@ -1,7 +1,7 @@
 <template>
   <v-tooltip bottom>
     <template #activator="{ on }">
-      <v-btn small text v-on="on" @click="handleClick">
+      <v-btn icon small text v-on="on" @click="handleClick">
         <v-icon>mdi-subdirectory-arrow-left mdi-rotate-90</v-icon>
       </v-btn>
     </template>
@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: 'GoBackButton',
+  name: 'BackButtonDetail',
   computed: {
     table() {
       return this.$route.name.substring(0, this.$route.name.indexOf('-'))

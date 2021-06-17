@@ -3,24 +3,22 @@
     app
     dark
     style="z-index: 2050"
-    color="primary"
-    class="gradient-background"
-    :height="isLanding ? ($vuetify.breakpoint.smAndDown ? 56 : 112) : 64"
+    :color="isLanding ? 'transparent' : 'primary'"
+    :elevation="isLanding ? 0 : 4"
+    :class="{
+      'gradient-background': !isLanding,
+      'gradient-background-front': isLanding,
+    }"
   >
     <v-toolbar-items>
-      <go-back-button v-if="showBack" />
       <v-app-bar-title class="align-self-center app-title ml-3">
         <nuxt-link :to="localePath({ path: '/' })">
           <v-tooltip bottom>
             <template #activator="{ on, attrs }">
               <v-img
                 class="transition-logo"
-                :height="
-                  isLanding ? ($vuetify.breakpoint.smAndDown ? 45 : 65) : 45
-                "
-                :width="
-                  isLanding ? ($vuetify.breakpoint.smAndDown ? 90 : 130) : 90
-                "
+                :height="45"
+                :width="90"
                 contain
                 :src="logo"
                 v-bind="attrs"
@@ -37,7 +35,7 @@
       v-if="$vuetify.breakpoint.mdAndUp"
       vertical
       inset
-      class="quaternary mx-3"
+      class="white mx-3"
     />
     <div v-if="$vuetify.breakpoint.mdAndUp" class="montserrat">
       {{ $t('slogan') }}
@@ -69,12 +67,9 @@
     <v-toolbar-items>
       <lang-switcher v-show="$vuetify.breakpoint.smAndUp" />
       <v-btn
-        :text="$vuetify.breakpoint.smAndUp"
-        :icon="!$vuetify.breakpoint.smAndUp"
+        text
         class="montserrat"
-        :class="{ 'header-icon-button': !$vuetify.breakpoint.smAndUp }"
         aria-label="Open navigation drawer"
-        :small="!$vuetify.breakpoint.smAndUp"
         @click.stop="$emit('toggle:navigationDrawer')"
       >
         <div v-if="drawer">
@@ -121,11 +116,10 @@
 </template>
 
 <script>
-import GoBackButton from './GoBackButton.vue'
-import LangSwitcher from '~/components/lang_switcher/LangSwitcher'
+import LangSwitcher from '~/components/lang_switcher/LangSwitcher.vue'
 export default {
   name: 'AppHeader',
-  components: { LangSwitcher, GoBackButton },
+  components: { LangSwitcher },
   props: {
     isDetail: {
       type: Boolean,
@@ -133,10 +127,6 @@ export default {
       default: false,
     },
     drawer: Boolean,
-    showBack: {
-      type: Boolean,
-      default: false,
-    },
   },
   data() {
     return {
@@ -173,7 +163,7 @@ export default {
   },
   computed: {
     isLanding() {
-      return this.$route.name.startsWith('index')
+      return this.getRouteBaseName().startsWith('index')
     },
     isSearchPage() {
       return this.$route.name.startsWith('search')
@@ -193,7 +183,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .app-title >>> .v-app-bar-title__content {
   width: unset !important;
 }
@@ -204,7 +194,7 @@ export default {
 
 .active-tab {
   background-color: var(--v-quaternary-base) !important;
-  color: var(--v-tertiary-base) !important;
+  color: var(--v-accent-darken1) !important;
 }
 
 .v-app-bar ::v-deep .v-toolbar__content {
@@ -216,11 +206,22 @@ export default {
   transition: width 250ms ease-in-out, height 250ms ease-in-out;
 }
 
+$gradient-col: rgb(150, 163, 177);
+$gradient-col-sec: rgb(80, 149, 177);
+
+.gradient-background-front {
+  background: linear-gradient(
+    320deg,
+    rgba($gradient-col, 0.6),
+    rgba($gradient-col-sec, 0.6)
+  ) !important;
+}
+
 .gradient-background {
   background: linear-gradient(
     320deg,
-    var(--v-header-base),
-    rgba(0, 0, 0, 1)
+    rgba($gradient-col, 1),
+    rgba($gradient-col-sec, 1)
   ) !important;
 }
 </style>

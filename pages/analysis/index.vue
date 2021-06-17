@@ -3,7 +3,6 @@
     <template #title>
       <title-card
         :title="$t('common.analysesCount')"
-        :subtitle="$t('common.count', { count: count })"
         icon="mdi-chart-scatter-plot"
         class="title-analysis"
       />
@@ -14,12 +13,9 @@
     </template>
 
     <template #result>
-      <search-view-map-wrapper
-        :items="items"
-        class="mb-6"
-        @update="handleUpdate"
-      />
-
+      <div class="text-h6 pl-2 py-1">
+        {{ count ? $tc('common.count', count) : '' }}
+      </div>
       <analysis-table
         :show-search="false"
         :items="items"
@@ -35,8 +31,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import AnalysisTable from '@/components/tables/AnalysisTable'
-import AnalysisSearchForm from '~/components/search/forms/AnalysisSearchForm'
-import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
+import AnalysisSearchForm from '~/components/search/forms/AnalysisSearchForm.vue'
 import Search from '~/components/templates/Search'
 import dynamicTableHeaders from '~/mixins/dynamicTableHeaders'
 import TitleCard from '~/components/TitleCard.vue'
@@ -45,7 +40,6 @@ export default {
   name: 'AnalysisSearch',
   components: {
     Search,
-    SearchViewMapWrapper,
     AnalysisSearchForm,
     AnalysisTable,
     TitleCard,

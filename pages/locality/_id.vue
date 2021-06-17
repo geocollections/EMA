@@ -1,7 +1,7 @@
 <template>
   <detail>
     <template #title>
-      <prev-next-nav-title
+      <title-card-detail
         :ids="ids"
         :title="$translate({ et: locality.locality, en: locality.locality_en })"
         class="title-locality"
@@ -9,7 +9,9 @@
     </template>
 
     <template #column-left>
-      <v-card-title>{{ $t('common.general') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('common.general')
+      }}</v-card-title>
       <v-card-text>
         <v-simple-table dense class="custom-table">
           <template #default>
@@ -212,10 +214,13 @@
       </v-card-text>
     </template>
     <template v-if="locality.latitude && locality.longitude" #column-right>
-      <v-card-title>{{ $t('locality.map') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('locality.map')
+      }}</v-card-title>
       <v-card-text>
         <v-card id="map-wrap" elevation="0">
           <leaflet-map
+            rounded
             :estonian-map="locality.country__value === 'Eesti'"
             :estonian-bedrock-overlay="locality.country__value === 'Eesti'"
             locality-overlay
@@ -250,17 +255,17 @@
 <script>
 import { isNil, isEmpty } from 'lodash'
 import { mapFields } from 'vuex-map-fields'
+import TitleCardDetail from '@/components/TitleCardDetail'
 import LinkDataRow from '~/components/LinkDataRow'
 import DataRow from '~/components/DataRow'
 import LeafletMap from '~/components/map/LeafletMap'
 import Tabs from '~/components/Tabs'
-import PrevNextNavTitle from '~/components/PrevNextNavTitle'
 import Detail from '~/components/templates/Detail.vue'
 import ImageBar from '~/components/ImageBar.vue'
 
 export default {
   components: {
-    PrevNextNavTitle,
+    TitleCardDetail,
     DataRow,
     LinkDataRow,
     LeafletMap,

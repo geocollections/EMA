@@ -1,55 +1,67 @@
 <template>
   <v-form @submit.prevent="handleSearch">
-    <global-search />
-    <div class="mt-2 d-flex justify-end align-center">
-      <reset-search-button @click="handleReset" />
-      <search-button />
-    </div>
-    <text-field v-model="locality" :label="$t(filters.byIds.locality.label)" />
+    <search-actions class="mb-3" :count="count" @click="handleReset" />
+    <search-fields-wrapper :active="hasActiveFilters">
+      <text-field
+        v-model="locality"
+        :label="$t(filters.byIds.locality.label)"
+      />
 
-    <text-field v-model="people" :label="$t(filters.byIds.people.label)" />
+      <text-field v-model="people" :label="$t(filters.byIds.people.label)" />
 
-    <text-field v-model="tags" :label="$t(filters.byIds.tags.label)" />
+      <text-field v-model="tags" :label="$t(filters.byIds.tags.label)" />
 
-    <text-field v-model="country" :label="$t(filters.byIds.country.label)" />
+      <text-field v-model="country" :label="$t(filters.byIds.country.label)" />
 
-    <range-text-field v-model="date" :label="$t(filters.byIds.date.label)" />
+      <range-text-field v-model="date" :label="$t(filters.byIds.date.label)" />
 
-    <text-field v-model="dateFree" :label="$t(filters.byIds.dateFree.label)" />
+      <text-field
+        v-model="dateFree"
+        :label="$t(filters.byIds.dateFree.label)"
+      />
 
-    <text-field
-      v-model="imageNumber"
-      :label="$t(filters.byIds.imageNumber.label)"
+      <text-field
+        v-model="imageNumber"
+        :label="$t(filters.byIds.imageNumber.label)"
+      />
+
+      <text-field v-model="author" :label="$t(filters.byIds.author.label)" />
+
+      <text-field
+        v-model="imageSize"
+        :label="$t(filters.byIds.imageSize.label)"
+      />
+    </search-fields-wrapper>
+    <search-view-map-wrapper
+      use-custom-markers
+      :items="markers"
+      class="mt-2"
+      :active="geoJSON"
+      @update="handleMapUpdate"
     />
-
-    <text-field v-model="author" :label="$t(filters.byIds.author.label)" />
-
-    <text-field
-      v-model="imageSize"
-      :label="$t(filters.byIds.imageSize.label)"
-    />
-
     <institution-search-filter
-      class="pt-1"
+      class="mt-2"
+      :active="!isEmpty(institution)"
       :institution="institution"
       @change:institution="institution = $event"
     />
 
-    <extra-options class="pt-1" />
+    <extra-options class="mt-2" />
   </v-form>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
+import { isEmpty } from 'lodash'
 
-import GlobalSearch from '../GlobalSearch.vue'
-import ResetSearchButton from '../ResetSearchButton.vue'
-import SearchButton from '../SearchButton.vue'
+import SearchFieldsWrapper from '../SearchFieldsWrapper.vue'
+import SearchActions from '../SearchActions.vue'
 import TextField from '~/components/fields/TextField.vue'
 import InstitutionSearchFilter from '~/components/search/InstitutionSearchFilter'
 import RangeTextField from '~/components/fields/RangeTextField'
 import ExtraOptions from '~/components/search/ExtraOptions'
+import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
 
 export default {
   name: 'PhotoSearchForm',
@@ -58,12 +70,18 @@ export default {
     RangeTextField,
     InstitutionSearchFilter,
     TextField,
-    GlobalSearch,
-    ResetSearchButton,
-    SearchButton,
+    SearchFieldsWrapper,
+    SearchActions,
+    SearchViewMapWrapper,
+  },
+  props: {
+    markers: {
+      type: Array,
+      default: () => [],
+    },
   },
   computed: {
-    ...mapState('photo', ['filters']),
+    ...mapState('photo', ['filters', 'count', 'items']),
     ...mapFields('photo', {
       locality: 'filters.byIds.locality.value',
       people: 'filters.byIds.people.value',
@@ -78,9 +96,12 @@ export default {
     }),
     ...mapFields('globalSearch', {
       institution: 'filters.byIds.institution.value',
+      geoJSON: 'filters.byIds.geoJSON.value',
     }),
+    ...mapGetters('photo', ['hasActiveFilters']),
   },
   methods: {
+    isEmpty,
     ...mapActions('photo', ['searchImages', 'resetImageFilters']),
     ...mapActions('landing', ['resetSearch']),
     handleSearch(e) {
@@ -90,6 +111,9 @@ export default {
       this.resetSearch()
       this.resetImageFilters()
       this.searchImages()
+    },
+    async handleMapUpdate(tableState) {
+      await this.searchImages(tableState?.options)
     },
   },
 }

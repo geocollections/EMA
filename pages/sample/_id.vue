@@ -1,14 +1,12 @@
 <template>
   <detail>
     <template #title>
-      <prev-next-nav-title
-        :ids="ids"
-        :title="sampleTitle"
-        class="title-sample"
-      />
+      <title-card-detail :ids="ids" :title="sampleTitle" class="title-sample" />
     </template>
     <template #column-left>
-      <v-card-title>{{ $t('common.general') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('common.general')
+      }}</v-card-title>
       <v-card-text>
         <v-simple-table dense class="custom-table">
           <template #default>
@@ -195,100 +193,69 @@
     </template>
 
     <template v-if="sample.locality_id" #column-right>
-      <v-card-title>{{ $t('locality.locality') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('locality.locality')
+      }}</v-card-title>
       <v-card-text>
         <v-simple-table dense class="mb-4 custom-table">
           <template #default>
             <tbody>
-              <tr>
-                <td>{{ $t('locality.locality') }}</td>
-                <td>
-                  <a
-                    class="text-link"
-                    :href="
-                      localePath({
-                        name: 'locality-id',
-                        params: { id: sample.locality_id },
-                      })
-                    "
-                  >
-                    {{
-                      $translate({
-                        et: sample.locality__locality,
-                        en: sample.locality__locality_en,
-                      })
-                    }}
-                  </a>
-                </td>
-              </tr>
+              <link-data-row
+                :title="$t('locality.locality')"
+                :value="
+                  $translate({
+                    et: sample.locality__locality,
+                    en: sample.locality__locality_en,
+                  })
+                "
+                nuxt
+                :href="
+                  localePath({
+                    name: 'locality-id',
+                    params: { id: sample.locality_id },
+                  })
+                "
+              >
+              </link-data-row>
               <data-row
                 :title="$t('sample.localityFree')"
                 :value="sample.locality_free"
               />
-              <tr v-if="sample.locality__country__value">
-                <td>{{ $t('locality.country') }}</td>
-                <td
-                  v-if="
-                    isNil(
-                      $translate({
-                        et: sample.locality__country__value,
-                        en: sample.locality__country__value_en,
-                      })
-                    )
-                  "
-                  class="no-value"
-                >
-                  {{ $t('common.noValue') }}
-                </td>
-                <td v-else>
-                  {{
-                    $t('locality.countryFormat', {
-                      name: $translate({
-                        et: sample.locality__country__value,
-                        en: sample.locality__country__value_en,
-                      }),
-                      iso: sample.locality__country__iso_code,
-                    })
-                  }}
-                </td>
-              </tr>
-              <tr>
-                <td>{{ $t('locality.latitude') }}</td>
-                <td v-if="isNil(sample.locality__latitude)" class="no-value">
-                  {{ $t('common.noValue') }}
-                </td>
-                <td v-else>
-                  {{ sample.locality__latitude }}
-                </td>
-              </tr>
-
-              <tr>
-                <td>{{ $t('locality.longitude') }}</td>
-                <td v-if="isNil(sample.locality__longitude)" class="no-value">
-                  {{ $t('common.noValue') }}
-                </td>
-                <td v-else>
-                  {{ sample.locality__longitude }}
-                </td>
-              </tr>
-              <tr>
-                <td>{{ $t('locality.elevation') }}</td>
-                <td v-if="isNil(sample.locality__elevation)" class="no-value">
-                  {{ $t('common.noValue') }}
-                </td>
-                <td v-else>
-                  {{ sample.locality__elevation }}
-                </td>
-              </tr>
-              <tr>
-                <td>{{ $t('locality.depth') }}</td>
-                <td v-if="isNil(sample.locality__depth)" class="no-value">
-                  {{ $t('common.noValue') }}
-                </td>
-                <td v-else>
-                  {{ sample.locality__depth }}
-                </td>
-              </tr>
+              <data-row
+                v-if="
+                  $translate({
+                    et: sample.locality__country__value,
+                    en: sample.locality__country__value_en,
+                  })
+                "
+                :title="$t('locality.country')"
+                :value="
+                  $translate({
+                    et: sample.locality__country__value,
+                    en: sample.locality__country__value_en,
+                  })
+                "
+              />
+              <data-row
+                v-if="sample.locality__latitude"
+                :title="$t('locality.latitude')"
+                :value="sample.locality__latitude"
+              />
+              <data-row
+                v-if="sample.locality__longitude"
+                :title="$t('locality.longitude')"
+                :value="sample.locality__longitude"
+              />
+              <data-row
+                v-if="sample.locality__elevation"
+                :title="$t('locality.elevation')"
+                :value="sample.locality__elevation"
+              />
+              <data-row
+                v-if="sample.locality__depth"
+                :title="$t('locality.depth')"
+                :value="sample.locality__depth"
+              />
             </tbody>
           </template>
         </v-simple-table>
@@ -298,6 +265,7 @@
           elevation="0"
         >
           <leaflet-map
+            rounded
             :estonian-map="sample.locality__country__value === 'Eesti'"
             :estonian-bedrock-overlay="
               sample.locality__country__value === 'Eesti'
@@ -324,7 +292,9 @@
     </template>
 
     <template v-else-if="computedLocations.length > 0" #column-right>
-      <v-card-title>{{ $t('locality.map') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('locality.map')
+      }}</v-card-title>
       <v-card-text>
         <v-card elevation="0">
           <leaflet-map rounded :markers="computedLocations" />
@@ -342,16 +312,16 @@
 
 <script>
 import { isEmpty, isNil } from 'lodash'
-import DataRow from '@/components/DataRow'
-import LinkDataRow from '@/components/LinkDataRow'
-import Tabs from '@/components/Tabs'
-import LeafletMap from '@/components/map/LeafletMap'
-import PrevNextNavTitle from '~/components/PrevNextNavTitle'
-import Detail from '~/components/templates/Detail'
+import DataRow from '@/components/DataRow.vue'
+import LinkDataRow from '@/components/LinkDataRow.vue'
+import Tabs from '@/components/Tabs.vue'
+import LeafletMap from '@/components/map/LeafletMap.vue'
+import TitleCardDetail from '@/components/TitleCardDetail.vue'
+import Detail from '@/components/templates/Detail.vue'
 
 export default {
   components: {
-    PrevNextNavTitle,
+    TitleCardDetail,
     LinkDataRow,
     DataRow,
     Tabs,

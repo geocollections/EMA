@@ -5,31 +5,28 @@
       class="transition-swing"
       :class="{ 'on-hover': hover }"
       :elevation="hover ? 12 : 2"
-      :href="!innerLink ? link : ''"
-      :target="!innerLink ? '_blank' : ''"
-      :nuxt="innerLink"
-      @click="innerLink ? $router.push(localePath({ name: link })) : ''"
+      :href="href"
+      target="_blank"
     >
       <v-img
         :src="background"
         class="white--text align-end transition-swing"
         :class="{ grayscale: grayscale }"
         :gradient="`to bottom, rgba(0,0,0,.3), rgba(0,0,0,${
-          grayscale ? '.5' : '.5'
+          grayscale ? '.3' : '.3'
         })`"
-        height="250px"
+        height="175px"
         content-class="my-auto"
       >
-        <v-card-title
-          style="word-break: keep-all"
-          class="montserrat justify-center text-center text-shadow font-weight-bold text-uppercase"
-          >{{ $t(title) }}</v-card-title
-        >
-        <v-card-text class="text-body-1 text-center text-shadow">{{
-          $t(description)
+        <v-card-title style="word-break: keep-all" class="montserrat text-h5"
+          >{{ title }}
+          <v-icon right small>mdi-open-in-new</v-icon>
+        </v-card-title>
+        <v-card-text class="text-shadow montserrat">{{
+          description
         }}</v-card-text>
         <!-- Todo: remove buttons -->
-        <v-card-actions class="justify-center mb-2">
+        <!-- <v-card-actions class="justify-center mb-2">
           <v-btn
             outlined
             small
@@ -39,7 +36,7 @@
             >{{ $t('landing.visit_site') }}
             <v-icon right small>mdi-open-in-new</v-icon>
           </v-btn>
-        </v-card-actions>
+        </v-card-actions> -->
       </v-img>
     </v-card>
   </v-hover>
@@ -47,7 +44,7 @@
 
 <script>
 export default {
-  name: 'CardWrapper',
+  name: 'ExternalLinkCard',
   props: {
     title: {
       type: String,
@@ -59,17 +56,16 @@ export default {
       required: false,
       default: 'Description',
     },
-    link: {
+    href: {
       type: String,
       required: false,
-      default: 'Link',
+      default: '',
     },
     background: {
       type: String,
       required: false,
       default: 'https://picsum.photos/700/300',
     },
-    innerLink: Boolean,
     grayscale: Boolean,
   },
   computed: {

@@ -4,8 +4,8 @@
       v-model="activeTab"
       class="tabs"
       light
-      background-color="primary lighten-3"
-      slider-color="tertiary"
+      background-color="grey lighten-4"
+      slider-color="accent darken-1"
       :show-arrows="$vuetify.breakpoint.smAndUp"
       :vertical="$vuetify.breakpoint.xsOnly"
       grow
@@ -15,7 +15,8 @@
         :key="index"
         :disabled="item.count === 0"
         nuxt
-        active-class="active-tab"
+        class="montserrat"
+        exact-active-class="active-tab"
         exact
         :to="
           localePath({
@@ -81,7 +82,7 @@ export default {
 
 .active-tab {
   font-weight: bold;
-  color: var(--v-tertiary-base) !important;
+  color: var(--v-accent-darken1) !important;
 }
 
 .v-tabs--vertical {

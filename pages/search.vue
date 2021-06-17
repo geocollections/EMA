@@ -2,7 +2,7 @@
   <div>
     <v-row justify="center" align="center">
       <v-col>
-        <h1 class="text-center my-3">
+        <h1 class="text-sm-h3 font-weight-bold text-h4 text-center my-3">
           {{ $t('landing.searchTitle') }}
         </h1>
       </v-col>
@@ -14,7 +14,9 @@
     </v-row>
     <v-row justify="center">
       <v-col>
-        <button-tabs ref="tabs" :tabs="computedTabs" />
+        <div class="mb-2">
+          <button-tabs ref="tabs" :tabs="computedTabs" />
+        </div>
 
         <v-card>
           <nuxt-child keep-alive />
@@ -33,7 +35,7 @@ export default {
   name: 'QuickSearch',
   components: { ButtonTabs, GlobalSearch },
   // layout: 'search',
-  async asyncData({ params, route, error, app, store }) {
+  async asyncData({ params, route, error, app, store, redirect }) {
     try {
       const tabs = [
         {
@@ -126,6 +128,15 @@ export default {
           props: {},
         },
         {
+          id: 'photo',
+          table: 'attachment',
+          routeName: 'search-photos',
+          title: 'landing.photos',
+          isSolr: true,
+          count: 0,
+          props: {},
+        },
+        {
           id: 'taxon',
           routeName: 'search-taxa',
           title: 'landing.taxa',
@@ -150,22 +161,30 @@ export default {
           props: {},
         },
       ]
-
-      return {
-        tabs: await Promise.all(
-          tabs.map(
-            async (tab) =>
-              await app.$hydrateCount(tab, {
-                solr: {
-                  default: {
-                    q: isEmpty(store.state.landing.search)
-                      ? '*'
-                      : `${store.state.landing.search}`,
-                  },
+      const hydratedTabs = await Promise.all(
+        tabs.map(
+          async (tab) =>
+            await app.$hydrateCount(tab, {
+              solr: {
+                default: {
+                  q: isEmpty(store.state.landing.search)
+                    ? '*'
+                    : `${store.state.landing.search}`,
                 },
-              })
-          )
-        ),
+                photo: {
+                  fq: 'specimen_image_attachment:2',
+                },
+              },
+            })
+        )
+      )
+
+      const validPath = app.$validateTabRoute(route, hydratedTabs, {
+        findMax: true,
+      })
+      if (validPath !== route.path) redirect(validPath)
+      return {
+        tabs: hydratedTabs,
       }
     } catch (err) {}
   },
@@ -210,6 +229,9 @@ export default {
             await this.$hydrateCount(tab, {
               solr: {
                 default: { q: isEmpty(this.search) ? '*' : `${this.search}` },
+                photo: {
+                  fq: 'specimen_image_attachment:2',
+                },
               },
             })
         )

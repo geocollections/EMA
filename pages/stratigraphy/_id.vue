@@ -1,7 +1,7 @@
 <template>
   <detail>
     <template #title>
-      <prev-next-nav-title
+      <title-card-detail
         :ids="ids"
         :title="
           $translate({
@@ -14,7 +14,9 @@
     </template>
 
     <template #column-left>
-      <v-card-title>{{ $t('common.general') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('common.general')
+      }}</v-card-title>
       <v-card-text>
         <v-simple-table dense class="custom-table">
           <template #default>
@@ -165,7 +167,9 @@
       </v-card-text>
     </template>
     <template v-if="stratotypeCount > 0" #column-right>
-      <v-card-title>{{ $t('stratigraphy.stratotypes') }}</v-card-title>
+      <v-card-title class="subsection-title">{{
+        $t('stratigraphy.stratotypes')
+      }}</v-card-title>
       <v-card-text>
         <stratigraphy-stratotype-table
           only-table
@@ -176,6 +180,7 @@
         />
         <v-card id="map-wrap" elevation="0">
           <leaflet-map
+            rounded
             :estonian-map="mapIsEstonian"
             :estonian-bedrock-overlay="mapIsEstonian"
             :height="300"
@@ -201,7 +206,9 @@
       >
         <v-row no-gutters>
           <v-col cols="12">
-            <v-card-title>{{ $t('common.description') }}</v-card-title>
+            <v-card-title class="subsection-title">{{
+              $t('common.description')
+            }}</v-card-title>
 
             <!-- eslint-disable vue/no-v-html -->
             <v-card-text
@@ -223,16 +230,16 @@
 <script>
 import { isEmpty, isNull, isNil } from 'lodash'
 import LeafletMap from '@/components/map/LeafletMap'
+import TitleCardDetail from '@/components/TitleCardDetail'
 import Tabs from '~/components/Tabs.vue'
 import DataRow from '~/components/DataRow.vue'
 import LinkDataRow from '~/components/LinkDataRow.vue'
-import PrevNextNavTitle from '~/components/PrevNextNavTitle'
 import StratigraphyStratotypeTable from '~/components/tables/StratigraphyStratotypeTable'
 import { STRATOTYPE } from '~/constants'
 import Detail from '~/components/templates/Detail'
 export default {
   components: {
-    PrevNextNavTitle,
+    TitleCardDetail,
     Tabs,
     LinkDataRow,
     DataRow,

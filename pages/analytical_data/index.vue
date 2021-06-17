@@ -3,7 +3,6 @@
     <template #title>
       <title-card
         :title="$t('common.analyticalDataCount')"
-        :subtitle="$t('common.count', { count: count })"
         icon="mdi-chart-scatter-plot"
         class="title-analysis"
       />
@@ -14,13 +13,9 @@
     </template>
 
     <template #result>
-      <search-view-map-wrapper
-        site-overlay
-        locality-overlay
-        :items="items"
-        class="mb-6"
-        @update="handleUpdate"
-      />
+      <div class="text-h6 pl-2 py-1">
+        {{ count ? $tc('common.count', count) : '' }}
+      </div>
       <analytical-data-table
         :show-search="false"
         :items="items"
@@ -35,7 +30,6 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
 import AnalyticalDataTable from '~/components/tables/AnalyticalDataTable'
 import AnalyticalDataSearchForm from '~/components/search/forms/AnalyticalDataSearchForm'
 import Search from '~/components/templates/Search'
@@ -47,7 +41,6 @@ export default {
     Search,
     AnalyticalDataSearchForm,
     AnalyticalDataTable,
-    SearchViewMapWrapper,
     TitleCard,
   },
   head() {

@@ -1,47 +1,47 @@
 <template>
   <v-form @submit.prevent="handleSearch">
-    <global-search />
-    <div class="mt-2 d-flex justify-end align-center">
-      <reset-search-button @click="handleReset" />
-      <search-button />
-    </div>
-    <text-field v-model="name" :label="$t(filters.byIds.name.label)" />
-    <text-field v-model="owner" :label="$t(filters.byIds.owner.label)" />
-    <text-field v-model="date" :label="$t(filters.byIds.date.label)" />
-    <text-field v-model="remarks" :label="$t(filters.byIds.remarks.label)" />
+    <search-actions class="mb-3" :count="count" @click="handleReset" />
+    <search-fields-wrapper :active="hasActiveFilters">
+      <text-field v-model="name" :label="$t(filters.byIds.name.label)" />
+      <text-field v-model="owner" :label="$t(filters.byIds.owner.label)" />
+      <text-field v-model="date" :label="$t(filters.byIds.date.label)" />
+      <text-field v-model="remarks" :label="$t(filters.byIds.remarks.label)" />
 
-    <autocomplete-field
-      :label="$t('dataset.parameters')"
-      chips
-      clearable
-      multiple
-      :items="availableParameters"
-      :value="parameters"
-      return-object
-      item-text="text"
-      small-chips
-      deletable-chips
-      @input="handleParameterInput"
-    />
+      <autocomplete-field
+        :label="$t('dataset.parameters')"
+        chips
+        clearable
+        multiple
+        :items="availableParameters"
+        :value="parameters"
+        return-object
+        item-text="text"
+        small-chips
+        deletable-chips
+        @input="handleParameterInput"
+      />
+    </search-fields-wrapper>
 
     <institution-search-filter
-      class="pt-1"
+      class="mt-2"
+      :active="!isEmpty(institution)"
       :institution="institution"
       @change:institution="institution = $event"
     />
 
-    <extra-options class="pt-1" />
+    <extra-options class="mt-2" />
   </v-form>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
+import { isEmpty } from 'lodash'
 
 import InstitutionSearchFilter from '@/components/search/InstitutionSearchFilter'
-import GlobalSearch from '../GlobalSearch.vue'
-import ResetSearchButton from '../ResetSearchButton.vue'
-import SearchButton from '../SearchButton.vue'
+
+import SearchActions from '../SearchActions.vue'
+import SearchFieldsWrapper from '../SearchFieldsWrapper.vue'
 import TextField from '~/components/fields/TextField.vue'
 import AutocompleteField from '~/components/fields/AutocompleteField'
 import ExtraOptions from '~/components/search/ExtraOptions'
@@ -52,10 +52,9 @@ export default {
     ExtraOptions,
     InstitutionSearchFilter,
     TextField,
-    GlobalSearch,
-    ResetSearchButton,
-    SearchButton,
+    SearchActions,
     AutocompleteField,
+    SearchFieldsWrapper,
   },
   data() {
     return {
@@ -80,7 +79,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('dataset', ['filters']),
+    ...mapState('dataset', ['filters', 'count']),
     ...mapFields('dataset', {
       name: 'filters.byIds.name.value',
       owner: 'filters.byIds.owner.value',
@@ -91,8 +90,10 @@ export default {
     ...mapFields('globalSearch', {
       institution: 'filters.byIds.institution.value',
     }),
+    ...mapGetters('dataset', ['hasActiveFilters']),
   },
   methods: {
+    isEmpty,
     ...mapActions('dataset', ['searchDatasets', 'resetDatasetFilters']),
     ...mapActions('landing', ['resetSearch']),
     handleReset(e) {

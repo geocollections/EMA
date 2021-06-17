@@ -3,7 +3,6 @@
     <template #title>
       <title-card
         :title="$t('common.localitiesCount')"
-        :subtitle="$t('common.count', { count: count })"
         icon="mdi-map-marker-outline"
         class="title-locality"
       />
@@ -14,12 +13,9 @@
     </template>
 
     <template #result>
-      <search-view-map-wrapper
-        locality-overlay
-        :items="items"
-        class="mb-6"
-        @update="handleUpdate"
-      />
+      <div class="text-h6 pl-2 py-1">
+        {{ count ? $tc('common.count', count) : '' }}
+      </div>
       <locality-table
         :show-search="false"
         :items="items"
@@ -36,7 +32,6 @@
 import { mapState, mapActions } from 'vuex'
 import LocalitySearchForm from '@/components/search/forms/LocalitySearchForm'
 import LocalityTable from '~/components/tables/LocalityTable.vue'
-import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper'
 import Search from '~/components/templates/Search'
 import dynamicTableHeaders from '~/mixins/dynamicTableHeaders'
 import TitleCard from '~/components/TitleCard.vue'
@@ -44,7 +39,6 @@ import TitleCard from '~/components/TitleCard.vue'
 export default {
   components: {
     Search,
-    SearchViewMapWrapper,
     LocalityTable,
     LocalitySearchForm,
     TitleCard,
