@@ -1,7 +1,7 @@
 <template>
   <v-form @submit.prevent="handleSearch">
     <search-actions class="mb-3" :count="count" @click="handleReset" />
-    <search-fields-wrapper :active="hasActiveFilters">
+    <search-fields-wrapper :active="hasActiveFilters('locality')">
       <text-field v-model="name" :label="$t(filters.byIds.name.label)" />
 
       <text-field v-model="country" :label="$t(filters.byIds.country.label)" />
@@ -26,7 +26,7 @@
       locality-overlay
       :items="items"
       class="mt-2"
-      :active="geoJSON"
+      :active="geoJSON !== null"
       @update="handleMapUpdate"
     />
 
@@ -45,6 +45,7 @@ import AutocompleteField from '~/components/fields/AutocompleteField.vue'
 import autocompleteMixin from '~/mixins/autocompleteMixin'
 import ExtraOptions from '~/components/search/ExtraOptions'
 import SearchViewMapWrapper from '~/components/map/SearchViewMapWrapper.vue'
+
 export default {
   name: 'LocalitySearchForm',
   components: {
@@ -70,31 +71,30 @@ export default {
     }
   },
   computed: {
-    ...mapState('locality', ['filters', 'count', 'items']),
-    ...mapFields('locality', {
+    ...mapState('search/locality', ['filters', 'count', 'items']),
+    ...mapFields('search/locality', {
       name: 'filters.byIds.name.value',
       country: 'filters.byIds.country.value',
       stratigraphy: 'filters.byIds.stratigraphy.value',
       reference: 'filters.byIds.reference.value',
     }),
-    ...mapFields('globalSearch', {
-      geoJSON: 'filters.byIds.geoJSON.value',
+    ...mapFields('search', {
+      geoJSON: 'globalFilters.byIds.geoJSON.value',
     }),
-    ...mapGetters('locality', ['hasActiveFilters']),
+    ...mapGetters('search', ['hasActiveFilters']),
   },
   methods: {
-    ...mapActions('locality', ['searchLocalities', 'resetLocalityFilters']),
-    ...mapActions('landing', ['resetSearch']),
+    ...mapActions('search', ['resetFilters']),
+    ...mapActions('search/locality', ['searchLocalities']),
     handleSearch(e) {
       this.searchLocalities()
     },
-    handleReset(e) {
-      this.resetSearch()
-      this.resetLocalityFilters()
+    async handleReset(e) {
+      await this.resetFilters('locality')
       this.searchLocalities()
     },
-    async handleMapUpdate(tableState) {
-      await this.searchLocalities(tableState?.options)
+    handleMapUpdate(tableState) {
+      this.searchLocalities(tableState?.options)
     },
   },
 }

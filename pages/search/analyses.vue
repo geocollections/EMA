@@ -9,13 +9,19 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import AnalysisTable from '@/components/tables/AnalysisTable'
 import { debounce } from 'lodash'
+import { mapState } from 'vuex'
 import { ANALYSIS } from '~/constants'
 
 export default {
   components: { AnalysisTable },
+  props: {
+    query: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       options: ANALYSIS.options,
@@ -24,10 +30,10 @@ export default {
     }
   },
   computed: {
-    ...mapState('landing', ['search']),
+    ...mapState('search', { search: 'searchQuery' }),
   },
   watch: {
-    search: {
+    query: {
       handler: debounce(function (value) {
         this.options.page = 1
         this.handleUpdate({ options: { ...this.options }, search: value })
@@ -41,7 +47,7 @@ export default {
         'analysis',
         {
           options: tableState.options,
-          search: this.search,
+          search: this.query,
           queryFields: this.$getQueryFields(ANALYSIS.queryFields),
           searchFilters: {},
         }

@@ -9,13 +9,18 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import { debounce } from 'lodash'
 import { DATASET } from '~/constants'
 import DatasetTable from '~/components/tables/DatasetTable'
 
 export default {
   components: { DatasetTable },
+  props: {
+    query: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       options: DATASET.options,
@@ -23,13 +28,9 @@ export default {
       count: 0,
     }
   },
-  computed: {
-    ...mapState('landing', ['search']),
-  },
   watch: {
-    search: {
+    query: {
       handler: debounce(function (value) {
-        this.options.page = 1
         this.options.page = 1
         this.handleUpdate({ options: { ...this.options }, search: value })
       }, 500),
@@ -42,7 +43,7 @@ export default {
         'dataset',
         {
           options: tableState.options,
-          search: this.search,
+          search: this.query,
           queryFields: this.$getQueryFields(DATASET.queryFields),
           searchFilters: {},
         }

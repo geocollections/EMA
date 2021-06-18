@@ -57,13 +57,12 @@ export default {
     }
   },
   computed: {
-    ...mapState('landing', ['search']),
-    ...mapState('stratigraphy', ['options', 'items', 'count']),
+    ...mapState('search/stratigraphy', ['options', 'items', 'count']),
   },
   methods: {
-    ...mapActions('stratigraphy', ['searchStratigraphy']),
+    ...mapActions('search/stratigraphy', ['searchStratigraphies']),
     async handleUpdate(tableState) {
-      await this.searchStratigraphy(tableState?.options)
+      await this.searchStratigraphies(tableState?.options)
     },
   },
 }

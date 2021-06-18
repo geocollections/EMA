@@ -30,7 +30,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import SampleSearchForm from '@/components/search/forms/SampleSearchForm'
+import SampleSearchForm from '@/components/search/forms/SampleSearchForm.vue'
 import SampleTable from '~/components/tables/SampleTable.vue'
 import Search from '~/components/templates/Search'
 import dynamicTableHeaders from '~/mixins/dynamicTableHeaders'
@@ -57,13 +57,12 @@ export default {
     }
   },
   computed: {
-    ...mapState('landing', ['search']),
-    ...mapState('sample', ['options', 'items', 'count']),
+    ...mapState('search/sample', ['options', 'items', 'count']),
   },
   methods: {
-    ...mapActions('sample', ['searchSamples']),
-    async handleUpdate(tableState) {
-      await this.searchSamples(tableState?.options)
+    ...mapActions('search/sample', ['searchSamples']),
+    handleUpdate(tableState) {
+      this.searchSamples(tableState?.options)
     },
   },
 }

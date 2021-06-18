@@ -57,13 +57,12 @@ export default {
     }
   },
   computed: {
-    ...mapState('landing', ['search']),
-    ...mapState('locality', ['options', 'items', 'count']),
+    ...mapState('search/locality', ['options', 'items', 'count']),
   },
   methods: {
-    ...mapActions('locality', ['searchLocalities']),
-    async handleUpdate(tableState) {
-      await this.searchLocalities(tableState?.options)
+    ...mapActions('search/locality', ['searchLocalities']),
+    handleUpdate(tableState) {
+      this.searchLocalities(tableState?.options)
     },
   },
 }

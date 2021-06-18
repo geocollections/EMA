@@ -9,13 +9,18 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import { debounce } from 'lodash'
 import { SPECIMEN } from '~/constants'
 import SpecimenTable from '~/components/tables/SpecimenTable'
 
 export default {
   components: { SpecimenTable },
+  props: {
+    query: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       options: SPECIMEN.options,
@@ -23,11 +28,8 @@ export default {
       count: 0,
     }
   },
-  computed: {
-    ...mapState('landing', ['search']),
-  },
   watch: {
-    search: {
+    query: {
       handler: debounce(function (value) {
         this.options.page = 1
         this.handleUpdate({ options: { ...this.options }, search: value })
@@ -41,7 +43,7 @@ export default {
         'specimen',
         {
           options: tableState.options,
-          search: this.search,
+          search: this.query,
           queryFields: this.$getQueryFields(SPECIMEN.queryFields),
           searchFilters: {},
         }

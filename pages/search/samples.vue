@@ -9,13 +9,18 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import { debounce } from 'lodash'
 import SampleTable from '~/components/tables/SampleTable.vue'
 import { SAMPLE } from '~/constants'
 
 export default {
   components: { SampleTable },
+  props: {
+    query: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       options: SAMPLE.options,
@@ -23,11 +28,8 @@ export default {
       count: 0,
     }
   },
-  computed: {
-    ...mapState('landing', ['search']),
-  },
   watch: {
-    search: {
+    query: {
       handler: debounce(function (value) {
         this.options.page = 1
         this.handleUpdate({ options: { ...this.options }, search: value })
@@ -41,7 +43,7 @@ export default {
         'sample',
         {
           options: tableState.options,
-          search: this.search,
+          search: this.query,
           queryFields: this.$getQueryFields(SAMPLE.queryFields),
           searchFilters: {},
         }

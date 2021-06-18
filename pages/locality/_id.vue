@@ -183,7 +183,7 @@
         <v-btn
           v-if="analysisResultsCount > 0"
           small
-          color="emp-analysis"
+          color="emp-analysis montserrat"
           class="mt-2 white--text"
           @click="goToAnalyticalData"
           >{{ $t('locality.linkToAnalyticalData') }}
@@ -193,7 +193,7 @@
         <v-btn
           v-if="drillcore"
           small
-          color="emp-drillcore"
+          color="emp-drillcore  montserrat"
           class="mt-2 white--text"
           @click="
             $router.push(
@@ -399,7 +399,7 @@ export default {
 
       if (drillcore) {
         tabs.splice(3, 0, {
-          routeName: 'locality-id-drillcore_boxes',
+          routeName: 'locality-id-drillcore-boxes',
           title: 'locality.drillcoreBoxes',
           count: drillcore.boxes,
           props: { drillcore: drillcore.id },
@@ -491,7 +491,7 @@ export default {
         et: this.locality.locality,
         en: this.locality.locality_en,
       })
-      this.$router.push(this.localePath({ name: 'analytical_data' }))
+      this.$router.push(this.localePath({ name: 'analytical-data' }))
     },
   },
 }

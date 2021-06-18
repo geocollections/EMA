@@ -58,11 +58,10 @@ export default {
     }
   },
   computed: {
-    ...mapState('landing', ['search']),
-    ...mapState('taxon', ['options', 'items', 'count']),
+    ...mapState('search/taxon', ['options', 'items', 'count']),
   },
   methods: {
-    ...mapActions('taxon', ['searchTaxa']),
+    ...mapActions('search/taxon', ['searchTaxa']),
     async handleUpdate(tableState) {
       await this.searchTaxa(tableState?.options)
     },

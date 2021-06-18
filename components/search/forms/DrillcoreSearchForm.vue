@@ -1,7 +1,7 @@
 <template>
   <v-form @submit.prevent="handleSearch">
     <search-actions class="mb-3" :count="count" @click="handleReset" />
-    <search-fields-wrapper :active="hasActiveFilters">
+    <search-fields-wrapper :active="hasActiveFilters('drillcore')">
       <text-field v-model="name" :label="$t(filters.byIds.name.label)" />
       <text-field
         v-model="repository"
@@ -17,7 +17,7 @@
 
     <search-view-map-wrapper
       borehole-overlay
-      :active="geoJSON"
+      :active="geoJSON !== null"
       :items="items"
       class="mt-2"
       @update="handleMapUpdate"
@@ -60,34 +60,33 @@ export default {
     SearchViewMapWrapper,
   },
   computed: {
-    ...mapState('drillcore', ['filters', 'count', 'items']),
-    ...mapFields('drillcore', {
+    ...mapState('search/drillcore', ['filters', 'count', 'items']),
+    ...mapFields('search/drillcore', {
       name: 'filters.byIds.name.value',
       repository: 'filters.byIds.repository.value',
       country: 'filters.byIds.country.value',
       boxes: 'filters.byIds.boxes.value',
       storage: 'filters.byIds.storage.value',
     }),
-    ...mapFields('globalSearch', {
-      institution: 'filters.byIds.institution.value',
-      geoJSON: 'filters.byIds.geoJSON.value',
+    ...mapFields('search', {
+      institution: 'globalFilters.byIds.institutions.value',
+      geoJSON: 'globalFilters.byIds.geoJSON.value',
     }),
-    ...mapGetters('drillcore', ['hasActiveFilters']),
+    ...mapGetters('search', ['hasActiveFilters']),
   },
   methods: {
     isEmpty,
-    ...mapActions('drillcore', ['searchDrillcores', 'resetDrillcoreFilters']),
-    ...mapActions('landing', ['resetSearch']),
-    handleReset(e) {
-      this.resetSearch()
-      this.resetDrillcoreFilters()
+    ...mapActions('search', ['resetFilters']),
+    ...mapActions('search/drillcore', ['searchDrillcores']),
+    async handleReset(e) {
+      await this.resetFilters('drillcore')
       this.searchDrillcores()
     },
     handleSearch(e) {
       this.searchDrillcores()
     },
-    async handleMapUpdate(tableState) {
-      await this.searchDrillcores(tableState?.options)
+    handleMapUpdate(tableState) {
+      this.searchDrillcores(tableState?.options)
     },
   },
 }

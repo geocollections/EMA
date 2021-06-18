@@ -63,13 +63,12 @@ export default {
     }
   },
   computed: {
-    ...mapState('landing', ['search']),
-    ...mapState('drillcore', ['options', 'items', 'count']),
+    ...mapState('search/drillcore', ['options', 'items', 'count']),
   },
   methods: {
-    ...mapActions('drillcore', ['searchDrillcores']),
-    async handleUpdate(tableState) {
-      await this.searchDrillcores(tableState?.options)
+    ...mapActions('search/drillcore', ['searchDrillcores']),
+    handleUpdate(tableState) {
+      this.searchDrillcores(tableState?.options)
     },
   },
 }

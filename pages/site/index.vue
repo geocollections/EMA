@@ -57,8 +57,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('landing', ['search']),
-    ...mapState('site', ['options', 'items', 'count']),
+    ...mapState('search/site', ['options', 'items', 'count']),
     translatedHeaders() {
       return this.headers.map((header) => {
         return {
@@ -69,7 +68,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions('site', ['searchSites']),
+    ...mapActions('search/site', ['searchSites']),
     async handleUpdate(tableState) {
       await this.searchSites(tableState?.options)
     },

@@ -9,13 +9,18 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import PreparationTable from '@/components/tables/PreparationTable'
 import { debounce } from 'lodash'
 import { PREPARATION } from '~/constants'
 
 export default {
   components: { PreparationTable },
+  props: {
+    query: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       options: PREPARATION.options,
@@ -23,11 +28,8 @@ export default {
       count: 0,
     }
   },
-  computed: {
-    ...mapState('landing', ['search']),
-  },
   watch: {
-    search: {
+    query: {
       handler: debounce(function (value) {
         this.options.page = 1
         this.handleUpdate({ options: { ...this.options }, search: value })
@@ -41,7 +43,7 @@ export default {
         'preparation',
         {
           options: tableState.options,
-          search: this.search,
+          search: this.query,
           queryFields: this.$getQueryFields(PREPARATION.queryFields),
           searchFilters: {},
         }

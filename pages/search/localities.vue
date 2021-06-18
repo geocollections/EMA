@@ -9,13 +9,18 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import { debounce } from 'lodash'
 import LocalityTable from '~/components/tables/LocalityTable.vue'
 import { LOCALITY } from '~/constants'
 
 export default {
   components: { LocalityTable },
+  props: {
+    query: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       options: LOCALITY.options,
@@ -23,11 +28,8 @@ export default {
       count: 0,
     }
   },
-  computed: {
-    ...mapState('landing', ['search']),
-  },
   watch: {
-    search: {
+    query: {
       handler: debounce(function (value) {
         this.options.page = 1
         this.handleUpdate({
@@ -44,7 +46,7 @@ export default {
         'locality',
         {
           options: tableState.options,
-          search: this.search,
+          search: this.query,
           queryFields: this.$getQueryFields(LOCALITY.queryFields),
           searchFilters: {},
         }

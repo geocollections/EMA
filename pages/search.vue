@@ -2,7 +2,7 @@
   <div>
     <v-row justify="center" align="center">
       <v-col>
-        <h1 class="text-sm-h3 font-weight-bold text-h4 text-center my-3">
+        <h1 class="my-3 text-center text-sm-h3 font-weight-bold text-h4">
           {{ $t('landing.searchTitle') }}
         </h1>
       </v-col>
@@ -19,7 +19,7 @@
         </div>
 
         <v-card>
-          <nuxt-child keep-alive />
+          <nuxt-child :query="searchQuery" keep-alive />
         </v-card>
       </v-col>
     </v-row>
@@ -161,17 +161,21 @@ export default {
           props: {},
         },
       ]
+
       const hydratedTabs = await Promise.all(
         tabs.map(
           async (tab) =>
             await app.$hydrateCount(tab, {
               solr: {
                 default: {
-                  q: isEmpty(store.state.landing.search)
+                  q: isEmpty(store.state.search.searchQuery)
                     ? '*'
-                    : `${store.state.landing.search}`,
+                    : `${store.state.search.searchQuery}`,
                 },
                 photo: {
+                  q: isEmpty(store.state.search.searchQuery)
+                    ? '*'
+                    : `${store.state.search.searchQuery}`,
                   fq: 'specimen_image_attachment:2',
                 },
               },
@@ -194,7 +198,7 @@ export default {
     }
   },
   computed: {
-    ...mapFields('landing', ['search']),
+    ...mapFields('search', ['searchQuery']),
     computedTabs() {
       // Filtering out empty tabs but still showing active tab whether it is empty or not
       const filteredTabs = this.tabs.filter(
@@ -228,8 +232,11 @@ export default {
           async (tab) =>
             await this.$hydrateCount(tab, {
               solr: {
-                default: { q: isEmpty(this.search) ? '*' : `${this.search}` },
+                default: {
+                  q: isEmpty(this.searchQuery) ? '*' : `${this.searchQuery}`,
+                },
                 photo: {
+                  q: isEmpty(this.searchQuery) ? '*' : `${this.searchQuery}`,
                   fq: 'specimen_image_attachment:2',
                 },
               },

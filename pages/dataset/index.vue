@@ -57,11 +57,10 @@ export default {
     }
   },
   computed: {
-    ...mapState('landing', ['search']),
-    ...mapState('dataset', ['options', 'items', 'count']),
+    ...mapState('search/dataset', ['options', 'items', 'count']),
   },
   methods: {
-    ...mapActions('dataset', ['searchDatasets']),
+    ...mapActions('search/dataset', ['searchDatasets']),
     async handleUpdate(tableState) {
       await this.searchDatasets(tableState?.options)
     },

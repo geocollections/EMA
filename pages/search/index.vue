@@ -9,13 +9,17 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import { debounce } from 'lodash'
 import DrillcoreTable from '~/components/tables/DrillcoreTable.vue'
 import { DRILLCORE } from '~/constants'
-
 export default {
   components: { DrillcoreTable },
+  props: {
+    query: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       options: DRILLCORE.options,
@@ -23,11 +27,8 @@ export default {
       count: 0,
     }
   },
-  computed: {
-    ...mapState('landing', ['search']),
-  },
   watch: {
-    search: {
+    query: {
       handler: debounce(function (value) {
         this.options.page = 1
         this.handleUpdate({ options: { ...this.options }, search: value })
@@ -41,7 +42,7 @@ export default {
         'drillcore',
         {
           options: tableState.options,
-          search: this.search,
+          search: this.query,
           queryFields: this.$getQueryFields(DRILLCORE.queryFields),
           searchFilters: {},
         }
