@@ -1,17 +1,18 @@
 <template>
-  <v-card
-    class="align-center d-flex"
+  <v-chip
+    class="pa-4 align-center d-flex font-weight-bold"
     :class="`${cardClass}`"
     hover
     nuxt
+    style="background-color: white"
     :height="height"
     :width="'100%'"
     :to="to"
   >
-    <v-card-title class="montserrat text-none">
+    <div class="montserrat text-none">
       {{ title }}
-    </v-card-title>
-  </v-card>
+    </div>
+  </v-chip>
 </template>
 
 <script>

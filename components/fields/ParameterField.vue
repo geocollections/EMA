@@ -2,6 +2,7 @@
   <v-row no-gutters>
     <v-col cols="4" class="pr-1">
       <autocomplete-field
+        class="montserrat"
         :label="$t('analyticalData.parameter')"
         :items="parameters"
         return-object
@@ -53,7 +54,7 @@
       </v-row>
     </v-col>
 
-    <v-col cols="1" align-self="center" class="text-center">
+    <v-col cols="1" align-self="end" class="text-center">
       <v-btn
         small
         icon
@@ -65,7 +66,7 @@
       </v-btn>
     </v-col>
 
-    <v-col cols="1" align-self="center" class="text-center">
+    <v-col cols="1" align-self="end" class="text-center">
       <v-btn
         small
         icon

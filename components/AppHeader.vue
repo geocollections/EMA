@@ -2,16 +2,19 @@
   <v-app-bar
     app
     dark
+    :absolute="isLanding"
     style="z-index: 2050"
     :color="isLanding ? 'transparent' : 'primary'"
     :elevation="isLanding ? 0 : 4"
     :class="{
       'gradient-background': !isLanding,
-      'gradient-background-front': isLanding,
     }"
   >
     <v-toolbar-items>
-      <v-app-bar-title class="ml-3 align-self-center app-title">
+      <v-app-bar-title
+        v-if="!isLanding || (isLanding && $vuetify.breakpoint.xsOnly)"
+        class="ml-3 align-self-center app-title"
+      >
         <nuxt-link :to="localePath({ path: '/' })">
           <v-tooltip bottom>
             <template #activator="{ on, attrs }">
@@ -32,16 +35,16 @@
       </v-app-bar-title>
     </v-toolbar-items>
     <v-divider
-      v-if="$vuetify.breakpoint.mdAndUp"
+      v-if="!isLanding && $vuetify.breakpoint.mdAndUp"
       vertical
       inset
       class="mx-3 white"
     />
-    <div v-if="$vuetify.breakpoint.mdAndUp" class="montserrat">
+    <div v-if="!isLanding && $vuetify.breakpoint.mdAndUp" class="montserrat">
       {{ $t('slogan') }}
     </div>
 
-    <v-toolbar-items class="ml-3">
+    <v-toolbar-items v-if="!isLanding" class="ml-3">
       <v-btn
         v-show="$vuetify.breakpoint.smAndUp"
         nuxt
@@ -107,7 +110,7 @@
           nuxt
           active-class="active-tab font-weight-bold"
           :to="localePath({ name: tab.routeName })"
-          class="montserrat"
+          class="montserrat font-weight-bold"
           >{{ tab.text }}</v-tab
         >
       </v-tabs>
@@ -153,10 +156,10 @@ export default {
           text: this.$t('common.analyticalData'),
         },
         { routeName: 'dataset', text: this.$t('common.datasets') },
-        {
-          routeName: 'taxon',
-          text: this.$t('common.taxa'),
-        },
+        // {
+        //   routeName: 'taxon',
+        //   text: this.$t('common.taxa'),
+        // },
         { routeName: 'photo', text: this.$t('common.photo') },
       ],
       logo: require('~/assets/logos/emaapou5white.svg'),
@@ -201,22 +204,14 @@ export default {
   transition: width 250ms ease-in-out, height 250ms ease-in-out;
 }
 
-$gradient-col: rgb(150, 163, 177);
-$gradient-col-sec: rgb(80, 149, 177);
-
-.gradient-background-front {
-  background: linear-gradient(
-    320deg,
-    rgba($gradient-col, 0.6),
-    rgba($gradient-col-sec, 0.6)
-  ) !important;
-}
+$gradient-col: var(--v-primary-base);
+$gradient-col-sec: var(--v-header-darken1);
 
 .gradient-background {
   background: linear-gradient(
     320deg,
-    rgba($gradient-col, 1),
-    rgba($gradient-col-sec, 1)
+    $gradient-col,
+    $gradient-col-sec
   ) !important;
 }
 </style>

@@ -1,7 +1,7 @@
 export default {
   title: 'e·Maapõu',
   subtitle: 'Eesti geoloogia infoportaal',
-  slogan: 'Kogu info Eesti maapõuest',
+  slogan: 'Geoloogilised andmed',
   landing: {
     searchTitle: 'Leia e·Maapõuest',
     drillcores: 'Puursüdamikud ({number})',
@@ -22,12 +22,14 @@ export default {
     visit_site: 'Vaata',
     title: 'Geoloogilised andmed ja e-teenused',
     otherPages: 'Geoloogilised andmed teistes e-teenustes',
-    goToFrontpage: 'Mine pealehele',
+    goToFrontpage: 'Pealehele',
     showMenu: 'Näita menüüd',
     routes: 'Navigatsioon',
     searchRoutes: 'Otsing',
     eMaapouPages: 'e·Maapõu ökosüsteem',
     map: 'Andmed kaardil',
+    quickSearch: 'Leia kiirelt',
+    viewMore: 'Vaata lähemalt',
   },
   common: {
     general: 'Üldinfo',
@@ -102,6 +104,8 @@ export default {
     clipboard: 'Kopeeri lõikelauale',
     export: 'Eksport',
     taxa: 'Taksonid',
+    closeMap: 'Sulge kaart',
+    openMap: 'Ava kaart',
   },
   link: {
     sarvAPI: 'Avalik API',

@@ -14,7 +14,7 @@
 
     <template #result>
       <div class="text-h6 pl-2 py-1">
-        {{ count ? $tc('common.count', count) : '' }}
+        {{ count ? $tc('common.count', count) : '&nbsp;' }}
       </div>
       <analytical-data-table
         :show-search="false"
@@ -30,8 +30,8 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import AnalyticalDataTable from '~/components/tables/AnalyticalDataTable'
-import AnalyticalDataSearchForm from '~/components/search/forms/AnalyticalDataSearchForm'
+import AnalyticalDataTable from '~/components/tables/AnalyticalDataTable.vue'
+import AnalyticalDataSearchForm from '~/components/search/forms/AnalyticalDataSearchForm.vue'
 import Search from '~/components/templates/Search'
 import TitleCard from '~/components/TitleCard.vue'
 
